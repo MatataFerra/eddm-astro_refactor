@@ -1,0 +1,15 @@
+---
+// src/components/ImgPlaceholder.astro
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<div class="bg-striped flex min-h-50 w-full items-center justify-center border border-white/5 p-3">
+  <span
+    class="text-muted text-center font-mono text-[11px] leading-relaxed tracking-wider uppercase"
+  >
+    {label}
+  </span>
+</div>

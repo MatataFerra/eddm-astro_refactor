@@ -1,0 +1,101 @@
+---
+import ImgPlaceholder from '@/components/share/ImgPlaceholder.astro';
+
+const MAACA = [
+  {
+    title: 'Mildura (o la vez que renuncié al restaurante indio)',
+    date: '2 mar 2026',
+    cover:
+      'https://res.cloudinary.com/docq8rbdu/image/upload/v1772445729/el-diario-de-mati/mas-aca-en-el-tiempo/x29j2abbyvqzdhpzt0h7.jpg',
+    href: '/blog/mildura',
+  },
+  // ... resto de tus datos
+];
+
+const RELATOS = [
+  {
+    title: 'El origen del miedo',
+    tag: 'relato',
+    cover:
+      'https://res.cloudinary.com/docq8rbdu/image/upload/v1762130751/el-diario-de-mati/covers/egn7z7qepu6remuqdavu.webp',
+    href: '/relatos/origen-del-miedo',
+    summary: 'El origen del miedo a través de civilizaciones antiguas...',
+  },
+  // ... resto de tus datos
+];
+---
+
+<section class="mx-auto max-w-6xl space-y-20 p-8">
+  <div class="fade-in">
+    <h2
+      class="font-fraunces text-gold-main border-gold-soft mb-8 inline-block border-b pb-2 text-sm tracking-[0.2em] uppercase"
+    >
+      Más acá en el tiempo
+    </h2>
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+      {
+        MAACA.map((post) => (
+          <a href={post.href} class="group block space-y-4">
+            <div class="relative overflow-hidden border border-white/5 shadow-2xl">
+              {post.cover ? (
+                <img
+                  src={post.cover}
+                  alt={post.title}
+                  class="aspect-4/3 w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
+                />
+              ) : (
+                <ImgPlaceholder label={post.title} />
+              )}
+            </div>
+            <div class="space-y-1">
+              <p class="text-gold-text/50 text-[9px] tracking-tighter uppercase">{post.date}</p>
+              <h3 class="group-hover:text-gold-main font-serif text-lg leading-snug text-white transition-colors">
+                {post.title}
+              </h3>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="fade-in fade-in-delay-1">
+    <h2
+      class="font-fraunces text-gold-main border-gold-soft mb-10 inline-block border-b pb-2 text-sm tracking-[0.2em] uppercase"
+    >
+      Relatos & Notas
+    </h2>
+    <div class="grid grid-cols-1 gap-x-16 gap-y-12 lg:grid-cols-2">
+      {
+        RELATOS.map((relato) => (
+          <article class="group flex flex-col gap-6 sm:flex-row">
+            <div class="overflow-hidden border border-white/10 sm:w-2/5">
+              <img
+                src={relato.cover}
+                alt={relato.title}
+                class="aspect-3/4 object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+            </div>
+            <div class="flex flex-col justify-center space-y-4 sm:w-3/5">
+              <span class="border-gold-main/30 text-gold-main w-fit border px-2 py-0.5 text-[9px] tracking-widest uppercase">
+                {relato.tag}
+              </span>
+              <h3 class="group-hover:text-gold-text font-serif text-2xl text-white transition-colors">
+                {relato.title}
+              </h3>
+              <p class="line-clamp-3 font-sans text-sm leading-relaxed text-white/50">
+                {relato.summary}
+              </p>
+              <a
+                href={relato.href}
+                class="text-gold-main text-[10px] tracking-widest uppercase transition-transform duration-300 hover:translate-x-2"
+              >
+                Leer pieza completa —
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
