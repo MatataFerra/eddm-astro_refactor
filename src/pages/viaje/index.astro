@@ -1,0 +1,18 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Tracker from '@/components/viaje/Tracker.astro';
+import Nav from '@/components/share/Nav.astro';
+import { getContentNavigateArticles } from '@/lib/api/get-content-navigate';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+import { adaptArticlesToMeses } from '@/lib/adapters/viaje-adapter';
+
+const articles = await getContentNavigateArticles<ContentNavigate[]>();
+const mesesData = adaptArticlesToMeses(articles?.data || []);
+---
+
+<Layout title="Un año viajando | El diario de Mati">
+  <Nav variant="detail" title="Un año viajando" />
+  <main class="min-h-screen bg-[#0a0a0f]">
+    <Tracker months={mesesData} />
+  </main>
+</Layout>

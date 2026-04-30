@@ -1,0 +1,203 @@
+---
+import Video from '@/components/viaje/entry/Video.astro';
+import 'photoswipe/style.css';
+
+interface MediaItem {
+  type: 'image' | 'video';
+  src: string;
+  alt?: string;
+  poster?: string;
+}
+
+interface Props {
+  items: MediaItem[];
+  caption?: string;
+}
+
+const { items, caption }: Props = Astro.props;
+const count = items.length;
+
+if (count === 0) return null;
+
+// Layout logic
+const isSingle = count === 1;
+const isDouble = count === 2;
+const isTriple = count === 3;
+const isBento = count >= 4;
+
+const firstTwo = items.slice(0, 2);
+const rest = items.slice(2);
+---
+
+<div class="reveal pswp-gallery my-8">
+  {/* LAYOUT 1: SINGLE */}
+  {
+    isSingle && (
+      <div class="flex justify-center">
+        <div
+          class={
+            items[0].type === 'video'
+              ? 'aspect-video w-full'
+              : 'max-w-(--breakpoint-sm) overflow-hidden rounded-xl border border-white/5'
+          }
+        >
+          {items[0].type === 'video' ? (
+            <Video item={items[0]} />
+          ) : (
+            <a
+              href={items[0].src}
+              data-pswp-width="1200"
+              data-pswp-height="1600"
+              target="_blank"
+              class="block"
+            >
+              <img
+                src={items[0].src}
+                alt={items[0].alt}
+                class="h-auto w-full cursor-zoom-in object-contain"
+              />
+            </a>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  {/* LAYOUT 2: DOUBLE */}
+  {
+    isDouble && (
+      <div class="grid grid-cols-2 gap-3">
+        {items.map((item) => (
+          <div class="aspect-4/5 overflow-hidden rounded-xl border border-white/5">
+            {item.type === 'video' ? (
+              <Video item={item} />
+            ) : (
+              <a
+                href={item.src}
+                data-pswp-width="1200"
+                data-pswp-height="1600"
+                target="_blank"
+                class="block h-full"
+              >
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  class="h-full w-full cursor-zoom-in object-cover"
+                />
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {/* LAYOUT 3: TRIPLE */}
+  {
+    isTriple && (
+      <div class="grid h-80 grid-cols-[1.2fr_1fr] grid-rows-2 gap-3 md:h-100">
+        {items.map((item, idx) => (
+          <div
+            class={`${idx === 0 ? 'row-span-2' : ''} overflow-hidden rounded-xl border border-white/5`}
+          >
+            {item.type === 'video' ? (
+              <Video item={item} />
+            ) : (
+              <a
+                href={item.src}
+                data-pswp-width="1200"
+                data-pswp-height="1600"
+                target="_blank"
+                class="block h-full"
+              >
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  class="h-full w-full cursor-zoom-in object-cover"
+                />
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {/* LAYOUT 4+: BENTO */}
+  {
+    isBento && (
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          {firstTwo.map((item) => (
+            <div class="aspect-square overflow-hidden rounded-xl border border-white/5 md:aspect-16/10">
+              {item.type === 'video' ? (
+                <Video item={item} />
+              ) : (
+                <a
+                  href={item.src}
+                  data-pswp-width="1600"
+                  data-pswp-height="1200"
+                  target="_blank"
+                  class="block h-full"
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    class="h-full w-full cursor-zoom-in object-cover"
+                  />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+        <div
+          class="grid gap-3"
+          style={`grid-template-columns: repeat(${rest.length}, minmax(0, 1fr))`}
+        >
+          {rest.map((item) => (
+            <div class="aspect-square overflow-hidden rounded-xl border border-white/5 md:aspect-16/10">
+              {item.type === 'video' ? (
+                <Video item={item} />
+              ) : (
+                <a
+                  href={item.src}
+                  data-pswp-width="1600"
+                  data-pswp-height="1200"
+                  target="_blank"
+                  class="block h-full"
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    class="h-full w-full cursor-zoom-in object-cover"
+                  />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    caption && (
+      <p class="font-dm mt-4 text-center text-[10px] tracking-widest text-[#444] uppercase">
+        {caption}
+      </p>
+    )
+  }
+</div>
+
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '.pswp-gallery',
+    children: 'a[data-pswp-width]',
+    pswpModule: () => import('photoswipe'),
+    showHideAnimationType: 'zoom',
+  });
+
+  lightbox.init();
+</script>

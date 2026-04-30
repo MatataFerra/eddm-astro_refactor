@@ -1,0 +1,57 @@
+---
+import BadgeLeido from '@/components/viaje/entry/svelte/BadgeLeido.svelte';
+import type { Article } from '@/lib/interfaces/articles';
+import { Image } from 'astro:assets';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+---
+
+<section class="relative h-[85vh] min-h-120 overflow-hidden bg-[#0a0a0f]">
+  {
+    article.header && (
+      <Image
+        src={article.header.url}
+        alt={article.title}
+        class="absolute inset-0 h-full w-full object-cover"
+        width={200}
+        height={400}
+      />
+    )
+  }
+
+  <div class="absolute inset-0 bg-linear-to-t from-[#0a0a0f] via-[#0a0a0f]/55 to-[#0a0a0f]/20">
+  </div>
+
+  <div
+    class="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_80%,rgba(93,158,107,0.2)_0%,transparent_55%)]"
+  >
+  </div>
+
+  <div class="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-6 pb-17 text-center">
+    <div
+      class="reveal mb-4.5 inline-flex items-center gap-2 rounded-full border border-[#5d9e6b]/30 bg-[#5d9e6b]/12 px-3.5 py-1.5"
+    >
+      <div class="h-1.25 w-1.25 rounded-full bg-[#5d9e6b]"></div>
+      <span class="font-dm text-[10px] tracking-widest text-[#8ac49a] uppercase">
+        {article.category?.name}
+      </span>
+    </div>
+
+    <h1
+      class="reveal font-fraunces text-[clamp(52px,8vw,96px)] leading-none font-extrabold tracking-tighter text-[#f0eeff]"
+      style="--delay: 0.1s"
+    >
+      {article.title}
+    </h1>
+
+    <p class="reveal font-dm mt-4 text-sm tracking-wide text-[#666]" style="--delay: 0.18s">
+      {article.summary}
+    </p>
+
+    <BadgeLeido semanaNum={article.order || 0} client:load />
+  </div>
+</section>

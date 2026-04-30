@@ -1,0 +1,60 @@
+---
+import MainLayout from '@/layouts/Layout.astro';
+import Nav from '@/components/share/Nav.astro';
+import MarcarLeido from '@/components/viaje/svelte/MarcarLeido.svelte';
+import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import type { Article } from '@/lib/interfaces/articles';
+import LocationBar from '@/components/viaje/entry/LocationBar.astro';
+import Divider from '@/components/viaje/entry/Divider.astro';
+import Content from '@/components/viaje/entry/Content.astro';
+import Hero from '@/components/viaje/entry/Hero.astro';
+import { getContentNavigateArticles } from '@/lib/api/get-content-navigate';
+
+const { slug } = Astro.params;
+
+export async function getStaticPaths() {
+  const response = await getContentNavigateArticles<ContentNavigate[]>();
+  const articles = response?.data || [];
+
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
+  strategy: 'slug',
+  query: slug,
+});
+
+if (!response || !response.data) return Astro.redirect('/404');
+
+const article = response.data;
+---
+
+<MainLayout title={article.title}>
+  <Nav variant="detail" title="Un año viajando" />
+
+  <Hero {article} />
+
+  <main class="mx-auto max-w-180 px-6 py-14">
+    {
+      article.geolocations && article.summary && (
+        <LocationBar geolocations={article.geolocations} dateRange={article.summary} />
+      )
+    }
+
+    <Divider />
+
+    <Content content={article.md_content} />
+
+    <MarcarLeido identifier={article.slug} client:visible />
+
+    <footer class="reveal mt-20 flex justify-between border-t border-white/5 pt-8">
+      <a href="/viaje" class="font-dm text-sm text-[#666] transition-colors hover:text-[#8ac49a]"
+        >← Índice</a
+      >
+    </footer>
+  </main>
+</MainLayout>

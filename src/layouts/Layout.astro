@@ -21,3 +21,55 @@ const { title } = Astro.props;
     <slot />
   </body>
 </html>
+
+<style is:global>
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+    transition-delay: var(--delay, 0s);
+    will-change: opacity, transform;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  function observeAll() {
+    document.querySelectorAll('.reveal:not(.visible)').forEach((el) => observer.observe(el));
+  }
+
+  // Initial pass
+  observeAll();
+
+  // Re-scan when new elements arrive (Svelte hydration, View Transitions, etc.)
+  const mo = new MutationObserver(() => observeAll());
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  // Astro View Transitions: re-run on every navigation
+  document.addEventListener('astro:page-load', observeAll);
+</script>

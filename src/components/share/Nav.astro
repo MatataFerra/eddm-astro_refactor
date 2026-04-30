@@ -1,0 +1,181 @@
+---
+interface Props {
+  variant?: 'main' | 'detail';
+  title?: string;
+  links?: string[];
+}
+
+const {
+  variant = 'main',
+  title = 'Un año viajando',
+  links = ['viaje', 'relatos', 'notas'],
+} = Astro.props;
+
+const isMain = variant === 'main';
+
+const topLevelRoutes = ['/viaje', '/relatos', '/notas'];
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const isTopLevel = topLevelRoutes.includes(currentPath);
+const showBackButton = !isMain && !isTopLevel;
+---
+
+<nav
+  data-navbar
+  class="fixed top-0 right-0 left-0 z-1000 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
+>
+  {
+    isMain ? (
+      <span class="font-fraunces z-50 text-lg font-semibold tracking-tight text-[#f0eeff] italic">
+        el diario de mati
+      </span>
+    ) : (
+      <div class="z-50 flex items-center gap-4">
+        {showBackButton && (
+          <button
+            id="smart-back"
+            type="button"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 text-[#888] transition-all hover:border-white/30 hover:text-[#f0eeff]"
+            aria-label="Volver"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
+        <a
+          href="/"
+          class="font-fraunces text-[17px] text-[#f0eeff] italic no-underline transition-opacity hover:opacity-70"
+        >
+          el diario de mati
+        </a>
+      </div>
+    )
+  }
+
+  {
+    isMain ? (
+      <>
+        <div class="hidden items-center gap-8 md:flex">
+          {links.map((link) => (
+            <a
+              href={`/${link}`}
+              class="font-dm hover:text-accent-text text-xs tracking-widest text-[#888] uppercase no-underline transition-colors duration-200"
+            >
+              {link}
+            </a>
+          ))}
+          <span class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors">
+            Japón →
+          </span>
+        </div>
+
+        <button
+          id="menu-btn"
+          class="z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
+          aria-label="Menu"
+          aria-expanded="false"
+        >
+          <div class="line-1 h-0.5 w-6 origin-center bg-[#f0eeff] transition-all duration-300" />
+          <div class="line-2 h-0.5 w-6 bg-[#f0eeff] transition-all duration-300" />
+          <div class="line-3 h-0.5 w-6 origin-center bg-[#f0eeff] transition-all duration-300" />
+        </button>
+
+        <div
+          id="mobile-menu"
+          class="mobile-menu fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-[#0a0a0f]/98 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
+        >
+          {links.map((link) => (
+            <a
+              href={`/${link}`}
+              class="font-fraunces hover:text-accent-text text-4xl text-[#f0eeff] italic no-underline transition-colors"
+            >
+              {link}
+            </a>
+          ))}
+          <span class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors">
+            Japón →
+          </span>
+        </div>
+      </>
+    ) : (
+      <span class="font-dm text-[11px] font-medium tracking-[0.12em] text-[#8ac49a] uppercase">
+        {title}
+      </span>
+    )
+  }
+</nav>
+
+<style>
+  .mobile-menu {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  .mobile-menu.active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .open .line-1 {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .open .line-2 {
+    opacity: 0;
+  }
+  .open .line-3 {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+</style>
+
+<script>
+  const nav = document.querySelector('[data-navbar]');
+  const menuBtn = document.querySelector('#menu-btn');
+  const mobileMenu = document.querySelector('#mobile-menu');
+  const smartBack = document.querySelector<HTMLButtonElement>('#smart-back');
+
+  const handleScroll = () => {
+    if (window.scrollY > 40) {
+      nav?.classList.add('border-white/5', 'bg-[#0a0a0f]/85', 'backdrop-blur-md');
+      nav?.classList.remove('border-transparent', 'bg-transparent');
+    } else {
+      nav?.classList.remove('border-white/5', 'bg-[#0a0a0f]/85', 'backdrop-blur-md');
+      nav?.classList.add('border-transparent', 'bg-transparent');
+    }
+  };
+
+  smartBack?.addEventListener('click', () => {
+    const cameFromSite = document.referrer && new URL(document.referrer).origin === location.origin;
+
+    if (cameFromSite && history.length > 1) {
+      history.back();
+    } else {
+      location.href = '/';
+    }
+  });
+
+  menuBtn?.addEventListener('click', () => {
+    const isOpen = menuBtn.classList.toggle('open');
+    mobileMenu?.classList.toggle('active');
+    document.body.classList.toggle('overflow-hidden', isOpen);
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      menuBtn?.classList.remove('open');
+      mobileMenu?.classList.remove('active');
+      document.body.classList.remove('overflow-hidden');
+    });
+  });
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+</script>

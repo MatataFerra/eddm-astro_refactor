@@ -1,0 +1,61 @@
+---
+import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
+---
+
+<div class="reveal hidden h-full lg:block" style="--delay: 0.2s">
+  <div class="relative h-120">
+    <div
+      class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]"
+    >
+      <ImagePlaceholder label="Próximo viaje: Japón" />
+      <div
+        class="absolute inset-0 bg-linear-to-t from-[#0a0a0f]/90 via-[#0a0a0f]/20 to-transparent"
+      >
+      </div>
+      <div
+        class="absolute right-0 bottom-0 left-0 border-t border-white/10 bg-[#08080e]/55 p-7 backdrop-blur-md"
+      >
+        <div class="text-accent-text font-dm mb-1.5 text-[10px] tracking-[0.12em] uppercase">
+          2024 — 2025
+        </div>
+        <div class="font-fraunces text-[22px] font-semibold tracking-[-0.01em] text-[#f0eeff]">
+          Un año viajando
+        </div>
+        <div class="font-dm mt-2 text-[13px] font-light text-[#666]">
+          Nueva Zelanda · 12 meses · 8 países
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="border-accent-main/30 absolute -top-4 -right-4 flex items-center gap-5 rounded-2xl border bg-[#0a0a12]/85 px-5 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_20px_var(--color-accent-glow)] backdrop-blur-md"
+    >
+      <div class="border-r border-white/10 pr-5 text-center">
+        <div
+          class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
+        >
+          8
+        </div>
+        <div class="font-dm mt-1 text-[9px] tracking-widest text-[#555] uppercase">países</div>
+      </div>
+      <div class="text-center">
+        <div
+          class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
+        >
+          59k
+        </div>
+        <div class="font-dm mt-1 text-[9px] tracking-widest text-[#555] uppercase">km</div>
+      </div>
+    </div>
+
+    <div
+      class="border-accent-main/20 absolute bottom-40 -left-5 flex items-center gap-2.5 rounded-xl border bg-[#0a0a12]/90 px-4 py-2.5 shadow-xl backdrop-blur-md"
+    >
+      <span class="text-[22px]">🗾</span>
+      <div>
+        <div class="font-dm text-[9px] tracking-widest text-[#555] uppercase">Próximo</div>
+        <div class="font-fraunces text-accent-text text-[15px] font-semibold">Japón</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+---
+interface Props {
+  item: {
+    src: string;
+    type: 'video' | 'image';
+    alt?: string;
+    poster?: string;
+  };
+}
+
+const { item }: Props = Astro.props;
+---
+
+<div class="group relative h-full w-full">
+  <video src={item.src} poster={item.poster} controls class="h-full w-full object-cover"></video>
+  <div
+    class="pointer-events-none absolute top-2 left-2 rounded-md border border-white/10 bg-[#0a0a0f]/70 px-2 py-0.5 backdrop-blur-md transition-opacity group-hover:opacity-0"
+  >
+    <span class="font-dm text-[9px] tracking-wider text-[#8ac49a] uppercase"> ▶ video </span>
+  </div>
+</div>

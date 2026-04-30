@@ -30,8 +30,6 @@ export type ApiResponse<T> = {
   };
 };
 
-export type ContentBySlug<T extends object> = { md_content: string } & T;
-
 function formatFields(fields?: Fields<Article>): string | undefined {
   if (!fields) return undefined;
 
