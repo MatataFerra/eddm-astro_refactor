@@ -55,3 +55,8 @@ export function processDiario(content: string | undefined): ProcessedSection[] {
 
   return processedSections;
 }
+
+export function processRelato(content: string | undefined) {
+  if (!content) return '';
+  return marked.parse(content);
+}

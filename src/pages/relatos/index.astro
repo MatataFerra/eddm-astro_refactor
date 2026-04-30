@@ -1,0 +1,73 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Nav from '@/components/share/Nav.astro';
+import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+import MainCard from '@/components/relatos/MainCard.astro';
+import RelatoCard from '@/components/relatos/RelatoCard.astro';
+import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
+
+const tales = await getContentNavigateTales<ContentNavigate[]>();
+
+const [featured, ...rest] = tales?.data || [];
+---
+
+<Layout title="Relatos y notas | El Diario de Mati">
+  <Nav variant="detail" title="Relatos" color="accent" />
+  <main class="bg-ash-main relative min-h-screen overflow-hidden">
+    <div
+      class="pointer-events-none absolute top-[20%] left-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-accent-glow)_0%,transparent_70%)] opacity-60"
+    >
+    </div>
+
+    <section class="relative px-6 pt-28 pb-16 text-center">
+      <div
+        class="reveal border-accent-main/25 bg-accent-soft mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
+      >
+        <div class="bg-accent-main h-1.5 w-1.5 animate-pulse rounded-full"></div>
+        <span class="font-dm text-accent-text text-[10px] font-medium tracking-[0.14em] uppercase">
+          Escritura
+        </span>
+      </div>
+
+      <h1 class="reveal heading-1" style="--delay: 0.1s">Relatos y notas</h1>
+
+      <p
+        class="reveal font-dm text-ash-hard mx-auto mt-8 max-w-120 text-base leading-relaxed font-light"
+        style="--delay: 0.2s"
+      >
+        Historias que nacieron en cuadernos, servilletas y apps de notas alrededor del mundo.
+      </p>
+    </section>
+    <section class="mx-auto max-w-7xl px-6 pb-24 md:px-15">
+      <MainCard
+        relato={{
+          href: '/relatos/' + featured?.slug,
+          cover: featured?.header?.url || '',
+          title: featured?.title || 'Diario de bordo',
+          summary:
+            featured?.summary ||
+            'Un relato íntimo que captura la esencia de cada lugar visitado, las personas encontradas y las emociones vividas durante el viaje.',
+          tag: 'Relato destacado',
+        }}
+      />
+      <RelatoDivider />
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {
+          rest.map((relato, index) => (
+            <RelatoCard
+              relato={{
+                href: '/relatos/' + relato.slug,
+                cover: relato.header?.url || '',
+                title: relato.title || 'Relato sin título',
+                summary: relato.summary || 'Sin resumen disponible.',
+                tag: 'Relato',
+              }}
+              delay={`${(index % 3) * 0.1}s`}
+            />
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</Layout>

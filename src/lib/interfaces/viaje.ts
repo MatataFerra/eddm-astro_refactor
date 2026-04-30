@@ -7,7 +7,6 @@ export type Mes = {
 export type Semana = {
   num: number;
   titulo: string;
-  dates: string;
   cover: string;
   lugares: string[];
   slug: string;

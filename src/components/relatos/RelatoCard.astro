@@ -1,0 +1,62 @@
+---
+import { cn } from '@/lib/utils';
+
+interface Props {
+  relato: {
+    title: string;
+    summary: string;
+    cover: string;
+    tag: string;
+    href: string;
+  };
+  delay?: string;
+}
+
+const { relato, delay = '0s' } = Astro.props;
+---
+
+<div class="reveal" style={`--delay: ${delay}`}>
+  <a href={relato.href} class="group block no-underline outline-none">
+    <div
+      class={cn(
+        'relative overflow-hidden rounded-[18px] border bg-ash-main transition-all duration-300 ease-out',
+        'border-white/7 shadow-[0_4px_20px_rgba(0,0,0,0.3)]',
+        'group-hover:-translate-y-1 group-hover:border-accent-main/25 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]'
+      )}
+    >
+      <div class="aspect-16/10 overflow-hidden">
+        <img
+          src={relato.cover}
+          alt={relato.title}
+          class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="border-t border-white/6 bg-[#0c0c12]/95 p-[22px_24px_28px]">
+        <div class="mb-3 flex items-center gap-2">
+          <span
+            class="border-accent-main/20 bg-accent-soft font-dm text-accent-text rounded-[10px] border px-2 py-0.5 text-[9px] font-medium tracking-[0.14em] uppercase"
+          >
+            {relato.tag}
+          </span>
+        </div>
+
+        <h3
+          class="font-fraunces text-ash-text mb-3 text-2xl leading-[1.15] font-semibold tracking-tight italic"
+        >
+          {relato.title}
+        </h3>
+
+        <p class="font-dm text-ash-hard line-clamp-2 text-[13px] leading-relaxed font-light">
+          {relato.summary}
+        </p>
+
+        <div class="font-dm text-accent-text mt-4 flex items-center gap-1.5 text-[12px]">
+          <span>Leer</span>
+          <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>

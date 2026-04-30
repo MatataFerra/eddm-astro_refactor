@@ -40,7 +40,6 @@ export function adaptArticlesToMeses(articles: ContentNavigate[]): Mes[] {
     const semana: Semana = {
       num: article.id || 0,
       titulo: article.title,
-      dates: article.description || '',
       cover: article.header?.url || '',
       lugares: article.summary ? article.summary.split(',').map((l) => l.trim()) : [],
       slug: article.slug,

@@ -11,6 +11,6 @@
   let leidas = $readWeeks.filter((w) => weeks.includes(w)).length;
 </script>
 
-<span class="font-dm text-[10px] text-[#444]">
+<span class="font-dm text-ash-softest text-[10px]">
   {leidas}/{weekNums.length} leídas
 </span>
