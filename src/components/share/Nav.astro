@@ -1,22 +1,33 @@
 ---
+import { cn } from '@/lib/utils';
+
 interface Props {
   variant?: 'main' | 'detail';
+  color?: 'green' | 'blue' | 'accent';
   title?: string;
-  links?: string[];
+  links?: LinkKey[];
 }
+
+const topLevelRoutes = ['/viaje', '/relatos', '/mas-aca-en-el-tiempo'];
 
 const {
   variant = 'main',
+  color = 'green',
   title = 'Un año viajando',
-  links = ['viaje', 'relatos', 'notas'],
+  links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[],
 } = Astro.props;
+
+const LINK_MAP = {
+  viaje: { name: 'Un año viajando', color: 'green' },
+  relatos: { name: 'Relatos', color: 'accent' },
+  'mas-aca-en-el-tiempo': { name: 'Más acá en el tiempo', color: 'blue' },
+} as const;
+
+type LinkKey = keyof typeof LINK_MAP;
 
 const isMain = variant === 'main';
 
-const topLevelRoutes = ['/viaje', '/relatos', '/notas'];
 const currentPath = Astro.url.pathname.replace(/\/$/, '');
-const isTopLevel = topLevelRoutes.includes(currentPath);
-const showBackButton = !isMain && !isTopLevel;
 ---
 
 <nav
@@ -30,27 +41,6 @@ const showBackButton = !isMain && !isTopLevel;
       </span>
     ) : (
       <div class="z-50 flex items-center gap-4">
-        {showBackButton && (
-          <button
-            id="smart-back"
-            type="button"
-            class="hover:text-ash-text flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 text-[#888] transition-all hover:border-white/30"
-            aria-label="Volver"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
         <a
           href="/"
           class="font-fraunces text-ash-text text-[17px] italic no-underline transition-opacity hover:opacity-70"
@@ -70,7 +60,7 @@ const showBackButton = !isMain && !isTopLevel;
               href={`/${link}`}
               class="font-dm hover:text-accent-text text-xs tracking-widest text-[#888] uppercase no-underline transition-colors duration-200"
             >
-              {link}
+              {LINK_MAP[link]?.name || link}
             </a>
           ))}
           <span class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors">
@@ -98,7 +88,7 @@ const showBackButton = !isMain && !isTopLevel;
               href={`/${link}`}
               class="font-fraunces hover:text-accent-text text-ash-text text-4xl italic no-underline transition-colors"
             >
-              {link}
+              {LINK_MAP[link]?.name || link}
             </a>
           ))}
           <span class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors">
@@ -107,9 +97,15 @@ const showBackButton = !isMain && !isTopLevel;
         </div>
       </>
     ) : (
-      <span class="font-dm text-green-main text-[11px] font-medium tracking-[0.12em] uppercase">
+      <a
+        href={`/${currentPath.split('/')[1]}`}
+        class={cn(
+          'font-dm text-sm font-medium tracking-[0.12em] uppercase',
+          color ? `text-${color}-main` : 'text-ash-text'
+        )}
+      >
         {title}
-      </span>
+      </a>
     )
   }
 </nav>

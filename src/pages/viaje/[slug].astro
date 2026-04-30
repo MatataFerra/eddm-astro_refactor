@@ -19,7 +19,6 @@ export async function getStaticPaths() {
 
   return articles.map((article) => ({
     params: { slug: article.slug },
-    props: { article },
   }));
 }
 
@@ -52,7 +51,7 @@ const article = response.data;
     <MarcarLeido identifier={article.slug} client:visible />
 
     <footer class="reveal mt-20 flex justify-between border-t border-white/5 pt-8">
-      <a href="/viaje" class="font-dm hover:text-green-main text-ash-hard text-sm transition-colors"
+      <a href="/viaje" class="font-dm hover:text-green-soft text-ash-hard text-sm transition-colors"
         >← Índice</a
       >
     </footer>

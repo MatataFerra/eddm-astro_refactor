@@ -4,10 +4,10 @@ import type { Article } from '@/lib/interfaces/articles';
 import { Image } from 'astro:assets';
 
 interface Props {
-  article: Article;
+  tale: Article;
 }
 
-const { article } = Astro.props;
+const { tale: article } = Astro.props;
 ---
 
 <section class="bg-ash-main relative h-[85vh] min-h-120 overflow-hidden">
@@ -26,17 +26,17 @@ const { article } = Astro.props;
   <div class="from-ash-main via-ash-main/55 to-ash-main/20 absolute inset-0 bg-linear-to-t"></div>
 
   <div
-    class="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_80%,rgba(93,158,107,0.2)_0%,transparent_55%)]"
+    class="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_80%,rgba(10,10,15,0.55)_0%,transparent_55%)]"
   >
   </div>
 
   <div class="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-6 pb-17 text-center">
     <div
-      class="reveal border-green-main/30 bg-green-main/12 mb-4.5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5"
+      class="reveal border-accent-main/30 bg-accent-main/12 mb-4.5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5"
     >
-      <div class="bg-green-main h-1.25 w-1.25 rounded-full"></div>
-      <span class="font-dm text-green-soft text-[10px] tracking-widest uppercase">
-        {article.category?.name}
+      <div class="bg-accent-main h-1.25 w-1.25 rounded-full"></div>
+      <span class="font-dm text-accent-main text-[10px] tracking-widest uppercase">
+        Relatos y notas
       </span>
     </div>
 
@@ -46,10 +46,6 @@ const { article } = Astro.props;
     >
       {article.title}
     </h1>
-
-    <p class="reveal font-dm text-ash-hard mt-4 text-sm tracking-wide" style="--delay: 0.18s">
-      {article.summary}
-    </p>
 
     <BadgeLeido semanaNum={article.order || 0} client:load />
   </div>

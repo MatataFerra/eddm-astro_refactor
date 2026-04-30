@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 @theme {
   --color-accent-main: #d4a843;
@@ -6,8 +7,8 @@
   --color-accent-glow: rgba(212, 168, 67, 0.25);
   --color-accent-text: #e8ca7a;
 
-  --color-green-main: #8ac49a;
-  --color-green-tough: #5d9e6b;
+  --color-green-main: #5d9e6b;
+  --color-green-soft: #8ac49a;
 
   --color-blue-main: #4ca8c8;
   --color-blue-soft: #7ecde0;
@@ -52,4 +53,8 @@
     background: #7c6fff55;
     border-radius: 2px;
   }
+}
+
+.heading-1 {
+  @apply font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em];
 }

@@ -10,7 +10,7 @@
 <div use:fadein={{ delay: 0.24 }} class="mt-9 inline-flex flex-col items-center gap-2.5">
   <div class="h-0.75 w-70 overflow-hidden rounded-sm bg-white/5">
     <div
-      class="to-green-main from-green-tough h-full rounded-sm bg-linear-to-r transition-all duration-800"
+      class="to-green-soft from-green-main h-full rounded-sm bg-linear-to-r transition-all duration-800"
       style="width: {pct}%"
     ></div>
   </div>

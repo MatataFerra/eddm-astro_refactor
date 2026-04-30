@@ -123,7 +123,7 @@
   class={cn(
     'font-dm flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2 text-xs tracking-wider transition-all duration-200',
     open
-      ? 'text-green-main border-green-tough/40 bg-green-tough/12'
+      ? 'text-green-soft border-green-main/40 bg-green-main/12'
       : 'border-white/12 bg-white/5 text-[#aaa] hover:border-white/20'
   )}
 >
@@ -149,7 +149,7 @@
     role="dialog"
     aria-label={name}
     class={cn(
-      'border-green-tough/30 z-100 overflow-hidden border bg-[#0a0a12]/95 shadow-[0_16px_48px_rgba(0,0,0,0.6),0_0_0_1px_rgba(93,158,107,0.1)] backdrop-blur-xl',
+      'border-green-main/30 z-100 overflow-hidden border bg-[#0a0a12]/95 shadow-[0_16px_48px_rgba(0,0,0,0.6),0_0_0_1px_rgba(93,158,107,0.1)] backdrop-blur-xl',
       isMobile
         ? 'animate-in slide-in-from-bottom fixed inset-x-3 bottom-3 max-h-[85vh] overflow-y-auto rounded-2xl duration-300'
         : cn(
@@ -180,7 +180,7 @@
         href={mapsUrl}
         target="_blank"
         rel="noopener"
-        class="font-dm text-green-main border-green-tough/30 bg-green-tough/12 hover:bg-green-tough/20 inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-[12px] tracking-wider no-underline transition-colors"
+        class="font-dm text-green-soft border-green-main/30 bg-green-main/12 hover:bg-green-main/20 inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-[12px] tracking-wider no-underline transition-colors"
       >
         <span>🗺️</span> Ver en Google Maps
       </a>

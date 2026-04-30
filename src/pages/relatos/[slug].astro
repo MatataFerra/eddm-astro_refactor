@@ -1,0 +1,61 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import type { Article } from '@/lib/interfaces/articles';
+
+import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
+import Nav from '@/components/share/Nav.astro';
+import Hero from '@/components/relatos/entry/Hero.astro';
+import Content from '@/components/relatos/entry/Content.astro';
+
+export async function getStaticPaths() {
+  const response = await getContentNavigateTales<ContentNavigate[]>();
+  const tales = response?.data || [];
+
+  const sortedTales = [...tales].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return sortedTales.map((tale, index) => {
+    const nextRelato = sortedTales[index + 1]
+      ? { title: sortedTales[index + 1].title, slug: sortedTales[index + 1].slug }
+      : null;
+
+    const prevRelato = sortedTales[index - 1]
+      ? { title: sortedTales[index - 1].title, slug: sortedTales[index - 1].slug }
+      : null;
+
+    return {
+      params: { slug: tale.slug },
+      props: {
+        nav: { nextRelato, prevRelato },
+      },
+    };
+  });
+}
+
+const { slug } = Astro.params;
+const { nav } = Astro.props;
+
+const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
+  strategy: 'slug',
+  query: slug,
+});
+
+if (!response || !response.data) return Astro.redirect('/404');
+
+const tale = response.data;
+---
+
+<Layout title={tale.title}>
+  <Nav variant="detail" title="Relatos" color="accent" />
+
+  <Hero {tale} />
+  <Content
+    relato={{
+      content: tale.md_content,
+      description: tale.description,
+      summary: tale.summary ?? '',
+    }}
+    nextRelato={nav?.nextRelato}
+  />
+</Layout>

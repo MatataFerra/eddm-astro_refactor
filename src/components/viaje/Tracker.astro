@@ -2,7 +2,6 @@
 import ProgressBar from '@/components/viaje/svelte/ProgressBar.svelte';
 import MesCounter from '@/components/viaje/svelte/MesCounter.svelte';
 import SemanaGrid from '@/components/viaje/svelte/SemanaGrid.svelte';
-
 import type { Mes, Semana } from '@/lib/interfaces/viaje';
 
 interface Props {
@@ -21,19 +20,16 @@ const totalWeeks = months.reduce((s: number, m: Mes) => s + m.semanas.length, 0)
     </div>
 
     <div
-      class="reveal border-green-tough/40 bg-green-tough/12 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
+      class="reveal border-green-main/40 bg-green-main/12 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
       style={'--delay: 0.2s'}
     >
-      <div class="bg-green-tough h-1.5 w-1.5 rounded-full"></div>
-      <span class="font-dm text-green-main text-[11px] tracking-[0.12em] uppercase">
+      <div class="bg-green-main h-1.5 w-1.5 rounded-full"></div>
+      <span class="font-dm text-green-soft text-[11px] tracking-[0.12em] uppercase">
         Feb 2024 — Feb 2025
       </span>
     </div>
 
-    <h1
-      class="reveal font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em]"
-      style={'--delay: 0.3s'}
-    >
+    <h1 class="reveal heading-1" style={'--delay: 0.3s'}>
       Un año<br />viajando
     </h1>
 
