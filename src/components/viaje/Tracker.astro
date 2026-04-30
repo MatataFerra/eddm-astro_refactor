@@ -21,17 +21,17 @@ const totalWeeks = months.reduce((s: number, m: Mes) => s + m.semanas.length, 0)
     </div>
 
     <div
-      class="reveal mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-[#5d9e6b]/40 bg-[#5d9e6b]/12 px-4 py-1.5"
+      class="reveal border-green-tough/40 bg-green-tough/12 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
       style={'--delay: 0.2s'}
     >
-      <div class="h-1.5 w-1.5 rounded-full bg-[#5d9e6b]"></div>
-      <span class="font-dm text-[11px] tracking-[0.12em] text-[#8ac49a] uppercase">
+      <div class="bg-green-tough h-1.5 w-1.5 rounded-full"></div>
+      <span class="font-dm text-green-main text-[11px] tracking-[0.12em] uppercase">
         Feb 2024 — Feb 2025
       </span>
     </div>
 
     <h1
-      class="reveal font-fraunces text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em] text-[#f0eeff]"
+      class="reveal font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em]"
       style={'--delay: 0.3s'}
     >
       Un año<br />viajando
@@ -46,10 +46,10 @@ const totalWeeks = months.reduce((s: number, m: Mes) => s + m.semanas.length, 0)
         <div class="reveal mb-16" style={'--delay: 0.1s'}>
           <div class="mb-7 flex items-center gap-4">
             <div class="flex items-baseline gap-2.5">
-              <h2 class="font-fraunces text-[28px] font-semibold text-[#f0eeff] italic">
+              <h2 class="font-fraunces text-ash-text text-[28px] font-semibold italic">
                 {mes.mes}
               </h2>
-              <span class="font-dm text-xs text-[#444]">{mes.year}</span>
+              <span class="font-dm text-ash-softest text-xs">{mes.year}</span>
             </div>
             <div class="h-px flex-1 bg-white/5" />
             <MesCounter

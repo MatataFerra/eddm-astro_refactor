@@ -22,7 +22,7 @@ const { title, tag, summary, imgSrc, href = '#', delay = 0 } = Astro.props;
           alt={title}
           class="block h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
-        <div class="absolute inset-0 bg-linear-to-t from-[#0a0a0f] via-[#0a0a0f]/50 to-transparent">
+        <div class="from-ash-main via-ash-main/50 absolute inset-0 bg-linear-to-t to-transparent">
         </div>
       </div>
 
@@ -40,14 +40,14 @@ const { title, tag, summary, imgSrc, href = '#', delay = 0 } = Astro.props;
         }
 
         <div
-          class={`font-fraunces text-[21px] leading-tight font-semibold tracking-tight text-[#f0eeff] ${summary ? 'line-clamp-2' : 'line-clamp-none'}`}
+          class={`font-fraunces text-[21px] leading-tight font-semibold tracking-tight text-ash-text ${summary ? 'line-clamp-2' : 'line-clamp-none'}`}
         >
           {title}
         </div>
 
         {
           summary && (
-            <p class="font-dm mt-2 line-clamp-2 text-xs leading-relaxed font-light text-[#666]">
+            <p class="font-dm text-ash-hard mt-2 line-clamp-2 text-xs leading-relaxed font-light">
               {summary}
             </p>
           )

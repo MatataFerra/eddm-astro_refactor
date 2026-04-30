@@ -15,7 +15,7 @@ const { item, delay = 0 } = Astro.props;
 <div class="reveal" style={`--delay: ${delay}s`}>
   <a href={item.href} class="group block no-underline">
     <div
-      class="overflow-hidden rounded-2xl border border-white/[0.07] shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[#4ca8c8]/30 group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(76,168,200,0.11)]"
+      class="group-hover:border-blue-main/30 overflow-hidden rounded-2xl border border-white/[0.07] shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(76,168,200,0.11)]"
     >
       <div class="aspect-3/2 overflow-hidden">
         <img
@@ -26,22 +26,22 @@ const { item, delay = 0 } = Astro.props;
         />
       </div>
 
-      <div class="border-t border-[#4ca8c8]/[0.14] bg-[#0a0a10]/95 p-4 px-4.5 pb-5">
+      <div class="border-blue-main/[0.14] bg-ash-main/95 border-t p-4 px-4.5 pb-5">
         <div class="mb-2 flex items-center gap-1.5">
-          <div class="h-1 w-1 rounded-full bg-[#4ca8c8]"></div>
-          <span class="font-dm text-[9px] tracking-widest text-[#7ecde0] uppercase"> más acá </span>
-          <span class="font-dm ml-0.5 text-[9px] text-[#444]">
+          <div class="bg-blue-main h-1 w-1 rounded-full"></div>
+          <span class="font-dm text-blue-soft text-[9px] tracking-widest uppercase"> más acá </span>
+          <span class="font-dm text-ash-softest ml-0.5 text-[9px]">
             · {item.date}
           </span>
         </div>
 
         <h3
-          class="font-fraunces text-base leading-snug font-semibold tracking-[-0.01em] text-[#e0dcff] not-italic"
+          class="font-fraunces text-blue-text text-base leading-snug font-semibold tracking-[-0.01em] not-italic"
         >
           {item.title}
         </h3>
 
-        <div class="font-dm mt-2.5 flex items-center gap-1 text-[11px] text-[#7ecde0]">
+        <div class="font-dm text-blue-soft mt-2.5 flex items-center gap-1 text-[11px]">
           Leer
           <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
         </div>

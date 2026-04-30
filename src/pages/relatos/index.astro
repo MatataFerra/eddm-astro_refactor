@@ -1,0 +1,15 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Nav from '@/components/share/Nav.astro';
+import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+
+const tales = await getContentNavigateTales<ContentNavigate[]>();
+---
+
+<Layout title="Un año viajando | El diario de Mati">
+  <Nav variant="detail" title="Relatos" />
+  <main class="bg-ash-main min-h-screen">
+    {JSON.stringify(tales)}
+  </main>
+</Layout>

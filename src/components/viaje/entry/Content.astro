@@ -19,13 +19,13 @@ const DIAS = processDiario(content);
       return (
         <div class="mb-20">
           <div class="reveal mb-8 flex items-center gap-4">
-            <div class="h-2 w-2 rounded-full bg-[#5d9e6b]" />
-            <h2 class="font-fraunces text-2xl font-semibold text-[#8ac49a] italic">{dia.title}</h2>
+            <div class="bg-green-tough h-2 w-2 rounded-full" />
+            <h2 class="font-fraunces text-green-main text-2xl font-semibold italic">{dia.title}</h2>
             <div class="h-px flex-1 bg-white/5" />
           </div>
 
           <div
-            class="reveal prose prose-invert font-dm prose-p:mb-6 prose-strong:text-[#8ac49a] prose-a:text-[#8ac49a] prose-a:no-underline hover:prose-a:underline max-w-none text-[17px] leading-[1.9] font-light text-[#bbb]"
+            class="reveal prose prose-invert font-dm prose-p:mb-6 prose-strong:text-green-main prose-a:text-green-main prose-a:no-underline hover:prose-a:underline max-w-none text-[17px] leading-[1.9] font-light text-[#bbb]"
             set:html={dia.htmlContent}
           />
 

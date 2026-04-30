@@ -25,7 +25,7 @@ const showBackButton = !isMain && !isTopLevel;
 >
   {
     isMain ? (
-      <span class="font-fraunces z-50 text-lg font-semibold tracking-tight text-[#f0eeff] italic">
+      <span class="font-fraunces text-ash-text z-50 text-lg font-semibold tracking-tight italic">
         el diario de mati
       </span>
     ) : (
@@ -34,7 +34,7 @@ const showBackButton = !isMain && !isTopLevel;
           <button
             id="smart-back"
             type="button"
-            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 text-[#888] transition-all hover:border-white/30 hover:text-[#f0eeff]"
+            class="hover:text-ash-text flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 text-[#888] transition-all hover:border-white/30"
             aria-label="Volver"
           >
             <svg
@@ -53,7 +53,7 @@ const showBackButton = !isMain && !isTopLevel;
         )}
         <a
           href="/"
-          class="font-fraunces text-[17px] text-[#f0eeff] italic no-underline transition-opacity hover:opacity-70"
+          class="font-fraunces text-ash-text text-[17px] italic no-underline transition-opacity hover:opacity-70"
         >
           el diario de mati
         </a>
@@ -84,19 +84,19 @@ const showBackButton = !isMain && !isTopLevel;
           aria-label="Menu"
           aria-expanded="false"
         >
-          <div class="line-1 h-0.5 w-6 origin-center bg-[#f0eeff] transition-all duration-300" />
-          <div class="line-2 h-0.5 w-6 bg-[#f0eeff] transition-all duration-300" />
-          <div class="line-3 h-0.5 w-6 origin-center bg-[#f0eeff] transition-all duration-300" />
+          <div class="line-1 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300" />
+          <div class="line-2 bg-ash-text h-0.5 w-6 transition-all duration-300" />
+          <div class="line-3 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300" />
         </button>
 
         <div
           id="mobile-menu"
-          class="mobile-menu fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-[#0a0a0f]/98 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
+          class="mobile-menu bg-ash-main/98 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
         >
           {links.map((link) => (
             <a
               href={`/${link}`}
-              class="font-fraunces hover:text-accent-text text-4xl text-[#f0eeff] italic no-underline transition-colors"
+              class="font-fraunces hover:text-accent-text text-ash-text text-4xl italic no-underline transition-colors"
             >
               {link}
             </a>
@@ -107,7 +107,7 @@ const showBackButton = !isMain && !isTopLevel;
         </div>
       </>
     ) : (
-      <span class="font-dm text-[11px] font-medium tracking-[0.12em] text-[#8ac49a] uppercase">
+      <span class="font-dm text-green-main text-[11px] font-medium tracking-[0.12em] uppercase">
         {title}
       </span>
     )
@@ -144,10 +144,10 @@ const showBackButton = !isMain && !isTopLevel;
 
   const handleScroll = () => {
     if (window.scrollY > 40) {
-      nav?.classList.add('border-white/5', 'bg-[#0a0a0f]/85', 'backdrop-blur-md');
+      nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
       nav?.classList.remove('border-transparent', 'bg-transparent');
     } else {
-      nav?.classList.remove('border-white/5', 'bg-[#0a0a0f]/85', 'backdrop-blur-md');
+      nav?.classList.remove('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
       nav?.classList.add('border-transparent', 'bg-transparent');
     }
   };
