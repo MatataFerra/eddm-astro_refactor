@@ -1,7 +1,7 @@
 <script lang="ts">
   import { readWeeks } from '@/lib/store/viaje-store';
   import SemanaCard from '@/components/viaje/svelte/SemanaCard.svelte';
-  import type { Semana } from '@/lib/data/viaje';
+  import type { Semana } from '@/lib/interfaces/viaje';
 
   interface Props {
     semanas: Semana[];

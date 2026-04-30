@@ -52,7 +52,11 @@ const totalWeeks = months.reduce((s: number, m: Mes) => s + m.semanas.length, 0)
               <span class="font-dm text-xs text-[#444]">{mes.year}</span>
             </div>
             <div class="h-px flex-1 bg-white/5" />
-            <MesCounter weekNums={mes.semanas.map((s: Semana) => s.num)} client:visible />
+            <MesCounter
+              weeks={mes.semanas.map((s: Semana) => s.slug)}
+              weekNums={mes.semanas.map((s: Semana) => s.num)}
+              client:visible
+            />
           </div>
           <SemanaGrid semanas={mes.semanas} client:visible />
         </div>

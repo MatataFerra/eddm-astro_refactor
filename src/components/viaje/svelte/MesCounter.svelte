@@ -1,8 +1,14 @@
 <script lang="ts">
+  import type { Semana } from '@/lib/interfaces/viaje';
   import { readWeeks } from '@/lib/store/viaje-store';
 
-  let { weekNums }: { weekNums: number[] } = $props();
-  let leidas = $derived(weekNums.filter((n) => $readWeeks.includes(n)).length);
+  interface Props {
+    weekNums: number[];
+    weeks: Semana['slug'][];
+  }
+
+  let { weekNums, weeks }: Props = $props();
+  let leidas = $readWeeks.filter((w) => weeks.includes(w)).length;
 </script>
 
 <span class="font-dm text-[10px] text-[#444]">

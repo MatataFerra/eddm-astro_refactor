@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Semana } from '@/lib/data/viaje';
+  import type { Semana } from '@/lib/interfaces/viaje';
   import { cn } from '@/lib/utils';
 
   interface Props {
