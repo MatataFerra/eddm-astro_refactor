@@ -1,0 +1,51 @@
+---
+import BadgeLeido from '@/components/viaje/entry/svelte/BadgeLeido.svelte';
+import type { Article } from '@/lib/interfaces/articles';
+import { Image } from 'astro:assets';
+
+interface Props {
+  tale: Article;
+}
+
+const { tale: article } = Astro.props;
+---
+
+<section class="bg-ash-main relative h-[85vh] min-h-120 overflow-hidden">
+  {
+    article.header && (
+      <Image
+        src={article.header.url}
+        alt={article.title}
+        class="absolute inset-0 h-full w-full object-cover"
+        width={200}
+        height={400}
+      />
+    )
+  }
+  <div class="from-ash-main via-ash-main/55 to-ash-main/20 absolute inset-0 bg-linear-to-t"></div>
+
+  <div
+    class="bg-[radial-gradient(ellipse_at_15%_80%,rgba(76, 168, 200, 0.25)_0%,transparent_55%)] absolute inset-0"
+  >
+  </div>
+
+  <div class="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-6 pb-17 text-center">
+    <div
+      class="reveal border-blue-main/30 bg-blue-main/12 mb-4.5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5"
+    >
+      <div class="bg-blue-main h-1.25 w-1.25 rounded-full"></div>
+      <span class="font-dm text-blue-main text-[10px] tracking-widest uppercase">
+        Más acá en el tiempo
+      </span>
+    </div>
+
+    <h1
+      class="reveal font-fraunces text-ash-text text-[clamp(52px,8vw,96px)] leading-none font-extrabold tracking-tighter"
+      style="--delay: 0.1s"
+    >
+      {article.title}
+    </h1>
+
+    <BadgeLeido semanaNum={article.order || 0} client:load />
+  </div>
+</section>
