@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { APP_ROUTER } from '@/lib/constants';
   import type { Semana } from '@/lib/interfaces/viaje';
   import { cn } from '@/lib/utils';
 
@@ -11,7 +12,7 @@
   let { semana, isRead = false, eager = false }: Props = $props();
 </script>
 
-<a href={`/viaje/${semana.slug}`} class="group block no-underline">
+<a href={APP_ROUTER.ARTICLE(semana.slug)} class="group block no-underline">
   <div
     class={cn(
       'group-hover:border-green-main/50 relative transform-gpu overflow-hidden rounded-2xl border transition-all duration-300 will-change-transform group-hover:-translate-y-1 group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.5)]',

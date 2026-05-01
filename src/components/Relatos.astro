@@ -1,58 +1,14 @@
 ---
 import GlassCard from '@/components/GlassCard.astro';
 import FeatureCard from './FeatureCard.astro';
+import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
+import type { ContentNavigate } from '@/lib/interfaces/share';
 
-const RELATOS = [
-  {
-    title: 'El origen del miedo',
-    tag: 'relato',
-    cover:
-      'https://res.cloudinary.com/docq8rbdu/image/upload/v1762130751/el-diario-de-mati/covers/egn7z7qepu6remuqdavu.webp',
-    href: 'Relato — El origen del miedo.html',
-    summary:
-      'El origen del miedo a través de civilizaciones antiguas, manuscritos persas y una comunidad científica que no quiere escuchar.',
-  },
-  {
-    title: 'Los ofendiditos',
-    tag: 'relato',
-    cover:
-      'https://res.cloudinary.com/docq8rbdu/image/upload/v1762130806/el-diario-de-mati/covers/lczuhdci9ae4p3c5naaq.webp',
-    href: '#',
-    summary:
-      'Una reflexión sobre la cultura de la ofensa y los límites de la tolerancia en el mundo moderno.',
-  },
-  {
-    title: 'Nota de emergencia',
-    tag: 'nota',
-    cover:
-      'https://res.cloudinary.com/docq8rbdu/image/upload/v1762131016/el-diario-de-mati/covers/rh7pkdduy9fvdbndm8ms.webp',
-    href: '#',
-    summary: 'Todo lo que hay que decir cuando el tiempo apremia y las palabras faltan.',
-  },
-  {
-    title: 'El tiempo de los desesperados',
-    tag: 'relato',
-    cover:
-      'https://res.cloudinary.com/docq8rbdu/image/upload/v1761801442/el-diario-de-mati/covers/zaxbcxlis18k27hvu57k.webp',
-    href: '#',
-    summary: 'Sobre la urgencia, la impaciencia y la ilusión de que siempre hay tiempo de sobra.',
-  },
-];
+const relatos = await getContentNavigateTales<ContentNavigate[]>();
 ---
 
 <div class="mb-4 grid grid-rows-[420px] gap-8 md:grid-cols-[1.6fr_1fr_1fr] md:gap-4">
-  {
-    RELATOS.slice(0, 3).map((r, i) => (
-      <GlassCard
-        delay={i * 0.1}
-        title={r.title}
-        tag={r.tag}
-        summary={r.summary}
-        imgSrc={r.cover}
-        href={r.href}
-      />
-    ))
-  }
+  {relatos?.data.slice(0, 3).map((r, i) => <GlassCard delay={i * 0.1} tag={'Relato'} item={r} />)}
 </div>
 
-<FeatureCard item={RELATOS[3]} delay={0.4} />
+<FeatureCard item={relatos!.data[3]} delay={0.4} tag="Relato destacado" />

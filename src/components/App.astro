@@ -4,6 +4,7 @@ import MasAcaSection from '@/components/MasAcaSection.astro';
 import JapanTeaser from '@/components/JapanTeaser.astro';
 import Relatos from '@/components/Relatos.astro';
 import Hero from '@/components/Hero.astro';
+import { APP_ROUTER } from '@/lib/constants';
 ---
 
 <div>
@@ -20,7 +21,7 @@ import Hero from '@/components/Hero.astro';
       </h2>
       <div class="h-px flex-1 bg-white/10"></div>
       <a
-        href="/relatos"
+        href={APP_ROUTER.TALES}
         class="font-dm text-accent-text text-xs tracking-[0.06em] whitespace-nowrap no-underline"
         >Ver todos →</a
       >

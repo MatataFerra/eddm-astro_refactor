@@ -6,6 +6,7 @@ import type { ContentNavigate } from '@/lib/interfaces/share';
 import MainCard from '@/components/relatos/MainCard.astro';
 import RelatoCard from '@/components/relatos/RelatoCard.astro';
 import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
+import { APP_ROUTER } from '@/lib/constants';
 
 const tales = await getContentNavigateTales<ContentNavigate[]>();
 
@@ -42,7 +43,7 @@ const [featured, ...rest] = tales?.data || [];
     <section class="mx-auto max-w-7xl px-6 pb-24 md:px-15">
       <MainCard
         relato={{
-          href: '/relatos/' + featured?.slug,
+          href: APP_ROUTER.TALE(featured?.slug || ''),
           cover: featured?.header?.url || '',
           title: featured?.title || 'Diario de bordo',
           summary:
@@ -57,7 +58,7 @@ const [featured, ...rest] = tales?.data || [];
           rest.map((relato, index) => (
             <RelatoCard
               relato={{
-                href: '/relatos/' + relato.slug,
+                href: APP_ROUTER.TALE(relato.slug),
                 cover: relato.header?.url || '',
                 title: relato.title || 'Relato sin título',
                 summary: relato.summary || 'Sin resumen disponible.',
