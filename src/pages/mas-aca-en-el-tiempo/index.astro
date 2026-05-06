@@ -1,6 +1,5 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import Nav from '@/components/share/Nav.astro';
 import { getContentNavigateFurtherTimeArticles } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import MainCard from '@/components/maaca/MainCard.astro';
@@ -14,7 +13,6 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
 ---
 
 <Layout title="Más acá en el tiempo | El Diario de Mati">
-  <Nav variant="detail" title="Más acá en el tiempo" color="blue" />
   <main class="bg-ash-main relative min-h-screen overflow-hidden">
     <div
       class="pointer-events-none absolute top-[20%] left-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-blue-glow)_0%,transparent_70%)] opacity-60"

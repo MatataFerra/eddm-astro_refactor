@@ -58,7 +58,7 @@
     <div class="border-t border-white/5 bg-[#0a0a10]/96 px-4 pt-3.5 pb-4.5">
       <div class="mb-2 flex items-center justify-between">
         <div class="flex gap-1">
-          {#each semana.lugares as l}
+          {#each semana.lugares as l (l + semana.slug)}
             <span
               class="font-dm text-green-soft border-green-main/30 bg-green-main/12 rounded-lg border px-1.5 py-0.5 text-[9px]"
               >📍 {l}</span

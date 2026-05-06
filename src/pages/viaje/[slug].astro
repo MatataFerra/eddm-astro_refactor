@@ -1,6 +1,5 @@
 ---
 import MainLayout from '@/layouts/Layout.astro';
-import Nav from '@/components/share/Nav.astro';
 import MarcarLeido from '@/components/viaje/svelte/MarcarLeido.svelte';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
 import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
@@ -33,8 +32,6 @@ const article = response.data;
 ---
 
 <MainLayout title={article.title}>
-  <Nav variant="detail" title="Un año viajando" />
-
   <Hero {article} />
 
   <main class="mx-auto max-w-180 px-6 py-14">

@@ -9,14 +9,14 @@ interface Props {
   links?: LinkKey[];
 }
 
-const topLevelRoutes = [APP_ROUTER.JOURNEY, APP_ROUTER.TALES, APP_ROUTER.FURTHER_TIME] as const;
+const topLevelRoutes = [
+  APP_ROUTER.JOURNEY,
+  APP_ROUTER.TALES,
+  APP_ROUTER.FURTHER_TIME,
+  APP_ROUTER.TRIP,
+] as const;
 
-const {
-  variant = 'main',
-  color = 'green',
-  title = 'Un año viajando',
-  links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[],
-} = Astro.props;
+const { links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[] } = Astro.props;
 
 const LINK_MAP = {
   viaje: { name: 'Un año viajando', color: 'green' },
@@ -26,9 +26,7 @@ const LINK_MAP = {
 
 type LinkKey = keyof typeof LINK_MAP;
 
-const isMain = variant === 'main';
-
-const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const currentPath = Astro.url.pathname;
 ---
 
 <nav
@@ -36,15 +34,15 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '');
   class="fixed top-0 right-0 left-0 z-1000 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
 >
   {
-    isMain ? (
+    currentPath === APP_ROUTER.HOME ? (
       <span class="font-fraunces text-ash-text z-50 text-lg font-semibold tracking-tight italic">
         el diario de mati
       </span>
     ) : (
       <div class="z-50 flex items-center gap-4">
         <a
-          href="/"
-          class="font-fraunces text-ash-text text-[17px] italic no-underline transition-opacity hover:opacity-70"
+          href={APP_ROUTER.HOME}
+          class="font-fraunces text-ash-text z-50 text-lg font-semibold tracking-tight italic transition-opacity hover:opacity-70"
         >
           el diario de mati
         </a>
@@ -52,63 +50,61 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '');
     )
   }
 
-  {
-    isMain ? (
-      <>
-        <div class="hidden items-center gap-8 md:flex">
-          {links.map((link) => (
-            <a
-              href={`/${link}`}
-              class="font-dm hover:text-accent-text text-xs tracking-widest text-[#888] uppercase no-underline transition-colors duration-200"
-            >
-              {LINK_MAP[link]?.name || link}
-            </a>
-          ))}
-          <span class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors">
-            Japón →
-          </span>
-        </div>
-
-        <button
-          id="menu-btn"
-          class="z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
-          aria-label="Menu"
-          aria-expanded="false"
+  <div class="hidden items-center gap-8 md:flex">
+    {
+      links.map((link) => (
+        <a
+          href={`/${link}`}
+          class={cn(
+            'font-dm hover:text-accent-text text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
+            currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-hard no-underline'
+          )}
         >
-          <div class="line-1 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300" />
-          <div class="line-2 bg-ash-text h-0.5 w-6 transition-all duration-300" />
-          <div class="line-3 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300" />
-        </button>
+          {LINK_MAP[link]?.name || link}
+        </a>
+      ))
+    }
+    <span
+      class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors"
+    >
+      Japón →
+    </span>
+  </div>
 
-        <div
-          id="mobile-menu"
-          class="mobile-menu bg-ash-main/98 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
+  <button
+    id="menu-btn"
+    class="z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
+    aria-label="Menu"
+    aria-expanded="false"
+  >
+    <div class="line-1 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300"></div>
+    <div class="line-2 bg-ash-text h-0.5 w-6 transition-all duration-300"></div>
+    <div class="line-3 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300"></div>
+  </button>
+
+  <div
+    id="mobile-menu"
+    class="mobile-menu bg-ash-main/98 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
+  >
+    {
+      links.map((link) => (
+        <a
+          href={`/${link}`}
+          class={cn(
+            'font-fraunces hover:text-accent-text text-2xl italic transition-colors',
+            currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-text no-underline'
+          )}
         >
-          {links.map((link) => (
-            <a
-              href={`/${link}`}
-              class="font-fraunces hover:text-accent-text text-ash-text text-4xl italic no-underline transition-colors"
-            >
-              {LINK_MAP[link]?.name || link}
-            </a>
-          ))}
-          <span class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors">
-            Japón →
-          </span>
-        </div>
-      </>
-    ) : (
-      <a
-        href={`/${currentPath.split('/')[1]}`}
-        class={cn(
-          'font-dm text-sm font-medium tracking-[0.12em] uppercase',
-          color ? `text-${color}-main` : 'text-ash-text'
-        )}
-      >
-        {title}
-      </a>
-    )
-  }
+          {LINK_MAP[link]?.name || link}
+        </a>
+      ))
+    }
+    <span
+      class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors"
+    >
+      Japón →
+    </span>
+  </div>
 </nav>
 
 <style>

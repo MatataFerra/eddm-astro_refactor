@@ -5,7 +5,6 @@ import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
 
 import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
-import Nav from '@/components/share/Nav.astro';
 import Hero from '@/components/relatos/entry/Hero.astro';
 import Content from '@/components/relatos/entry/Content.astro';
 
@@ -47,8 +46,6 @@ const tale = response.data;
 ---
 
 <Layout title={tale.title}>
-  <Nav variant="detail" title="Relatos" color="accent" />
-
   <Hero {tale} />
   <Content
     relato={{

@@ -1,5 +1,10 @@
 ---
+import { TRANSLATIONS } from '@/lib/constants';
 import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
+import { getAllStats } from '@/lib/api/get-stats';
+import type { Stats } from '@/lib/interfaces/stats';
+
+const allStats = await getAllStats<Stats>();
 ---
 
 <div class="reveal hidden h-full lg:block" style="--delay: 0.2s">
@@ -7,7 +12,7 @@ import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
     <div
       class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]"
     >
-      <ImagePlaceholder label="Próximo viaje: Japón" />
+      <ImagePlaceholder />
       <div class="from-ash-main/90 via-ash-main/20 absolute inset-0 bg-linear-to-t to-transparent">
       </div>
       <div
@@ -20,7 +25,7 @@ import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
           Un año viajando
         </div>
         <div class="font-dm text-ash-hard mt-2 text-[13px] font-light">
-          Nueva Zelanda · 12 meses · 8 países
+          Nueva Zelanda · Australia · 12 meses
         </div>
       </div>
     </div>
@@ -32,17 +37,33 @@ import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
         <div
           class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
         >
-          8
+          {
+            allStats && allStats.data?.countries
+              ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
+                  allStats!.data?.countries || 0
+                )
+              : null
+          }
         </div>
-        <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">países</div>
+        <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">
+          {TRANSLATIONS.es.countries}
+        </div>
       </div>
       <div class="text-center">
         <div
           class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
         >
-          59k
+          {
+            allStats && allStats.data?.km
+              ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
+                  allStats!.data?.km || 0
+                )
+              : null
+          }
         </div>
-        <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">km</div>
+        <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">
+          {TRANSLATIONS.es.km}
+        </div>
       </div>
     </div>
 
