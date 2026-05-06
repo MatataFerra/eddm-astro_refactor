@@ -1,0 +1,16 @@
+---
+import MainLayout from '@/layouts/Layout.astro';
+import type { Trip } from '@/lib/interfaces/recorrido';
+import { getTrip } from '@/lib/api/get-trip';
+import RecorridoView from '@/components/recorrido/svelte/view.svelte';
+import { adaptTripToParadas } from '@/lib/adapters/recorrido-adapter';
+
+const trip = await getTrip<Trip>();
+const paradasUI = adaptTripToParadas(trip?.data);
+---
+
+<MainLayout title="El Recorrido | El Diario de Mati">
+  <main>
+    <RecorridoView paradas={paradasUI} client:load />
+  </main>
+</MainLayout>

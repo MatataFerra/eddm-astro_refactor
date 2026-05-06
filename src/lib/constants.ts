@@ -9,6 +9,8 @@ export const APP_ROUTES = {
 export type RoutePaths = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];
 
 export const APP_ROUTER = {
+  HOME: `${APP_ROUTES.main}`,
+  JOURNEY: `${APP_ROUTES.journey}`,
   ARTICLES: `${APP_ROUTES.journey}/article`,
   ARTICLE: (slug: string) => `${APP_ROUTES.journey}/${slug}`,
   TALES: `${APP_ROUTES.tales}`,
@@ -37,7 +39,6 @@ export const EXTERNAL_API_ENDPOINTS = {
   TALE: (slug: string) => `/tales/${slug}`,
   FURTHER_TIME_ARTICLE: (slug: string) => `/further-time/${slug}`,
 } as const;
-
 
 export const FALLBACK_SLUG = '__placeholder__' as const;
 export const NOTION_PARAM_KEY = {
@@ -75,4 +76,8 @@ export const VIDEO_SIZE = {
 
 export const CONTEXT_TITLE = {
   es: 'Prólogo',
+};
+
+export const TRANSLATIONS: Record<string, Record<string, string>> = {
+  es: { notes: 'Notas', countries: 'Países', km: 'Km recorridos', days: 'Días de viaje' },
 };

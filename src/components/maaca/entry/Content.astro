@@ -1,4 +1,5 @@
 ---
+import { APP_ROUTER } from '@/lib/constants';
 import { processRelato } from '@/lib/markdown/process';
 
 interface Props {
@@ -66,14 +67,14 @@ const htmlContent = processRelato(relato.content);
   <nav
     class="reveal font-dm mt-20 flex items-center justify-between border-t border-white/6 pt-8 text-[13px]"
   >
-    <a href="/mas-aca-en-el-tiempo" class="text-ash-hard hover:text-blue-text transition-colors">
+    <a href={APP_ROUTER.FURTHER_TIME} class="text-ash-hard hover:text-blue-text transition-colors">
       ← Todos los relatos
     </a>
 
     {
       nextRelato && (
         <a
-          href={`/mas-aca-en-el-tiempo/${nextRelato.slug}`}
+          href={APP_ROUTER.FURTHER_TIME_ARTICLE(nextRelato.slug)}
           class="text-ash-hard hover:text-blue-text text-right transition-colors"
         >
           {nextRelato.title} →

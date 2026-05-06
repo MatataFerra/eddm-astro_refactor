@@ -1,25 +1,25 @@
 ---
+import { APP_ROUTER } from '@/lib/constants';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+
 interface Props {
-  title: string;
+  item: ContentNavigate;
   tag?: string;
-  summary?: string;
-  imgSrc: string;
-  href?: string;
   delay?: number;
 }
 
-const { title, tag, summary, imgSrc, href = '#', delay = 0 } = Astro.props;
+const { item, tag, delay = 0 } = Astro.props;
 ---
 
 <div class="reveal h-full" style={`--delay: ${delay}s`}>
-  <a {href} class="group block h-full no-underline">
+  <a href={APP_ROUTER.TALE(item.slug)} class="group block h-full no-underline">
     <div
       class="group-hover:border-accent-main/50 relative h-full min-h-80 overflow-hidden rounded-[20px] border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_24px_60px_rgba(0,0,0,0.5),0_0_0_1px_var(--color-accent-main)]"
     >
       <div class="absolute inset-0">
         <img
-          src={imgSrc}
-          alt={title}
+          src={item.header?.url}
+          alt={item.title}
           class="block h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <div class="from-ash-main via-ash-main/50 absolute inset-0 bg-linear-to-t to-transparent">
@@ -40,15 +40,15 @@ const { title, tag, summary, imgSrc, href = '#', delay = 0 } = Astro.props;
         }
 
         <div
-          class={`font-fraunces text-[21px] leading-tight font-semibold tracking-tight text-ash-text ${summary ? 'line-clamp-2' : 'line-clamp-none'}`}
+          class={`font-fraunces text-[21px] leading-tight font-semibold tracking-tight text-ash-text ${item.summary ? 'line-clamp-2' : 'line-clamp-none'}`}
         >
-          {title}
+          {item.title}
         </div>
 
         {
-          summary && (
+          item.summary && (
             <p class="font-dm text-ash-hard mt-2 line-clamp-2 text-xs leading-relaxed font-light">
-              {summary}
+              {item.summary}
             </p>
           )
         }

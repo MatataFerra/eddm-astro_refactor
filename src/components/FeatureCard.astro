@@ -1,14 +1,23 @@
 ---
-const { item, delay = 0 } = Astro.props;
+import { APP_ROUTER } from '@/lib/constants';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+
+interface Props {
+  item: ContentNavigate;
+  delay?: number;
+  tag: string;
+}
+
+const { item, delay = 0, tag }: Props = Astro.props;
 ---
 
 <div class="reveal" style={`--delay: ${delay}s`}>
-  <a href={item.href} class="group block no-underline">
+  <a href={APP_ROUTER.TALE(item.slug)} class="group block no-underline">
     <div
       class="group-hover:border-accent-main/30 relative min-h-55 overflow-hidden rounded-[20px] border border-white/10 transition-all duration-300 group-hover:-translate-y-0.5 md:h-45"
     >
       <img
-        src={item.cover}
+        src={item.header?.url}
         alt={item.title}
         class="absolute inset-0 block h-full w-full object-cover"
       />
@@ -24,7 +33,7 @@ const { item, delay = 0 } = Astro.props;
         <span
           class="text-accent-text font-dm bg-accent-soft border-accent-main/30 shrink-0 rounded-full border px-2 py-0.75 text-[9px] tracking-[0.14em] uppercase"
         >
-          {item.tag}
+          {tag}
         </span>
 
         <div class="flex-1">

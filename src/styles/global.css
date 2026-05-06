@@ -15,6 +15,12 @@
   --color-blue-text: #e0dcff;
   --color-blue-glow: rgba(76, 168, 200, 0.25);
 
+  --color-orange-main: #e8924a;
+  --color-orange-soft: rgba(232, 146, 74, 0.12);
+  --color-orange-glow: rgba(232, 146, 74, 0.2);
+  --color-orange-text: #f0c080;
+  --color-orange-dim: #c4783a;
+
   --color-ash-main: #0a0a0f;
   --color-ash-hard: #666666;
   --color-ash-soft: #555555;
@@ -23,6 +29,8 @@
 
   --font-fraunces: 'Fraunces Variable', serif;
   --font-dm: 'DM Sans Variable', sans-serif;
+
+  --animate-pulse-dot: pulse-dot 3s infinite;
 }
 
 @layer base {
@@ -58,4 +66,14 @@
 
 .heading-1 {
   @apply font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em];
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 146, 74, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(232, 146, 74, 0);
+  }
 }

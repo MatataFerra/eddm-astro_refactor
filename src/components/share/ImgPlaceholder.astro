@@ -1,30 +1,36 @@
 ---
-interface Props {
-  label: string;
+import ImageSlider from '@/components/share/svelte/ImageSlider.svelte';
+import { getTrip } from '@/lib/api/get-trip';
+import type { Trip } from '@/lib/interfaces/recorrido';
+
+const trip = await getTrip<Trip>();
+
+type ImageSlider = {
+  url: string;
+  id: string;
+  city: string;
+}[];
+
+const PLACEHOLDER =
+  'https://res.cloudinary.com/docq8rbdu/image/upload/v1777827696/el-diario-de-mati/trips/Whitehaven_Beach_tr341v.webp';
+
+let getStopImages: ImageSlider = [
+  {
+    url: PLACEHOLDER,
+    id: 'placeholder-1',
+    city: 'Whitheaven Beach',
+  },
+];
+
+if (trip?.data) {
+  getStopImages = trip.data.stops.map((stop) => ({
+    url: stop.stopImage || PLACEHOLDER,
+    id: stop.id,
+    city: stop.city,
+  }));
 }
-const { label } = Astro.props;
 ---
 
-<div class="bg-striped flex size-full items-center justify-center border border-white/5 p-3">
-  <span
-    class="text-muted text-center font-mono text-[11px] leading-relaxed tracking-wider uppercase"
-  >
-    {label}
-  </span>
+<div class="flex size-full items-center justify-center border border-white/5 p-3">
+  <ImageSlider client:load locations={getStopImages} />
 </div>
-
-<style>
-  .bg-striped {
-    background-image: linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.05) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0.05) 75%,
-      transparent 75%,
-      transparent
-    );
-    background-size: 20px 20px;
-  }
-</style>

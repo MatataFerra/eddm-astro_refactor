@@ -1,11 +1,11 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import Nav from '@/components/share/Nav.astro';
 import { getContentNavigateFurtherTimeArticles } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import MainCard from '@/components/maaca/MainCard.astro';
 import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
 import MaacaCard from '@/components/maaca/MaacaCard.astro';
+import { APP_ROUTER } from '@/lib/constants';
 
 const furtherTimeArticles = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
 
@@ -13,7 +13,6 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
 ---
 
 <Layout title="Más acá en el tiempo | El Diario de Mati">
-  <Nav variant="detail" title="Más acá en el tiempo" color="blue" />
   <main class="bg-ash-main relative min-h-screen overflow-hidden">
     <div
       class="pointer-events-none absolute top-[20%] left-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-blue-glow)_0%,transparent_70%)] opacity-60"
@@ -42,7 +41,7 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
     <section class="mx-auto max-w-7xl px-6 pb-24 md:px-15">
       <MainCard
         relato={{
-          href: '/mas-aca-en-el-tiempo/' + featured?.slug,
+          href: APP_ROUTER.FURTHER_TIME_ARTICLE(featured?.slug || ''),
           cover: featured?.header?.url || '',
           title: featured?.title || 'Diario de bordo',
           summary:
@@ -57,7 +56,7 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
           rest.map((relato, index) => (
             <MaacaCard
               relato={{
-                href: '/mas-aca-en-el-tiempo/' + relato.slug,
+                href: APP_ROUTER.FURTHER_TIME_ARTICLE(relato.slug),
                 cover: relato.header?.url || '',
                 title: relato.title || 'Relato sin título',
                 summary: relato.summary || 'Sin resumen disponible.',
