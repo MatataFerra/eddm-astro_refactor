@@ -1,5 +1,5 @@
 ---
-import { TRANSLATIONS } from '@/lib/constants';
+import { APP_ROUTER, TRANSLATIONS } from '@/lib/constants';
 import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
 import { getAllStats } from '@/lib/api/get-stats';
 import type { Stats } from '@/lib/interfaces/stats';
@@ -9,26 +9,30 @@ const allStats = await getAllStats<Stats>();
 
 <div class="reveal hidden h-full lg:block" style="--delay: 0.2s">
   <div class="relative h-120">
-    <div
-      class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]"
-    >
-      <ImagePlaceholder />
-      <div class="from-ash-main/90 via-ash-main/20 absolute inset-0 bg-linear-to-t to-transparent">
-      </div>
+    <a href={APP_ROUTER.JOURNEY} class="no-underline">
       <div
-        class="absolute right-0 bottom-0 left-0 border-t border-white/10 bg-[#08080e]/55 p-7 backdrop-blur-md"
+        class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]"
       >
-        <div class="text-accent-text font-dm mb-1.5 text-[10px] tracking-[0.12em] uppercase">
-          2024 — 2025
+        <ImagePlaceholder />
+        <div
+          class="from-ash-main/90 via-ash-main/20 absolute inset-0 bg-linear-to-t to-transparent"
+        >
         </div>
-        <div class="font-fraunces text-ash-text text-[22px] font-semibold tracking-[-0.01em]">
-          Un año viajando
-        </div>
-        <div class="font-dm text-ash-hard mt-2 text-[13px] font-light">
-          Nueva Zelanda · Australia · 12 meses
+        <div
+          class="absolute right-0 bottom-0 left-0 border-t border-white/10 bg-[#08080e]/55 p-7 backdrop-blur-md"
+        >
+          <div class="text-accent-text font-dm mb-1.5 text-[10px] tracking-[0.12em] uppercase">
+            2024 — 2025
+          </div>
+          <div class="font-fraunces text-ash-text text-[22px] font-semibold tracking-[-0.01em]">
+            Un año viajando
+          </div>
+          <div class="font-dm text-ash-hard mt-2 text-[13px] font-light">
+            Nueva Zelanda · Australia · 12 meses
+          </div>
         </div>
       </div>
-    </div>
+    </a>
 
     <div
       class="border-accent-main/30 absolute -top-4 -right-4 flex items-center gap-5 rounded-2xl border bg-[#0a0a12]/85 px-5 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_20px_var(--color-accent-glow)] backdrop-blur-md"

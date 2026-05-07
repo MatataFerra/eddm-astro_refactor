@@ -35,18 +35,20 @@
 
       {#if isRead}
         <div
-          class="border-green-main/40 bg-green-main/12 absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-sm"
+          class="border-green-main/40 bg-green-main/30 absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 rounded-full border px-2.5 py-1 backdrop-blur-sm"
         >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
             <path
               d="M2 6l3 3 5-5"
-              stroke="#5d9e6b"
+              stroke="#444444"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
-          <span class="font-dm text-green-soft text-[9px] tracking-widest uppercase">leído</span>
+          <span class="font-dm text-ash-softest text-sm font-semibold tracking-widest uppercase"
+            >leído</span
+          >
         </div>
       {/if}
 

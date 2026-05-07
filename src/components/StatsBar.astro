@@ -13,7 +13,7 @@ const allStats = await getAllStats<Stats>();
     {
       allStats?.data ? (
         Object.entries(allStats?.data).map(([key, value]: [string, number]) => (
-          <div class="flex-1 border-r border-white/7 px-4 py-5 text-center last:border-r-0 md:px-6 md:py-7">
+          <div class="flex-1 border-r border-white/7 px-4 py-5 text-center last:hidden last:border-r-0 md:px-6 md:py-7 last:md:block">
             <div class="font-fraunces text-accent-text text-[44px] leading-none font-light tracking-[-0.03em] italic">
               {new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(value)}
             </div>

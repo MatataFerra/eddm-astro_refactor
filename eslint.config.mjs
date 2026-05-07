@@ -22,6 +22,7 @@ export default [
     },
     rules: {
       'no-console': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
 
@@ -36,10 +37,9 @@ export default [
     },
     rules: {
       'no-console': 'warn',
-      // Desactivamos la obligatoriedad de la key en los bloques cada
       'svelte/no-keyed-each': 'off',
-      // O si el error viene de svelte/block-lang-config o similar:
       'svelte/valid-each-key': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
 
@@ -49,6 +49,7 @@ export default [
     rules: {
       'no-console': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
 

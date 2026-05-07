@@ -26,17 +26,13 @@ const { item, delay = 0 } = Astro.props;
 
       <div class="border-blue-main/[0.14] bg-ash-main/95 border-t p-4 px-4.5 pb-5">
         <div class="mb-2 flex items-center gap-1.5">
-          <div class="bg-blue-main h-1 w-1 rounded-full"></div>
-          <span class="font-dm text-blue-soft text-[9px] tracking-widest uppercase"> más acá </span>
-          <span class="font-dm text-ash-softest ml-0.5 text-[9px]">
-            · {
-              new Date(item.createdAt ?? '').toLocaleDateString('es-AR', {
-                day: 'numeric',
-                month: 'short',
-                year: '2-digit',
-              })
-            }
-          </span>
+          <div class="mb-2 flex items-center gap-2">
+            <span
+              class="text-blue-soft font-dm bg-blue-glow border-blue-main/60 rounded-full border px-2 py-0.75 text-[9px] tracking-[0.14em] uppercase"
+            >
+              mas acá
+            </span>
+          </div>
         </div>
 
         <h3

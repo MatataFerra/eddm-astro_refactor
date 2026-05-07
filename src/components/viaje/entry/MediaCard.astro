@@ -1,0 +1,58 @@
+---
+import Video from '@/components/viaje/entry/Video.astro';
+
+interface MediaItem {
+  type: 'image' | 'video';
+  src: string;
+  alt?: string;
+  poster?: string;
+  width?: number;
+  height?: number;
+}
+
+interface Props {
+  item: MediaItem;
+
+  containerClass?: string;
+  imageClass?: string;
+
+  widthFallback?: number;
+  heightFallback?: number;
+}
+
+const {
+  item,
+  containerClass = '',
+  imageClass = '',
+
+  widthFallback = 1200,
+  heightFallback = 900,
+} = Astro.props;
+---
+
+<div class:list={['overflow-hidden border border-white/5', containerClass]}>
+  {
+    item.type === 'video' ? (
+      <Video item={item} />
+    ) : (
+      <a
+        href={item.src}
+        data-pswp-width={item.width || widthFallback}
+        data-pswp-height={item.height || heightFallback}
+        target="_blank"
+        class="block h-full"
+      >
+        <img
+          src={item.src}
+          alt={item.alt}
+          loading="lazy"
+          decoding="async"
+          class:list={[
+            'h-full w-full cursor-zoom-in object-cover transition-transform duration-700 hover:scale-[1.02]',
+            imageClass,
+          ]}
+        />
+      </a>
+    )
+  }
+</div>

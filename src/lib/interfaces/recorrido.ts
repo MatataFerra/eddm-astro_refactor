@@ -21,3 +21,19 @@ export interface Trip {
   updatedAt: string;
   stops: TripStop[];
 }
+
+export type ParadaUI = {
+  id: string | number;
+  lugar: string;
+  pais: string;
+  flag: string;
+  fecha: string;
+  year: number;
+  kmDesdeOrigen: number;
+  kmEtapa: number;
+  kmAcumulados: number;
+  cover: string | null;
+  descripcion: string;
+  tipo: 'origen' | 'destino' | 'proximo';
+  semanas: string[];
+};

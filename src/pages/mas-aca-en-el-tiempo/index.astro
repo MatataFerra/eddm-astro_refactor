@@ -21,10 +21,10 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
 
     <section class="relative px-6 pt-28 pb-16 text-center">
       <div
-        class="reveal border-blue-main/25 bg-blue-soft mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
+        class="reveal text-blue-soft font-dm bg-blue-glow border-blue-main/60 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
       >
-        <div class="bg-blue-glow h-1.5 w-1.5 animate-pulse rounded-full"></div>
-        <span class="font-dm text-ash-main text-[10px] font-medium tracking-[0.14em] uppercase">
+        <div class="bg-blue-main h-1.5 w-1.5 animate-pulse rounded-full"></div>
+        <span class="font-dm text-[10px] font-medium tracking-[0.14em] uppercase">
           Historias recientes
         </span>
       </div>
@@ -47,7 +47,7 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
           summary:
             featured?.summary ||
             'Un relato íntimo que captura la esencia de cada lugar visitado, las personas encontradas y las emociones vividas durante el viaje.',
-          tag: 'Más acá en el tiempo',
+          tag: 'Historia del aguante',
         }}
       />
       <RelatoDivider />

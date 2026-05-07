@@ -22,6 +22,7 @@ const LINK_MAP = {
   viaje: { name: 'Un año viajando', color: 'green' },
   relatos: { name: 'Relatos', color: 'accent' },
   'mas-aca-en-el-tiempo': { name: 'Más acá en el tiempo', color: 'blue' },
+  trip: { name: 'Recorrido', color: 'accent' },
 } as const;
 
 type LinkKey = keyof typeof LINK_MAP;
@@ -91,7 +92,7 @@ const currentPath = Astro.url.pathname;
         <a
           href={`/${link}`}
           class={cn(
-            'font-fraunces hover:text-accent-text text-2xl italic transition-colors',
+            'font-fraunces hover:text-accent-text text-2xl capitalize italic transition-colors',
             currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-text no-underline'
           )}
         >

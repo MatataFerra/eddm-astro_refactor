@@ -32,12 +32,11 @@ const { relato } = Astro.props;
       <div class="max-w-140">
         <!-- Metadata -->
         <div class="mb-5 flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <div class="bg-blue-main/80 size-1.5 animate-pulse rounded-full"></div>
-            <span class="font-dm text-blue-main text-[9px] font-medium tracking-[0.16em] uppercase">
-              {relato.tag}
-            </span>
-          </div>
+          <span
+            class="text-blue-soft font-dm bg-blue-glow border-blue-main/60 rounded-full border px-4 py-1.5 text-[9px] font-medium tracking-[0.16em] uppercase"
+          >
+            {relato.tag}
+          </span>
           <span class="font-dm text-ash-soft text-[11px] tracking-wider"> Destacado </span>
         </div>
 

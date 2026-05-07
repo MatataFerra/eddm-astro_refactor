@@ -1,12 +1,17 @@
 ---
 import Video from '@/components/viaje/entry/Video.astro';
+
 import 'photoswipe/style.css';
+import MediaCard from '@/components/viaje/entry/MediaCard.astro';
 
 interface MediaItem {
   type: 'image' | 'video';
   src: string;
   alt?: string;
   poster?: string;
+
+  width?: number;
+  height?: number;
 }
 
 interface Props {
@@ -24,9 +29,6 @@ const isSingle = count === 1;
 const isDouble = count === 2;
 const isTriple = count === 3;
 const isBento = count >= 4;
-
-const firstTwo = items.slice(0, 2);
-const rest = items.slice(2);
 ---
 
 <div class="reveal pswp-gallery my-8">
@@ -44,19 +46,11 @@ const rest = items.slice(2);
           {items[0].type === 'video' ? (
             <Video item={items[0]} />
           ) : (
-            <a
-              href={items[0].src}
-              data-pswp-width="1200"
-              data-pswp-height="1600"
-              target="_blank"
-              class="block"
-            >
-              <img
-                src={items[0].src}
-                alt={items[0].alt}
-                class="h-auto w-full cursor-zoom-in object-contain"
-              />
-            </a>
+            <MediaCard
+              item={items[0]}
+              containerClass="max-w-(--breakpoint-sm) rounded-xl"
+              imageClass="h-auto object-contain"
+            />
           )}
         </div>
       </div>
@@ -72,19 +66,7 @@ const rest = items.slice(2);
             {item.type === 'video' ? (
               <Video item={item} />
             ) : (
-              <a
-                href={item.src}
-                data-pswp-width="1200"
-                data-pswp-height="1600"
-                target="_blank"
-                class="block h-full"
-              >
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  class="h-full w-full cursor-zoom-in object-cover"
-                />
-              </a>
+              <MediaCard item={item} containerClass="aspect-4/5 rounded-xl" imageClass="" />
             )}
           </div>
         ))}
@@ -103,19 +85,11 @@ const rest = items.slice(2);
             {item.type === 'video' ? (
               <Video item={item} />
             ) : (
-              <a
-                href={item.src}
-                data-pswp-width="1200"
-                data-pswp-height="1600"
-                target="_blank"
-                class="block h-full"
-              >
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  class="h-full w-full cursor-zoom-in object-cover"
-                />
-              </a>
+              <MediaCard
+                item={item}
+                containerClass={`${idx === 0 ? 'row-span-2' : ''} rounded-xl`}
+                imageClass=""
+              />
             )}
           </div>
         ))}
@@ -125,59 +99,81 @@ const rest = items.slice(2);
 
   {/* LAYOUT 4+: BENTO */}
   {
-    isBento && (
-      <div class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          {firstTwo.map((item) => (
-            <div class="aspect-square overflow-hidden rounded-xl border border-white/5 md:aspect-16/10">
-              {item.type === 'video' ? (
-                <Video item={item} />
+    isBento &&
+      (() => {
+        const hero = items[0];
+        const rest = items.slice(1);
+
+        const rows = [];
+        let i = 0;
+
+        while (i < rest.length) {
+          const remaining = rest.length - i;
+
+          // THIRD ITEM LARGE
+          if (i === 2 && rest[i]) {
+            rows.push({
+              type: 'large',
+              items: [rest[i]],
+            });
+
+            i += 1;
+            continue;
+          }
+
+          // LAST ODD ITEM => LARGE
+          if (remaining === 1) {
+            rows.push({
+              type: 'large',
+              items: [rest[i]],
+            });
+
+            break;
+          }
+
+          // NORMAL DOUBLE ROW
+          rows.push({
+            type: 'double',
+            items: [rest[i], rest[i + 1]],
+          });
+
+          i += 2;
+        }
+
+        return (
+          <div class="space-y-3">
+            {/* HERO */}
+            {hero && (
+              <MediaCard
+                item={hero}
+                containerClass="rounded-2xl"
+                imageClass="h-[420px] md:h-[620px]"
+              />
+            )}
+
+            {/* ROWS */}
+            {rows.map((row) =>
+              row.type === 'large' ? (
+                <MediaCard
+                  item={row.items[0]}
+                  containerClass="rounded-2xl"
+                  imageClass="h-[180px] md:h-[260px]"
+                />
               ) : (
-                <a
-                  href={item.src}
-                  data-pswp-width="1600"
-                  data-pswp-height="1200"
-                  target="_blank"
-                  class="block h-full"
-                >
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    class="h-full w-full cursor-zoom-in object-cover"
-                  />
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-        <div
-          class="grid gap-3"
-          style={`grid-template-columns: repeat(${rest.length}, minmax(0, 1fr))`}
-        >
-          {rest.map((item) => (
-            <div class="aspect-square overflow-hidden rounded-xl border border-white/5 md:aspect-16/10">
-              {item.type === 'video' ? (
-                <Video item={item} />
-              ) : (
-                <a
-                  href={item.src}
-                  data-pswp-width="1600"
-                  data-pswp-height="1200"
-                  target="_blank"
-                  class="block h-full"
-                >
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    class="h-full w-full cursor-zoom-in object-cover"
-                  />
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    )
+                <div class="grid grid-cols-2 gap-3">
+                  {row.items.map((item) => (
+                    <MediaCard
+                      item={item}
+                      containerClass="rounded-xl"
+                      imageClass="aspect-square md:aspect-[4/3]"
+                    />
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        );
+      })()
   }
 
   {
@@ -196,7 +192,6 @@ const rest = items.slice(2);
     gallery: '.pswp-gallery',
     children: 'a[data-pswp-width]',
     pswpModule: () => import('photoswipe'),
-    showHideAnimationType: 'zoom',
   });
 
   lightbox.init();
