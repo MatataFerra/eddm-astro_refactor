@@ -1,5 +1,4 @@
-import type { ParadaUI } from '@/components/recorrido/svelte/view.svelte';
-import type { Trip } from '@/lib/interfaces/recorrido';
+import type { ParadaUI, Trip } from '@/lib/interfaces/recorrido';
 
 function calcularDistanciaKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
@@ -87,6 +86,7 @@ export function adaptTripToParadas(trip: Trip | undefined): ParadaUI[] {
       kmEtapa,
       kmAcumulados,
       tipo: isOrigen ? 'origen' : 'destino',
+      googleMapsUrl: stop.googleMapsUrl,
     });
   });
 

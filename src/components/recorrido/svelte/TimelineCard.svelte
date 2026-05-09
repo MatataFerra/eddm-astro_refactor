@@ -10,7 +10,12 @@
   let { p, isProximo = false, isOrigen = false }: Props = $props();
 </script>
 
-<div class="group w-full md:w-[calc(50%-40px)]">
+<a
+  href={p.googleMapsUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="group w-full md:w-[calc(50%-40px)]"
+>
   <div
     class="overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 group-hover:-translate-y-1 {isProximo
       ? 'border-orange-main/10 bg-orange-main/5 opacity-70'
@@ -100,20 +105,6 @@
           </div>
         </div>
       {/if}
-
-      <!-- Enlaces Semanas -->
-      {#if p.semanas.length > 0}
-        <div class="flex flex-wrap gap-2">
-          {#each p.semanas as href (href)}
-            <a
-              {href}
-              class="border-orange-main/25 bg-orange-soft font-dm text-orange-text hover:bg-orange-main/20 rounded-xl border px-3.5 py-1.5 text-[11px] tracking-[0.04em] transition-colors"
-            >
-              Ver entradas →
-            </a>
-          {/each}
-        </div>
-      {/if}
     </div>
   </div>
-</div>
+</a>

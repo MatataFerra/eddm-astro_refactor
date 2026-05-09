@@ -30,7 +30,7 @@
       >
         <!-- Punto central -->
         <div
-          class="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full {isOrigen
+          class="absolute top-1/2 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full md:block {isOrigen
             ? 'border-orange-text bg-orange-main animate-pulse-dot h-4.5 w-4.5 border-3 shadow-[0_0_0_6px_var(--color-orange-soft),0_0_20px_var(--color-orange-glow)]'
             : isProximo
               ? 'border-orange-main/40 h-3 w-3 border-2 border-dashed bg-transparent'
@@ -39,7 +39,7 @@
 
         <!-- Línea conectora -->
         <div
-          class="bg-orange-main/20 absolute top-1/2 h-px w-8.5 {side === 'left'
+          class="bg-orange-main/70 absolute top-1/2 h-px w-8.5 {side === 'left'
             ? 'right-[calc(50%+6px)]'
             : 'left-[calc(50%+6px)]'}"
         ></div>

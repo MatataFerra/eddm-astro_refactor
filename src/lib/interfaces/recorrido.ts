@@ -36,4 +36,5 @@ export type ParadaUI = {
   descripcion: string;
   tipo: 'origen' | 'destino' | 'proximo';
   semanas: string[];
+  googleMapsUrl?: string;
 };

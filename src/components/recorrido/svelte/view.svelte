@@ -50,7 +50,7 @@
       Desde el punto cero en Buenos Aires hasta donde estamos hoy.
     </p>
 
-    <div class="flex flex-col gap-2">
+    <div class="mx-4 flex flex-col gap-2">
       <!-- Contador KM Principal -->
       <Counter {totalKm} />
 

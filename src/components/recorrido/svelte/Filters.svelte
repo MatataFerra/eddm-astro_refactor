@@ -14,6 +14,5 @@
 
 <div class="flex flex-wrap items-center gap-6 px-6 pb-12 md:px-20">
   <CountryFilter {paradas} bind:filterPais />
-  <div class="h-5 w-px bg-white/10"></div>
   <YearFilter {paradas} bind:filterYear />
 </div>

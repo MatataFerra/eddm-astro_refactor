@@ -32,7 +32,7 @@ const currentPath = Astro.url.pathname;
 
 <nav
   data-navbar
-  class="fixed top-0 right-0 left-0 z-1000 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
+  class="fixed inset-x-0 top-0 z-100 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
 >
   {
     currentPath === APP_ROUTER.HOME ? (
@@ -74,7 +74,7 @@ const currentPath = Astro.url.pathname;
 
   <button
     id="menu-btn"
-    class="z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
+    class="relative z-120 flex cursor-pointer flex-col gap-1.5 md:hidden"
     aria-label="Menu"
     aria-expanded="false"
   >
@@ -85,7 +85,7 @@ const currentPath = Astro.url.pathname;
 
   <div
     id="mobile-menu"
-    class="mobile-menu bg-ash-main/98 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden"
+    class="mobile-menu bg-ash-main/98 fixed inset-0 z-110 flex flex-col items-center justify-center gap-8 backdrop-blur-xl md:hidden"
   >
     {
       links.map((link) => (
@@ -110,22 +110,42 @@ const currentPath = Astro.url.pathname;
 
 <style>
   .mobile-menu {
-    visibility: hidden;
     opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
     transform: translateX(100%);
+    transition:
+      opacity 0.4s ease,
+      transform 0.4s ease,
+      visibility 0.4s ease;
   }
+
   .mobile-menu.active {
-    visibility: visible;
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
     transform: translateX(0);
   }
-  .open .line-1 {
+
+  #menu-btn .line-1,
+  #menu-btn .line-2,
+  #menu-btn .line-3 {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  #menu-btn.open .line-1 {
     transform: translateY(8px) rotate(45deg);
   }
-  .open .line-2 {
+
+  #menu-btn.open .line-2 {
     opacity: 0;
   }
-  .open .line-3 {
+
+  #menu-btn.open .line-3 {
     transform: translateY(-8px) rotate(-45deg);
   }
 </style>
@@ -134,7 +154,35 @@ const currentPath = Astro.url.pathname;
   const nav = document.querySelector('[data-navbar]');
   const menuBtn = document.querySelector('#menu-btn');
   const mobileMenu = document.querySelector('#mobile-menu');
-  const smartBack = document.querySelector<HTMLButtonElement>('#smart-back');
+  const smartBack = document.querySelector('#smart-back');
+
+  const openMenu = () => {
+    menuBtn?.classList.add('open');
+    mobileMenu?.classList.add('active');
+
+    menuBtn?.setAttribute('aria-expanded', 'true');
+
+    document.body.classList.add('overflow-hidden');
+  };
+
+  const closeMenu = () => {
+    menuBtn?.classList.remove('open');
+    mobileMenu?.classList.remove('active');
+
+    menuBtn?.setAttribute('aria-expanded', 'false');
+
+    document.body.classList.remove('overflow-hidden');
+  };
+
+  const toggleMenu = () => {
+    const isOpen = menuBtn?.classList.contains('open');
+
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
 
   const handleScroll = () => {
     if (window.scrollY > 40) {
@@ -156,20 +204,19 @@ const currentPath = Astro.url.pathname;
     }
   });
 
-  menuBtn?.addEventListener('click', () => {
-    const isOpen = menuBtn.classList.toggle('open');
-    mobileMenu?.classList.toggle('active');
-    document.body.classList.toggle('overflow-hidden', isOpen);
-  });
+  menuBtn?.addEventListener('click', toggleMenu);
 
   mobileMenu?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      menuBtn?.classList.remove('open');
-      mobileMenu?.classList.remove('active');
-      document.body.classList.remove('overflow-hidden');
-    });
+    link.addEventListener('click', closeMenu);
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+      closeMenu();
+    }
   });
 
   window.addEventListener('scroll', handleScroll, { passive: true });
+
   handleScroll();
 </script>
