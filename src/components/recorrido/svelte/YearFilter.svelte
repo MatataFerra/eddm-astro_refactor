@@ -1,18 +1,15 @@
 <script lang="ts">
-  import type { ParadaUI } from '@/lib/interfaces/recorrido';
+  import { paradasStore, filterYearStore } from '@/lib/store/recorrido-store';
 
-  interface Props {
-    paradas: ParadaUI[];
-    filterYear: string;
-  }
-
-  let { paradas, filterYear = $bindable() }: Props = $props();
-
-  let years = $derived(
-    ['Todos', ...new Set(paradas.map((p) => p.year.toString()))].toSorted((a, b) =>
+  let years = $derived.by(() => {
+    return ['Todos', ...new Set($paradasStore.map((p) => p.year.toString()))].toSorted((a, b) =>
       a === 'Todos' ? -1 : b === 'Todos' ? 1 : parseInt(b) - parseInt(a)
-    )
-  );
+    );
+  });
+
+  const handleChange = (pais: string) => {
+    filterYearStore.set(pais);
+  };
 </script>
 
 <div class="flex w-full items-center gap-4">
@@ -25,11 +22,12 @@
     <div class="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2">
       {#each years as year (year)}
         <button
-          class="font-dm shrink-0 rounded-full border px-4 py-1.5 text-[12px] tracking-widest transition-all duration-200 {filterYear ===
-          year
-            ? 'border-orange-main bg-orange-soft text-orange-text shadow-[0_0_10px_var(--color-orange-glow)]'
-            : 'text-ash-soft hover:border-orange-main/40 hover:text-ash-text border-white/10 bg-transparent'}"
-          onclick={() => (filterYear = year)}
+          class={`font-dm shrink-0 rounded-full border px-4 py-1.5 text-[12px] tracking-widest transition-all duration-200 ${
+            $filterYearStore === year
+              ? 'border-orange-main bg-orange-soft text-orange-text shadow-[0_0_10px_var(--color-orange-glow)]'
+              : 'text-ash-soft hover:border-orange-main/40 hover:text-ash-text border-white/10 bg-transparent'
+          }`}
+          onclick={() => handleChange(year)}
         >
           {year}
         </button>

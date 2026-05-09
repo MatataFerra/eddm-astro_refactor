@@ -1,13 +1,8 @@
 <script lang="ts">
-  import type { ParadaUI } from '@/lib/interfaces/recorrido';
+  import { filteredParadasStore } from '@/lib/store/recorrido-store';
   import { fade } from 'svelte/transition';
   import TimelineCard from '@/components/recorrido/svelte/TimelineCard.svelte';
-
-  interface Props {
-    filtered: ParadaUI[];
-  }
-
-  let { filtered }: Props = $props();
+  import { cn } from '@/lib/utils';
 </script>
 
 <div class="relative px-6 pb-20 md:px-20">
@@ -17,7 +12,7 @@
   ></div>
 
   <div class="flex flex-col gap-10">
-    {#each filtered as p, i (p.id)}
+    {#each $filteredParadasStore as p, i (p.id)}
       {@const side = i % 2 === 0 ? 'left' : 'right'}
       {@const isProximo = p.tipo === 'proximo'}
       {@const isOrigen = p.tipo === 'origen'}
@@ -39,17 +34,21 @@
 
         <!-- Línea conectora -->
         <div
-          class="bg-orange-main/70 absolute top-1/2 h-px w-8.5 {side === 'left'
-            ? 'right-[calc(50%+6px)]'
-            : 'left-[calc(50%+6px)]'}"
+          class={cn(
+            'bg-orange-main/70 absolute top-1/2 h-px w-8.5',
+            side === 'left' ? 'right-[calc(50%+6px)]' : 'left-[calc(50%+6px)]'
+          )}
         ></div>
 
         <!-- Etiqueta KM (Lado opuesto) -->
         {#if !isOrigen}
           <div
-            class="pointer-events-none absolute top-1/2 -translate-y-1/2 {side === 'left'
-              ? 'right-[calc(50%+24px)] text-right'
-              : 'left-[calc(50%+24px)] text-left'}"
+            class={cn(
+              'pointer-events-none absolute top-1/2 -translate-y-1/2',
+              side === 'left'
+                ? 'right-[calc(50%+24px)] text-right'
+                : 'left-[calc(50%+24px)] text-left'
+            )}
           ></div>
         {/if}
 

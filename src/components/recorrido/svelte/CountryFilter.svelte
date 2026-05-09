@@ -1,17 +1,16 @@
 <script lang="ts">
-  import type { ParadaUI } from '@/lib/interfaces/recorrido';
+  import { paradasStore, filterPaisStore } from '@/lib/store/recorrido-store';
 
-  interface Props {
-    paradas: ParadaUI[];
-    filterPais: string;
-  }
+  const PAISES = $derived.by(() => {
+    return [
+      'Todos',
+      ...new Set($paradasStore.filter((p) => p.tipo !== 'origen').map((p) => p.pais)),
+    ];
+  });
 
-  let { paradas, filterPais = $bindable() }: Props = $props();
-
-  let PAISES = $derived([
-    'Todos',
-    ...new Set(paradas.filter((p) => p.tipo !== 'origen').map((p) => p.pais)),
-  ]);
+  const handleChange = (pais: string) => {
+    filterPaisStore.set(pais);
+  };
 </script>
 
 <div class="flex w-full items-center gap-4">
@@ -23,11 +22,12 @@
     <div class="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2">
       {#each PAISES as pais (pais)}
         <button
-          class="font-dm shrink-0 rounded-full border px-4 py-1.5 text-[12px] tracking-widest transition-all duration-200 {filterPais ===
-          pais
-            ? 'border-orange-main bg-orange-soft text-orange-text'
-            : 'text-ash-soft border-white/10 bg-transparent'}"
-          onclick={() => (filterPais = pais)}
+          class={`font-dm shrink-0 rounded-full border px-4 py-1.5 text-[12px] tracking-widest transition-all duration-200 ${
+            $filterPaisStore === pais
+              ? 'border-orange-main bg-orange-soft text-orange-text'
+              : 'text-ash-soft border-white/10 bg-transparent'
+          }`}
+          onclick={() => handleChange(pais)}
         >
           {pais}
         </button>

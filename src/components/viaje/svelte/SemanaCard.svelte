@@ -40,13 +40,13 @@
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
             <path
               d="M2 6l3 3 5-5"
-              stroke="#444444"
+              stroke="#f0eeff"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
-          <span class="font-dm text-ash-softest text-sm font-semibold tracking-widest uppercase"
+          <span class="font-dm text-ash-text text-sm font-semibold tracking-widest uppercase"
             >leído</span
           >
         </div>

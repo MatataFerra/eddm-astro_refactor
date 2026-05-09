@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ParadaUI } from '@/lib/interfaces/recorrido';
+  import { cn } from '@/lib/utils';
 
   interface Props {
     p: ParadaUI;
@@ -17,9 +18,12 @@
   class="group w-full md:w-[calc(50%-40px)]"
 >
   <div
-    class="overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 group-hover:-translate-y-1 {isProximo
-      ? 'border-orange-main/10 bg-orange-main/5 opacity-70'
-      : 'group-hover:border-orange-main/40 border-white/7 bg-[#0c0c12]/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(232,146,74,0.15)]'}"
+    class={cn(
+      'overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 group-hover:-translate-y-1',
+      isProximo
+        ? 'border-orange-main/10 bg-orange-main/5 opacity-70'
+        : 'group-hover:border-orange-main/40 border-white/7 bg-[#0c0c12]/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(232,146,74,0.15)]'
+    )}
   >
     <!-- Imagen Cover -->
     {#if p.cover}
@@ -27,9 +31,12 @@
         <img
           src={p.cover}
           alt={p.lugar}
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 {isProximo
-            ? 'blur-[1px] grayscale-60'
-            : ''}"
+          loading="lazy"
+          decoding="async"
+          class={cn(
+            'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
+            isProximo && 'blur-[1px] grayscale-60'
+          )}
         />
         <div class="absolute inset-0 bg-linear-to-t from-[#0c0c12]/90 to-transparent/40"></div>
         {#if isProximo}
