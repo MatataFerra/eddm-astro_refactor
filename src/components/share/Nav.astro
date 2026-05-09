@@ -30,62 +30,69 @@ type LinkKey = keyof typeof LINK_MAP;
 const currentPath = Astro.url.pathname;
 ---
 
-<nav
-  data-navbar
-  class="fixed inset-x-0 top-0 z-100 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
->
-  {
-    currentPath === APP_ROUTER.HOME ? (
-      <span class="font-fraunces text-ash-text z-50 text-lg font-semibold tracking-tight italic">
-        el diario de mati
-      </span>
-    ) : (
-      <div class="z-50 flex items-center gap-4">
+<header>
+  <!-- NAVBAR -->
+  <nav
+    data-navbar
+    class="fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
+  >
+    {
+      currentPath === APP_ROUTER.HOME ? (
+        <span class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic">
+          el diario de mati
+        </span>
+      ) : (
         <a
           href={APP_ROUTER.HOME}
-          class="font-fraunces text-ash-text z-50 text-lg font-semibold tracking-tight italic transition-opacity hover:opacity-70"
+          class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic transition-opacity hover:opacity-70"
         >
           el diario de mati
         </a>
-      </div>
-    )
-  }
-
-  <div class="hidden items-center gap-8 md:flex">
-    {
-      links.map((link) => (
-        <a
-          href={`/${link}`}
-          class={cn(
-            'font-dm hover:text-accent-text text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
-            currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-hard no-underline'
-          )}
-        >
-          {LINK_MAP[link]?.name || link}
-        </a>
-      ))
+      )
     }
-    <span
-      class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors"
-    >
-      Japón →
-    </span>
-  </div>
 
+    <!-- DESKTOP -->
+    <div class="hidden items-center gap-8 md:flex">
+      {
+        links.map((link) => (
+          <a
+            href={`/${link}`}
+            class={cn(
+              'font-dm hover:text-accent-text text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
+              currentPath === `/${link}`
+                ? 'text-accent-text underline'
+                : 'text-ash-hard no-underline'
+            )}
+          >
+            {LINK_MAP[link]?.name || link}
+          </a>
+        ))
+      }
+
+      <span
+        class="border-accent-main text-accent-text font-dm bg-accent-soft hover:bg-accent-glow cursor-pointer rounded-full border px-4 py-1.5 text-[11px] tracking-widest uppercase transition-colors"
+      >
+        Japón →
+      </span>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU BUTTON -->
   <button
     id="menu-btn"
-    class="relative z-120 flex cursor-pointer flex-col gap-1.5 md:hidden"
+    class="fixed top-5 right-6 z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
     aria-label="Menu"
     aria-expanded="false"
   >
-    <div class="line-1 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300"></div>
-    <div class="line-2 bg-ash-text h-0.5 w-6 transition-all duration-300"></div>
-    <div class="line-3 bg-ash-text h-0.5 w-6 origin-center transition-all duration-300"></div>
+    <div class="line-1 bg-ash-text h-0.5 w-6 origin-center"></div>
+    <div class="line-2 bg-ash-text h-0.5 w-6 origin-center"></div>
+    <div class="line-3 bg-ash-text h-0.5 w-6 origin-center"></div>
   </button>
 
+  <!-- MOBILE MENU -->
   <div
     id="mobile-menu"
-    class="mobile-menu bg-ash-main/98 fixed inset-0 z-110 flex flex-col items-center justify-center gap-8 backdrop-blur-xl md:hidden"
+    class="mobile-menu bg-ash-main/95 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl md:hidden"
   >
     {
       links.map((link) => (
@@ -100,25 +107,33 @@ const currentPath = Astro.url.pathname;
         </a>
       ))
     }
+
     <span
       class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors"
     >
       Japón →
     </span>
   </div>
-</nav>
+</header>
 
 <style>
+  html.menu-open,
+  body.menu-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   .mobile-menu {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 
-    transform: translateX(100%);
+    transform: translateY(-100%);
+
     transition:
-      opacity 0.4s ease,
-      transform 0.4s ease,
-      visibility 0.4s ease;
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease,
+      visibility 0.3s ease;
   }
 
   .mobile-menu.active {
@@ -126,7 +141,7 @@ const currentPath = Astro.url.pathname;
     visibility: visible;
     pointer-events: auto;
 
-    transform: translateX(0);
+    transform: translateY(0);
   }
 
   #menu-btn .line-1,
@@ -134,7 +149,8 @@ const currentPath = Astro.url.pathname;
   #menu-btn .line-3 {
     transition:
       transform 0.3s ease,
-      opacity 0.3s ease;
+      opacity 0.3s ease,
+      background-color 0.3s ease;
   }
 
   #menu-btn.open .line-1 {
@@ -148,75 +164,102 @@ const currentPath = Astro.url.pathname;
   #menu-btn.open .line-3 {
     transform: translateY(-8px) rotate(-45deg);
   }
+
+  #menu-btn.open .line-1,
+  #menu-btn.open .line-2,
+  #menu-btn.open .line-3 {
+    background-color: white;
+  }
 </style>
 
-<script>
-  const nav = document.querySelector('[data-navbar]');
-  const menuBtn = document.querySelector('#menu-btn');
-  const mobileMenu = document.querySelector('#mobile-menu');
-  const smartBack = document.querySelector('#smart-back');
+<script is:inline>
+  if (!window.__navbar_initialized__) {
+    window.__navbar_initialized__ = true;
 
-  const openMenu = () => {
-    menuBtn?.classList.add('open');
-    mobileMenu?.classList.add('active');
+    const nav = document.querySelector('[data-navbar]');
+    const menuBtn = document.querySelector('#menu-btn');
+    const mobileMenu = document.querySelector('#mobile-menu');
+    const smartBack = document.querySelector('#smart-back');
 
-    menuBtn?.setAttribute('aria-expanded', 'true');
+    const openMenu = () => {
+      menuBtn?.classList.add('open');
+      mobileMenu?.classList.add('active');
 
-    document.body.classList.add('overflow-hidden');
-  };
+      menuBtn?.setAttribute('aria-expanded', 'true');
 
-  const closeMenu = () => {
-    menuBtn?.classList.remove('open');
-    mobileMenu?.classList.remove('active');
-
-    menuBtn?.setAttribute('aria-expanded', 'false');
-
-    document.body.classList.remove('overflow-hidden');
-  };
-
-  const toggleMenu = () => {
-    const isOpen = menuBtn?.classList.contains('open');
-
-    if (isOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  };
-
-  const handleScroll = () => {
-    if (window.scrollY > 40) {
-      nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
       nav?.classList.remove('border-transparent', 'bg-transparent');
-    } else {
-      nav?.classList.remove('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
-      nav?.classList.add('border-transparent', 'bg-transparent');
-    }
-  };
 
-  smartBack?.addEventListener('click', () => {
-    const cameFromSite = document.referrer && new URL(document.referrer).origin === location.origin;
+      nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
 
-    if (cameFromSite && history.length > 1) {
-      history.back();
-    } else {
-      location.href = '/';
-    }
-  });
+      document.documentElement.classList.add('menu-open');
+      document.body.classList.add('menu-open');
+    };
 
-  menuBtn?.addEventListener('click', toggleMenu);
+    const closeMenu = () => {
+      menuBtn?.classList.remove('open');
+      mobileMenu?.classList.remove('active');
 
-  mobileMenu?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', closeMenu);
-  });
+      menuBtn?.setAttribute('aria-expanded', 'false');
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) {
-      closeMenu();
-    }
-  });
+      document.documentElement.classList.remove('menu-open');
+      document.body.classList.remove('menu-open');
 
-  window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+    };
 
-  handleScroll();
+    const toggleMenu = () => {
+      const isOpen = menuBtn?.classList.contains('open');
+
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    };
+
+    const handleScroll = () => {
+      const isOpen = menuBtn?.classList.contains('open');
+
+      if (isOpen) return;
+
+      if (window.scrollY > 40) {
+        nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
+
+        nav?.classList.remove('border-transparent', 'bg-transparent');
+      } else {
+        nav?.classList.remove('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
+
+        nav?.classList.add('border-transparent', 'bg-transparent');
+      }
+    };
+
+    smartBack?.addEventListener('click', () => {
+      const cameFromSite =
+        document.referrer && new URL(document.referrer).origin === location.origin;
+
+      if (cameFromSite && history.length > 1) {
+        history.back();
+      } else {
+        location.href = '/';
+      }
+    });
+
+    menuBtn?.addEventListener('click', toggleMenu);
+
+    mobileMenu?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        closeMenu();
+      }
+    });
+
+    window.addEventListener('scroll', handleScroll, {
+      passive: true,
+    });
+
+    handleScroll();
+  }
 </script>

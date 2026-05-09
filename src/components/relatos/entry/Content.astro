@@ -1,5 +1,5 @@
 ---
-import { processRelato } from '@/lib/markdown/process';
+import { processDiario } from '@/lib/markdown/process';
 import { APP_ROUTER } from '@/lib/constants';
 
 interface Props {
@@ -12,7 +12,8 @@ interface Props {
 }
 
 const { relato, nextRelato } = Astro.props;
-const htmlContent = processRelato(relato.content);
+const section = await processDiario(relato.content);
+const { htmlContent } = section[0];
 ---
 
 <section class="mx-auto max-w-2xl px-6 py-16 md:py-24">

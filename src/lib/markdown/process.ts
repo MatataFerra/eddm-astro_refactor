@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 
 type ProcessedSection = {
-  title: string;
+  title: string | undefined;
   htmlContent: string | Promise<string>;
   media: {
     type: 'image' | 'video';
@@ -45,14 +45,20 @@ async function getImageSize(url: string) {
 export async function processDiario(content: string | undefined): Promise<ProcessedSection[]> {
   if (!content) return [];
 
-  const sections = content.split(/(?=### \d+ de )/g);
+  const sections = content
+    .split(/(?=^###\s)/gm)
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const processedSections = await Promise.all(
     sections.map(async (section) => {
-      const titleMatch = section.match(/### (.*)/);
-      const title = titleMatch ? titleMatch[1] : '';
+      // Busca heading opcional
+      const titleMatch = section.match(/^###\s+(.*)$/m);
+
+      const title = titleMatch?.[1]?.trim();
 
       const mediaRegex = /(?:!\[(.*?)\]|\[(.*?)\])\((https?:\/\/.*?)\)/g;
+
       const mediaMatches = [...section.matchAll(mediaRegex)];
 
       const media = await Promise.all(
@@ -63,8 +69,8 @@ export async function processDiario(content: string | undefined): Promise<Proces
           const isVideo = /\.(webm|mp4|mov|ogg|m4v)($|\?)/i.test(url);
 
           let dimensions = {
-            width: 1200 as number,
-            height: 900 as number,
+            width: 1200,
+            height: 900,
           };
 
           if (!isVideo) {
@@ -75,18 +81,20 @@ export async function processDiario(content: string | undefined): Promise<Proces
             type: isVideo ? ('video' as const) : ('image' as const),
             alt: altOrName,
             src: url,
+
             poster: isVideo
               ? url
                   .replace('/video/upload/', '/video/upload/so_1,f_jpg/')
                   .replace(/\.[^.]+$/, '.jpg')
               : undefined,
+
             ...dimensions,
           };
         })
       );
 
       const rawText = section
-        .replace(/### .*/, '')
+        .replace(/^###\s+.*$/m, '')
         .replace(/(?:!\[.*?\]|\[.*?\])\(https?:\/\/.*?\)/g, '')
         .trim();
 
@@ -98,5 +106,5 @@ export async function processDiario(content: string | undefined): Promise<Proces
     })
   );
 
-  return processedSections.filter((s) => s.title !== '');
+  return processedSections.filter((s) => s.title || s.htmlContent || s.media.length);
 }
