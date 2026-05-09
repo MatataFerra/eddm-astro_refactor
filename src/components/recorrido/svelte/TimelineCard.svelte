@@ -59,7 +59,7 @@
   <div
     data-slot="conector"
     class={cn(
-      'bg-orange-main/70 absolute top-1/2 z-50 h-px w-8.5',
+      'bg-orange-main/70 absolute top-1/2 z-50 hidden h-px w-8.5 md:block',
       side === 'left' ? 'right-[calc(50%+6px)]' : 'left-[calc(50%+6px)]'
     )}
   ></div>
