@@ -2,24 +2,16 @@
 import MainLayout from '@/layouts/Layout.astro';
 import MarcarLeido from '@/components/viaje/svelte/MarcarLeido.svelte';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
-import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import type { ContentBySlug } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
 import LocationBar from '@/components/viaje/entry/LocationBar.astro';
 import Divider from '@/components/viaje/entry/Divider.astro';
 import Content from '@/components/viaje/entry/Content.astro';
 import Hero from '@/components/viaje/entry/Hero.astro';
-import { getContentNavigateArticles } from '@/lib/api/get-content-navigate';
+
+export const prerender = false;
 
 const { slug } = Astro.params;
-
-export async function getStaticPaths() {
-  const response = await getContentNavigateArticles<ContentNavigate[]>();
-  const articles = response?.data || [];
-
-  return articles.map((article) => ({
-    params: { slug: article.slug },
-  }));
-}
 
 const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
   strategy: 'slug',

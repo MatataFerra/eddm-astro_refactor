@@ -34,7 +34,7 @@ const currentPath = Astro.url.pathname;
   <!-- NAVBAR -->
   <nav
     data-navbar
-    class="fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent bg-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
+    class="bg-ash-main/30 fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
   >
     {
       currentPath === APP_ROUTER.HOME ? (
@@ -59,9 +59,9 @@ const currentPath = Astro.url.pathname;
             href={`/${link}`}
             class={cn(
               'font-dm hover:text-accent-text text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
-              currentPath === `/${link}`
+              currentPath === `/${link}` || currentPath.includes(link)
                 ? 'text-accent-text underline'
-                : 'text-ash-hard no-underline'
+                : 'text-ash-text no-underline'
             )}
           >
             {LINK_MAP[link]?.name || link}
@@ -181,15 +181,52 @@ const currentPath = Astro.url.pathname;
     const mobileMenu = document.querySelector('#mobile-menu');
     const smartBack = document.querySelector('#smart-back');
 
+    // =========================
+    // VISUAL STATES
+    // =========================
+
+    const NAV_STYLES = {
+      transparent: {
+        add: ['border-transparent', 'bg-ash-main/30'],
+        remove: ['border-white/5', 'bg-ash-main/85', 'backdrop-blur-md'],
+      },
+
+      solid: {
+        add: ['border-white/5', 'bg-ash-main/85', 'backdrop-blur-md'],
+        remove: ['border-transparent', 'bg-ash-main/30'],
+      },
+    };
+
+    // =========================
+    // HELPERS
+    // =========================
+
+    const applyClasses = (element, config) => {
+      if (!element) return;
+
+      element.classList.remove(...config.remove);
+      element.classList.add(...config.add);
+    };
+
+    const setNavState = (state) => {
+      applyClasses(nav, NAV_STYLES[state]);
+    };
+
+    const isMenuOpen = () => {
+      return menuBtn?.classList.contains('open');
+    };
+
+    // =========================
+    // MENU
+    // =========================
+
     const openMenu = () => {
       menuBtn?.classList.add('open');
       mobileMenu?.classList.add('active');
 
       menuBtn?.setAttribute('aria-expanded', 'true');
 
-      nav?.classList.remove('border-transparent', 'bg-transparent');
-
-      nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
+      setNavState('solid');
 
       document.documentElement.classList.add('menu-open');
       document.body.classList.add('menu-open');
@@ -208,30 +245,30 @@ const currentPath = Astro.url.pathname;
     };
 
     const toggleMenu = () => {
-      const isOpen = menuBtn?.classList.contains('open');
-
-      if (isOpen) {
+      if (isMenuOpen()) {
         closeMenu();
       } else {
         openMenu();
       }
     };
 
-    const handleScroll = () => {
-      const isOpen = menuBtn?.classList.contains('open');
+    // =========================
+    // SCROLL
+    // =========================
 
-      if (isOpen) return;
+    const handleScroll = () => {
+      if (isMenuOpen()) return;
 
       if (window.scrollY > 40) {
-        nav?.classList.add('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
-
-        nav?.classList.remove('border-transparent', 'bg-transparent');
+        setNavState('solid');
       } else {
-        nav?.classList.remove('border-white/5', 'bg-ash-main/85', 'backdrop-blur-md');
-
-        nav?.classList.add('border-transparent', 'bg-transparent');
+        setNavState('transparent');
       }
     };
+
+    // =========================
+    // BACK BUTTON
+    // =========================
 
     smartBack?.addEventListener('click', () => {
       const cameFromSite =
@@ -243,6 +280,10 @@ const currentPath = Astro.url.pathname;
         location.href = '/';
       }
     });
+
+    // =========================
+    // EVENTS
+    // =========================
 
     menuBtn?.addEventListener('click', toggleMenu);
 
