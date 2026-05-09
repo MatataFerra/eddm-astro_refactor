@@ -1,117 +1,74 @@
 <script lang="ts">
   import type { ParadaUI } from '@/lib/interfaces/recorrido';
+  import Card from '@/components/recorrido/svelte/Card.svelte';
   import { cn } from '@/lib/utils';
 
   interface Props {
     p: ParadaUI;
-    isProximo: boolean;
-    isOrigen: boolean;
+    side: 'left' | 'right';
   }
 
-  let { p, isProximo = false, isOrigen = false }: Props = $props();
+  let { p, side }: Props = $props();
+
+  const isProximo = $derived.by(() => p.tipo === 'proximo');
+  const isOrigen = $derived.by(() => p.tipo === 'origen');
+
+  let visible = $state(false);
+  let element: HTMLDivElement;
+
+  $effect(() => {
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          visible = true;
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '50px',
+      }
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  });
 </script>
 
-<a
-  href={p.googleMapsUrl}
-  target="_blank"
-  rel="noopener noreferrer"
-  class="group w-full md:w-[calc(50%-40px)]"
+<div
+  bind:this={element}
+  class={cn('relative flex w-full items-center', side === 'left' ? 'justify-start' : 'justify-end')}
 >
+  <!-- Punto -->
   <div
     class={cn(
-      'overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 group-hover:-translate-y-1',
-      isProximo
-        ? 'border-orange-main/10 bg-orange-main/5 opacity-70'
-        : 'group-hover:border-orange-main/40 border-white/7 bg-[#0c0c12]/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(232,146,74,0.15)]'
+      'absolute top-1/2 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full md:block',
+      isOrigen
+        ? 'border-orange-text bg-orange-main animate-pulse-dot h-4.5 w-4.5 border-3 shadow-[0_0_0_6px_var(--color-orange-soft),0_0_20px_var(--color-orange-glow)]'
+        : isProximo
+          ? 'border-orange-main/40 h-3 w-3 border-2 border-dashed bg-transparent'
+          : 'border-orange-dim bg-orange-main h-3 w-3 border-2 shadow-[0_0_10px_var(--color-orange-glow)]'
     )}
-  >
-    <!-- Imagen Cover -->
-    {#if p.cover}
-      <div class="relative h-45 overflow-hidden">
-        <img
-          src={p.cover}
-          alt={p.lugar}
-          loading="lazy"
-          decoding="async"
-          class={cn(
-            'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
-            isProximo && 'blur-[1px] grayscale-60'
-          )}
-        />
-        <div class="absolute inset-0 bg-linear-to-t from-[#0c0c12]/90 to-transparent/40"></div>
-        {#if isProximo}
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span
-              class="border-orange-main/25 font-fraunces text-orange-text bg-ash-main/80 rounded-full border px-4 py-2 text-lg italic backdrop-blur-sm"
-              >Próximamente</span
-            >
-          </div>
-        {/if}
-      </div>
-    {:else}
-      <div
-        class="border-orange-main/10 bg-orange-soft flex h-45 items-center justify-center border-b"
-      >
-        <span class="text-6xl">🗾</span>
-      </div>
-    {/if}
+  ></div>
 
-    <!-- Info Card -->
-    <div class="p-5 md:p-6">
-      <div class="mb-3 flex items-start justify-between">
-        <div>
-          <div class="mb-1.5 flex items-center gap-2">
-            <span class="text-lg">{p.flag}</span>
-            <span class="font-dm text-ash-soft text-[10px] tracking-widest uppercase">{p.pais}</span
-            >
-          </div>
-          <h3
-            class="font-fraunces text-ash-text text-2xl leading-none font-bold tracking-[-0.02em]"
-          >
-            {p.lugar}
-          </h3>
-          <div class="font-dm text-ash-soft mt-1.5 text-[11px] tracking-[0.04em]">
-            {p.fecha}
-          </div>
-        </div>
-        {#if !isOrigen && p.kmEtapa > 0}
-          <div class="shrink-0 text-right">
-            <div class="font-dm text-ash-softest mb-1 text-[9px] tracking-widest uppercase">
-              esta etapa
-            </div>
-            <div class="font-fraunces text-orange-text text-2xl tracking-[-0.02em] italic">
-              +{p.kmEtapa.toLocaleString('es-AR')}
-            </div>
-            <div class="font-dm text-ash-softest text-[9px] tracking-[0.06em]">km</div>
-          </div>
-        {/if}
-      </div>
+  <!-- Connector -->
+  <div
+    data-slot="conector"
+    class={cn(
+      'bg-orange-main/70 absolute top-1/2 z-50 h-px w-8.5',
+      side === 'left' ? 'right-[calc(50%+6px)]' : 'left-[calc(50%+6px)]'
+    )}
+  ></div>
 
-      <p class="font-dm text-ash-hard mb-4 text-[13px] leading-relaxed font-light">
-        {p.descripcion}
-      </p>
-
-      <!-- Stats KM Internos -->
-      {#if !isOrigen}
-        <div class="mb-4 grid grid-cols-2 gap-2">
-          <div class="border-orange-main/10 bg-orange-main/5 rounded-xl border px-3.5 py-2.5">
-            <div class="font-dm text-ash-soft mb-1 text-[9px] tracking-widest uppercase">
-              Desde Bs. As.
-            </div>
-            <div class="font-fraunces text-orange-text text-xl tracking-[-0.02em] italic">
-              {p.kmDesdeOrigen.toLocaleString('es-AR')}
-            </div>
-          </div>
-          <div class="rounded-xl border border-white/7 bg-white/3 px-3.5 py-2.5">
-            <div class="font-dm text-ash-soft mb-1 text-[9px] tracking-widest uppercase">
-              Total acumulado
-            </div>
-            <div class="font-fraunces text-ash-text text-xl tracking-[-0.02em] italic">
-              {p.kmAcumulados.toLocaleString('es-AR')}
-            </div>
-          </div>
-        </div>
-      {/if}
-    </div>
-  </div>
-</a>
+  {#if visible}
+    <Card {p} {isProximo} {isOrigen} loadMedia={true} />
+  {:else}
+    <div
+      class="h-112.5 w-full animate-pulse rounded-2xl border border-white/5 bg-[#0c0c12]/50 md:w-[calc(50%-40px)]"
+    ></div>
+  {/if}
+</div>
