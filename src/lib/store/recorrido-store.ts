@@ -22,11 +22,11 @@ export const filteredParadasStore = computed(
 );
 
 export const totalKmStore = computed(paradasStore, (paradas) => {
-  return paradas[paradas.length - 2]?.kmAcumulados || 0;
+  return paradas[paradas.length - 1]?.kmAcumulados || 0;
 });
 
 export const totalPaisesStore = computed(paradasStore, (paradas) => {
-  return new Set(paradas.filter((p) => p.tipo === 'destino').map((p) => p.pais)).size;
+  return new Set(paradas.map((p) => p.pais)).size;
 });
 
 export const totalCiudadesStore = computed(paradasStore, (paradas) => {

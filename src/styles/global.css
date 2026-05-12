@@ -1,6 +1,22 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional;
+}
+
 @theme {
   --color-accent-main: #d4a843;
   --color-accent-soft: rgba(212, 168, 67, 0.15);
@@ -27,8 +43,8 @@
   --color-ash-softest: #444444;
   --color-ash-text: #f0eeff;
 
-  --font-fraunces: 'Fraunces Variable', serif;
-  --font-dm: 'DM Sans Variable', sans-serif;
+  --font-dm: 'DM Sans';
+  --font-fraunces: 'Fraunces';
 
   --animate-pulse-dot: pulse-dot 3s infinite;
 }

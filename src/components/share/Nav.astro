@@ -32,9 +32,10 @@ const currentPath = Astro.url.pathname;
 
 <header>
   <!-- NAVBAR -->
+
   <nav
     data-navbar
-    class="bg-ash-main/30 fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent px-6 transition-all duration-400 ease-in-out md:px-10"
+    class="bg-ash-main/30 fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent px-6 transition-[background-color,border-color,backdrop-filter] duration-400 ease-in-out will-change-[backdrop-filter] md:px-10"
   >
     {
       currentPath === APP_ROUTER.HOME ? (
