@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import Nav from '@/components/share/Nav.astro';
+import frauncesFont from '@/assets/fonts/fraunces.woff2';
+import dmSansFont from '@/assets/fonts/dm-sans.woff2';
 
 interface Props {
   title: string;
@@ -15,11 +17,14 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <link rel="preload" href={frauncesFont} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={dmSansFont} as="font" type="font/woff2" crossorigin="anonymous" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
   <body id="body-root">
-    <Nav variant="main" />
+    <Nav variant="main" data-navbar />
     <slot />
   </body>
 </html>
@@ -30,12 +35,13 @@ const { title } = Astro.props;
   }
   .reveal {
     opacity: 0.001;
-    transform: translateY(12px);
+    transform: translate3d(0, 12px, 0);
+    backface-visibility: hidden;
     transition:
       opacity 0.7s ease,
       transform 0.7s ease;
     transition-delay: var(--delay, 0s);
-    will-change: opacity, transform;
+    /* will-change: opacity, transform; */
   }
   .reveal.visible {
     opacity: 1;
@@ -70,5 +76,11 @@ const { title } = Astro.props;
 
   observeAll();
 
-  document.addEventListener('astro:page-load', observeAll);
+  document.addEventListener('astro:page-load', async () => {
+    await document.fonts.ready;
+
+    requestAnimationFrame(() => {
+      observeAll();
+    });
+  });
 </script>
