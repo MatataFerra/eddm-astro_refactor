@@ -53,7 +53,7 @@ const currentPath = Astro.url.pathname;
     }
 
     <!-- DESKTOP -->
-    <div class="hidden items-center gap-8 md:flex">
+    <div class="hidden items-center gap-8 lg:flex">
       {
         links.map((link) => (
           <a
@@ -81,7 +81,7 @@ const currentPath = Astro.url.pathname;
   <!-- MOBILE MENU BUTTON -->
   <button
     id="menu-btn"
-    class="fixed top-5 right-6 z-50 flex cursor-pointer flex-col gap-1.5 md:hidden"
+    class="fixed top-5 right-6 z-50 flex cursor-pointer flex-col gap-1.5 lg:hidden"
     aria-label="Menu"
     aria-expanded="false"
   >
@@ -93,7 +93,7 @@ const currentPath = Astro.url.pathname;
   <!-- MOBILE MENU -->
   <div
     id="mobile-menu"
-    class="mobile-menu bg-ash-main/95 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl md:hidden"
+    class="mobile-menu bg-ash-main/95 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl lg:hidden"
   >
     {
       links.map((link) => (

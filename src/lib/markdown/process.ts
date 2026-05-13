@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import { imageSize } from 'image-size';
 
 type ProcessedSection = {
   title: string | undefined;
@@ -13,32 +14,39 @@ type ProcessedSection = {
   }[];
 };
 
-const imageSizeCache = new Map();
-
 async function getImageSize(url: string) {
-  const cached = imageSizeCache.get(url);
-
-  if (cached) return cached;
-
   try {
-    const infoUrl = url.replace('/upload/', '/upload/fl_getinfo/');
+    // Cloudinary fast-path
+    if (url.includes('res.cloudinary.com')) {
+      const infoUrl = url.replace('/upload/', '/upload/fl_getinfo/');
 
-    const response = await fetch(infoUrl);
-    const json = await response.json();
+      const response = await fetch(infoUrl);
+      const json = await response.json();
 
-    const result = {
-      width: json.input.width,
-      height: json.input.height,
-    };
+      return {
+        width: json.input.width,
+        height: json.input.height,
+      };
+    }
 
-    imageSizeCache.set(url, result);
+    // Generic images (Notion, etc)
+    const response = await fetch(url);
 
-    return result;
-  } catch {
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const dimensions = imageSize(buffer);
+
+    if (!dimensions.width || !dimensions.height) {
+      return null;
+    }
+
     return {
-      width: 1200,
-      height: 900,
+      width: dimensions.width,
+      height: dimensions.height,
     };
+  } catch {
+    return null;
   }
 }
 
@@ -74,7 +82,11 @@ export async function processDiario(content: string | undefined): Promise<Proces
           };
 
           if (!isVideo) {
-            dimensions = await getImageSize(url);
+            const response = await getImageSize(url);
+
+            if (response) {
+              dimensions = response;
+            }
           }
 
           return {

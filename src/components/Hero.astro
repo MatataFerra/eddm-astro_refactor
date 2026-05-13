@@ -3,7 +3,7 @@ import HeroImage from '@/components/HeroImage.astro';
 import HeroTitle from '@/components/HeroTitle.astro';
 ---
 
-<section class="relative flex min-h-screen items-center overflow-hidden">
+<section class="relative mt-4 flex h-275 min-h-screen items-center overflow-hidden lg:h-auto">
   <div
     class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(212,168,67,0.12)_0%,transparent_60%)]"
   >
@@ -16,10 +16,5 @@ import HeroTitle from '@/components/HeroTitle.astro';
   >
     <HeroTitle />
     <HeroImage />
-  </div>
-
-  <div class="absolute bottom-9 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
-    <div class="to-accent-main h-12 w-px bg-linear-to-b from-transparent"></div>
-    <div class="bg-accent-main h-1.5 w-1.5 animate-pulse rounded-full"></div>
   </div>
 </section>

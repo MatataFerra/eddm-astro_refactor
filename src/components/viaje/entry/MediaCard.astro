@@ -15,19 +15,9 @@ interface Props {
 
   containerClass?: string;
   imageClass?: string;
-
-  widthFallback?: number;
-  heightFallback?: number;
 }
 
-const {
-  item,
-  containerClass = '',
-  imageClass = '',
-
-  widthFallback = 1200,
-  heightFallback = 900,
-} = Astro.props;
+const { item, containerClass = '', imageClass = '' } = Astro.props;
 ---
 
 <div class:list={['overflow-hidden border border-white/5', containerClass]}>
@@ -37,8 +27,11 @@ const {
     ) : (
       <a
         href={item.src}
-        data-pswp-width={item.width || widthFallback}
-        data-pswp-height={item.height || heightFallback}
+        {...(item.width &&
+          item.height && {
+            'data-pswp-width': item.width,
+            'data-pswp-height': item.height,
+          })}
         target="_blank"
         class="block h-full"
       >
