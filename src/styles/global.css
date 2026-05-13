@@ -3,7 +3,7 @@
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('/fonts/dm-sans.woff2') format('woff2');
+  src: url('@/assets/fonts/dm-sans.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: optional;
@@ -11,10 +11,10 @@
 
 @font-face {
   font-family: 'Fraunces';
-  src: url('/fonts/fraunces.woff2') format('woff2');
+  src: url('@/assets/fonts/fraunces.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
-  font-display: optional;
+  font-display: block;
 }
 
 @theme {
@@ -43,8 +43,8 @@
   --color-ash-softest: #444444;
   --color-ash-text: #f0eeff;
 
-  --font-dm: 'DM Sans';
-  --font-fraunces: 'Fraunces';
+  --font-dm: 'DM Sans', system-ui, sans-serif;
+  --font-fraunces: 'Fraunces', Georgia, serif;
 
   --animate-pulse-dot: pulse-dot 3s infinite;
 }
