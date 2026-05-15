@@ -14,10 +14,10 @@ interface Props {
   item: MediaItem;
 
   containerClass?: string;
-  imageClass?: string;
+  mediaClass?: string;
 }
 
-const { item, containerClass = '', imageClass = '' } = Astro.props;
+const { item, containerClass = '', mediaClass = '' } = Astro.props;
 ---
 
 <div class:list={['overflow-hidden border border-white/5', containerClass]}>
@@ -42,7 +42,7 @@ const { item, containerClass = '', imageClass = '' } = Astro.props;
           decoding="async"
           class:list={[
             'h-full w-full cursor-zoom-in object-cover transition-transform duration-700 hover:scale-[1.02]',
-            imageClass,
+            mediaClass,
           ]}
         />
       </a>

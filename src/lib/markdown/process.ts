@@ -94,11 +94,12 @@ export async function processDiario(content: string | undefined): Promise<Proces
             alt: altOrName,
             src: url,
 
-            poster: isVideo
-              ? url
-                  .replace('/video/upload/', '/video/upload/so_1,f_jpg/')
-                  .replace(/\.[^.]+$/, '.jpg')
-              : undefined,
+            poster:
+              isVideo && url.includes('res.cloudinary.com')
+                ? url
+                    .replace('/video/upload/', '/video/upload/so_1,f_jpg/')
+                    .replace(/\.[^.]+$/, '.jpg')
+                : undefined,
 
             ...dimensions,
           };

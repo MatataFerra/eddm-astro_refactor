@@ -1,6 +1,7 @@
 ---
 import { processDiario } from '@/lib/markdown/process';
 import MediaBlock from '@/components/viaje/entry/MediaBlock.astro';
+import Article from '@/components/share/Article.astro';
 
 interface Props {
   content: string;
@@ -24,10 +25,7 @@ const DIAS = await processDiario(content);
             <div class="h-px flex-1 bg-white/5" />
           </div>
 
-          <div
-            class="reveal prose prose-invert font-dm prose-p:mb-6 prose-strong:text-green-soft prose-a:text-green-soft prose-a:no-underline hover:prose-a:underline max-w-none text-[17px] leading-[1.9] font-light text-[#bbb]"
-            set:html={dia.htmlContent}
-          />
+          <Article htmlContent={dia.htmlContent} />
 
           {dia.media.length > 0 && (
             <div class="reveal mt-10">

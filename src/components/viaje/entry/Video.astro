@@ -1,4 +1,5 @@
 ---
+import defaultPoster from '@/assets/images/vide-fallback.webp';
 interface Props {
   item: {
     src: string;
@@ -9,13 +10,29 @@ interface Props {
 }
 
 const { item }: Props = Astro.props;
+
+const videoPoster = item.poster || defaultPoster.src;
 ---
 
-<div class="group relative h-full w-full">
-  <video src={item.src} poster={item.poster} controls class="h-full w-full object-cover"></video>
-  <div
-    class="bg-ash-main/70 pointer-events-none absolute top-2 left-2 rounded-md border border-white/10 px-2 py-0.5 backdrop-blur-md transition-opacity group-hover:opacity-0"
+<div class="group bg-ash-main relative h-full w-full overflow-hidden rounded-xl">
+  <video
+    src={item.src}
+    poster={videoPoster}
+    controls
+    playsinline
+    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+    preload="metadata"
   >
-    <span class="font-dm text-green-soft text-[9px] tracking-wider uppercase"> ▶ video </span>
+  </video>
+
+  <div
+    class="bg-ash-main/70 pointer-events-none absolute top-3 left-3 z-10 rounded-md border border-white/10 px-2.5 py-1 backdrop-blur-md transition-opacity group-hover:opacity-0"
+  >
+    <div class="flex items-center gap-1.5">
+      <span class="bg-green-soft h-1.5 w-1.5 animate-pulse rounded-full"></span>
+      <span class="font-dm text-green-soft text-[10px] font-medium tracking-widest uppercase">
+        video
+      </span>
+    </div>
   </div>
 </div>

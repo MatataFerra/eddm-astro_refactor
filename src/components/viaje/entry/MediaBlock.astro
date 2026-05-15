@@ -1,10 +1,12 @@
 ---
 import Video from '@/components/viaje/entry/Video.astro';
+import { buildBentoRows } from '@/lib/bento';
 
 import 'photoswipe/style.css';
 import MediaCard from '@/components/viaje/entry/MediaCard.astro';
+import { cn } from '@/lib/utils';
 
-interface MediaItem {
+export interface MediaItem {
   type: 'image' | 'video';
   src: string;
   alt?: string;
@@ -29,6 +31,9 @@ const isSingle = count === 1;
 const isDouble = count === 2;
 const isTriple = count === 3;
 const isBento = count >= 4;
+
+const hero = items[0];
+const rows = buildBentoRows(items.slice(1));
 ---
 
 <div class="reveal pswp-gallery my-8">
@@ -49,7 +54,7 @@ const isBento = count >= 4;
             <MediaCard
               item={items[0]}
               containerClass="max-w-(--breakpoint-sm) rounded-xl"
-              imageClass="h-auto object-contain"
+              mediaClass="h-auto object-contain"
             />
           )}
         </div>
@@ -66,7 +71,7 @@ const isBento = count >= 4;
             {item.type === 'video' ? (
               <Video item={item} />
             ) : (
-              <MediaCard item={item} containerClass="aspect-4/5 rounded-xl" imageClass="" />
+              <MediaCard item={item} containerClass="aspect-4/5 rounded-xl" />
             )}
           </div>
         ))}
@@ -88,7 +93,6 @@ const isBento = count >= 4;
               <MediaCard
                 item={item}
                 containerClass={`${idx === 0 ? 'row-span-2' : ''} rounded-xl`}
-                imageClass=""
               />
             )}
           </div>
@@ -99,81 +103,96 @@ const isBento = count >= 4;
 
   {/* LAYOUT 4+: BENTO */}
   {
-    isBento &&
-      (() => {
-        const hero = items[0];
-        const rest = items.slice(1);
+    isBento && (
+      <div class="space-y-3">
+        {/* HERO */}
+        {hero && (
+          <div class="grid grid-cols-2 gap-3">
+            <MediaCard
+              item={hero}
+              containerClass="overflow-hidden rounded-2xl border border-white/5 col-span-2"
+              mediaClass="aspect-[16/10] w-full object-cover"
+            />
+          </div>
+        )}
 
-        const rows = [];
-        let i = 0;
+        {/* ROWS */}
+        {rows.map((row) => {
+          // -----------------------------------
+          // DOUBLE
+          // -----------------------------------
 
-        while (i < rest.length) {
-          const remaining = rest.length - i;
-
-          // THIRD ITEM LARGE
-          if (i === 2 && rest[i]) {
-            rows.push({
-              type: 'large',
-              items: [rest[i]],
-            });
-
-            i += 1;
-            continue;
-          }
-
-          // LAST ODD ITEM => LARGE
-          if (remaining === 1) {
-            rows.push({
-              type: 'large',
-              items: [rest[i]],
-            });
-
-            break;
-          }
-
-          // NORMAL DOUBLE ROW
-          rows.push({
-            type: 'double',
-            items: [rest[i], rest[i + 1]],
-          });
-
-          i += 2;
-        }
-
-        return (
-          <div class="space-y-3">
-            {/* HERO */}
-            {hero && (
-              <MediaCard
-                item={hero}
-                containerClass="rounded-2xl"
-                imageClass="h-[420px] md:h-[620px]"
-              />
-            )}
-
-            {/* ROWS */}
-            {rows.map((row) =>
-              row.type === 'large' ? (
-                <MediaCard
-                  item={row.items[0]}
-                  containerClass="rounded-2xl"
-                  imageClass="h-[180px] md:h-[260px]"
-                />
-              ) : (
-                <div class="grid grid-cols-2 gap-3">
-                  {row.items.map((item) => (
+          if (row.type === 'double') {
+            return (
+              <div class="grid grid-cols-2 gap-3">
+                {row.items.map((item) => (
+                  <div class="aspect-square overflow-hidden rounded-xl border border-white/5">
                     <MediaCard
                       item={item}
-                      containerClass="rounded-xl"
-                      imageClass="aspect-square md:aspect-[4/3]"
+                      containerClass="h-full w-full"
+                      mediaClass="h-full w-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+
+          // -----------------------------------
+          // FEATURE
+          // -----------------------------------
+
+          if (row.type === 'feature') {
+            const [large, smallA, smallB] = row.items;
+
+            return (
+              <div
+                class={cn(
+                  'grid gap-3 md:grid-cols-[1.4fr_1fr]',
+                  row.reversed && 'md:grid-cols-[1fr_1.4fr]'
+                )}
+              >
+                {/* LARGE */}
+                <div class={cn(row.reversed && 'md:order-2')}>
+                  <MediaCard
+                    item={large}
+                    containerClass="h-full overflow-hidden rounded-2xl border border-white/5"
+                    mediaClass="h-full min-h-[420px] w-full object-cover"
+                  />
+                </div>
+
+                {/* SMALL STACK */}
+                <div class={cn('grid gap-3', row.reversed && 'md:order-1')}>
+                  {[smallA, smallB].map((item) => (
+                    <MediaCard
+                      item={item}
+                      containerClass="overflow-hidden rounded-xl border border-white/5"
+                      mediaClass="aspect-[4/3] md:aspect-square object-cover"
                     />
                   ))}
                 </div>
-              )
-            )}
-          </div>
-        );
-      })()
+              </div>
+            );
+          }
+
+          // -----------------------------------
+          // FOOTER
+          // -----------------------------------
+
+          if (row.type === 'footer') {
+            return (
+              <div class="aspect-16/10 overflow-hidden rounded-2xl border border-white/5">
+                <MediaCard
+                  item={row.items[0]}
+                  containerClass="h-full w-full"
+                  mediaClass="h-full w-full object-cover"
+                />
+              </div>
+            );
+          }
+        })}
+      </div>
+    )
   }
 
   {

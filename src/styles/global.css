@@ -44,7 +44,7 @@
   --color-ash-text: #f0eeff;
 
   --font-dm: 'DM Sans', system-ui, sans-serif;
-  --font-fraunces: 'Fraunces', Georgia, serif;
+  --font-fraunces: 'Fraunces', Georgia, 'Times New Roman', serif;
 
   --animate-pulse-dot: pulse-dot 3s infinite;
 }

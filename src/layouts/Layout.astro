@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Nav from '@/components/share/Nav.astro';
 import frauncesFont from '@/assets/fonts/fraunces.woff2';
 import dmSansFont from '@/assets/fonts/dm-sans.woff2';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
@@ -22,6 +24,8 @@ const { title } = Astro.props;
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <Analytics />
+    <SpeedInsights />
   </head>
   <body id="body-root">
     <Nav variant="main" data-navbar />
