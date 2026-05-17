@@ -58,6 +58,9 @@
     @apply font-dm bg-ash-main text-ash-text overflow-x-hidden;
   }
 
+  img {
+    display: block;
+  }
   /* Grain overlay */
   body::before {
     content: '';
