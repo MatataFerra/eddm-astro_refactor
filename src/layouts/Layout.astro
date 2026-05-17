@@ -108,13 +108,14 @@ const { title } = Astro.props;
       }, 200);
     }
   });
-  const len = document.querySelectorAll('.reveal').length;
 
   let revealObserver: IntersectionObserver | null;
 
   // --- 2. LÓGICA DEL REVEAL ANIMATION ---
-  function initReveal() {
-    console.log('inicio reveals: ', len);
+  document.addEventListener('astro:page-load', async () => {
+    await document.fonts.ready;
+
+    // Limpiar observer anterior
     if (revealObserver) {
       revealObserver.disconnect();
       revealObserver = null;
@@ -129,18 +130,19 @@ const { title } = Astro.props;
           }
         }
       },
-      { threshold: 0.05, rootMargin: '0px 0px -5% 0px' }
+      { threshold: 0, rootMargin: '0px' }
     );
 
-    document.querySelectorAll('.reveal:not(.visible)').forEach((el) => {
-      revealObserver!.observe(el);
+    const elements = document.querySelectorAll('.reveal');
+
+    elements.forEach((el) => {
+      el.classList.remove('visible');
     });
 
-    console.log('fin reveals: ', len);
-  }
+    document.body.getBoundingClientRect();
 
-  document.addEventListener('astro:page-load', async () => {
-    await document.fonts.ready;
-    requestAnimationFrame(() => requestAnimationFrame(initReveal));
+    elements.forEach((el) => {
+      revealObserver!.observe(el);
+    });
   });
 </script>
