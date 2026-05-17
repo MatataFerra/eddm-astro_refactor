@@ -7,6 +7,8 @@ import RelatoCard from '@/components/relatos/RelatoCard.astro';
 import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
 import { APP_ROUTER } from '@/lib/constants';
 
+export const prerender = true;
+
 const tales = await getContentNavigateTales<ContentNavigate[]>();
 
 const [featured, ...rest] = tales?.data || [];

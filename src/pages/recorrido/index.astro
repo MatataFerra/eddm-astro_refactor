@@ -5,6 +5,8 @@ import { getTrip } from '@/lib/api/get-trip';
 import RecorridoView from '@/components/recorrido/View.astro';
 import { adaptTripToParadas } from '@/lib/adapters/recorrido-adapter';
 
+export const prerender = true;
+
 const trip = await getTrip<Trip>();
 const paradasUI = adaptTripToParadas(trip?.data);
 ---

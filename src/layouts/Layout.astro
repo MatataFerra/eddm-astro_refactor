@@ -112,6 +112,8 @@ const { title } = Astro.props;
   // --- 2. LÓGICA DEL REVEAL ANIMATION ---
   let revealObserver: IntersectionObserver;
 
+  const observed = new WeakSet();
+
   function initReveal() {
     if (!revealObserver) {
       revealObserver = new IntersectionObserver(
@@ -130,11 +132,10 @@ const { title } = Astro.props;
       );
     }
 
-    document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
-      // ya procesado
-      if (el.dataset.revealInit) return;
+    document.querySelectorAll('.reveal').forEach((el) => {
+      if (observed.has(el)) return;
 
-      el.dataset.revealInit = 'true';
+      observed.add(el);
 
       const rect = el.getBoundingClientRect();
 
@@ -150,7 +151,9 @@ const { title } = Astro.props;
     });
   }
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', async () => {
+    await document.fonts.ready;
+
     requestAnimationFrame(() => {
       requestAnimationFrame(initReveal);
     });

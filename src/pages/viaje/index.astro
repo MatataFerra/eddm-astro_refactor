@@ -5,6 +5,8 @@ import { getContentNavigateArticles } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import { adaptArticlesToMeses } from '@/lib/adapters/viaje-adapter';
 
+export const prerender = true;
+
 const articles = await getContentNavigateArticles<ContentNavigate[]>();
 const mesesData = adaptArticlesToMeses(articles?.data || []);
 ---

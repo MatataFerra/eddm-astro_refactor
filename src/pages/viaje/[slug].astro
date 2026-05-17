@@ -9,8 +9,6 @@ import Divider from '@/components/viaje/entry/Divider.astro';
 import Content from '@/components/viaje/entry/Content.astro';
 import Hero from '@/components/viaje/entry/Hero.astro';
 
-export const prerender = false;
-
 const { slug } = Astro.params;
 
 const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
