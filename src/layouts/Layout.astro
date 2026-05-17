@@ -42,9 +42,7 @@ const { title } = Astro.props;
   }
   .reveal {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
-    backface-visibility: hidden;
-    will-change: opacity, transform;
+    transform: translateY(12px);
     transition:
       opacity 0.7s ease,
       transform 0.7s ease;
@@ -112,35 +110,47 @@ const { title } = Astro.props;
   });
 
   // --- 2. LÓGICA DEL REVEAL ANIMATION ---
-  // --- 2. LÓGICA DEL REVEAL ANIMATION ---
-  let revealObserver: IntersectionObserver | null = null;
+  let revealObserver: IntersectionObserver;
 
   function initReveal() {
-    if (revealObserver) {
-      revealObserver.disconnect();
-      revealObserver = null;
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              revealObserver.unobserve(entry.target);
+            }
+          }
+        },
+        {
+          threshold: 0.05,
+          rootMargin: '0px 0px -5% 0px',
+        }
+      );
     }
 
-    revealObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObserver?.unobserve(entry.target);
-          }
-        }
-      },
-      { threshold: 0.05, rootMargin: '0px' }
-    );
+    document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
+      // ya procesado
+      if (el.dataset.revealInit) return;
 
-    document.querySelectorAll('.reveal').forEach((el) => {
-      el.classList.remove('visible');
-      revealObserver?.observe(el);
+      el.dataset.revealInit = 'true';
+
+      const rect = el.getBoundingClientRect();
+
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+
+      if (inView) {
+        requestAnimationFrame(() => {
+          el.classList.add('visible');
+        });
+      } else {
+        revealObserver.observe(el);
+      }
     });
   }
 
   document.addEventListener('astro:page-load', () => {
-    // Doble rAF: garantiza que el layout post-transición esté completamente estable
     requestAnimationFrame(() => {
       requestAnimationFrame(initReveal);
     });
