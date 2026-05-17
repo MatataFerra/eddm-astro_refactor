@@ -1,20 +1,14 @@
-export function fadein(node: HTMLElement, { delay = 0 } = {}) {
-  node.classList.add(
-    'opacity-0',
-    'translate-y-1',
-    'transition-opacity',
-    'transition-transform',
-    'duration-700',
-    'ease-out'
-  );
-
+export function fadein(node: HTMLElement, { delay = 0 }: { delay?: number } = {}) {
+  node.style.opacity = '0';
+  node.style.transform = 'translateY(6px)';
+  node.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
   node.style.transitionDelay = `${delay}s`;
 
   const reveal = () => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        node.classList.remove('opacity-0', 'translate-y-1');
-        node.classList.add('opacity-100', 'translate-y-0');
+        node.style.opacity = '1';
+        node.style.transform = 'translateY(0)';
       });
     });
   };
@@ -26,9 +20,7 @@ export function fadein(node: HTMLElement, { delay = 0 } = {}) {
         observer.disconnect();
       }
     },
-    {
-      threshold: 0.05,
-    }
+    { threshold: 0.05 }
   );
 
   observer.observe(node);

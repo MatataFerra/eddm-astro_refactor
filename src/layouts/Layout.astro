@@ -109,53 +109,34 @@ const { title } = Astro.props;
     }
   });
 
+  let revealObserver: IntersectionObserver | null;
+
   // --- 2. LÓGICA DEL REVEAL ANIMATION ---
-  let revealObserver: IntersectionObserver;
-
-  const observed = new WeakSet();
-
   function initReveal() {
-    if (!revealObserver) {
-      revealObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-              revealObserver.unobserve(entry.target);
-            }
-          }
-        },
-        {
-          threshold: 0.05,
-          rootMargin: '0px 0px -5% 0px',
-        }
-      );
+    if (revealObserver) {
+      revealObserver.disconnect();
+      revealObserver = null;
     }
 
-    document.querySelectorAll('.reveal').forEach((el) => {
-      if (observed.has(el)) return;
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver?.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -5% 0px' }
+    );
 
-      observed.add(el);
-
-      const rect = el.getBoundingClientRect();
-
-      const inView = rect.top < window.innerHeight && rect.bottom > 0;
-
-      if (inView) {
-        requestAnimationFrame(() => {
-          el.classList.add('visible');
-        });
-      } else {
-        revealObserver.observe(el);
-      }
+    document.querySelectorAll('.reveal:not(.visible)').forEach((el) => {
+      revealObserver!.observe(el);
     });
   }
 
   document.addEventListener('astro:page-load', async () => {
     await document.fonts.ready;
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(initReveal);
-    });
+    requestAnimationFrame(() => requestAnimationFrame(initReveal));
   });
 </script>
