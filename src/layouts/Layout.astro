@@ -5,6 +5,7 @@ import frauncesFont from '@/assets/fonts/fraunces.woff2';
 import dmSansFont from '@/assets/fonts/dm-sans.woff2';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -24,10 +25,12 @@ const { title } = Astro.props;
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <ClientRouter />
     <Analytics />
     <SpeedInsights />
   </head>
   <body id="body-root">
+    <div id="page-loader" transition:persist></div>
     <Nav variant="main" data-navbar />
     <slot />
   </body>
@@ -41,15 +44,31 @@ const { title } = Astro.props;
     opacity: 0.001;
     transform: translate3d(0, 12px, 0);
     backface-visibility: hidden;
+    will-change: opacity, transform;
     transition:
       opacity 0.7s ease,
       transform 0.7s ease;
     transition-delay: var(--delay, 0s);
-    /* will-change: opacity, transform; */
   }
   .reveal.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  #page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background-color: var(--color-orange-main);
+    z-index: 9999;
+    transition:
+      width 0.3s ease,
+      opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 0 10px var(--color-orange-glow);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -62,29 +81,63 @@ const { title } = Astro.props;
 </style>
 
 <script>
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      }
-    },
-    { threshold: 0.1 }
-  );
+  // --- 1. LÓGICA DE LA BARRA DE CARGA ---
+  // Al usar transition:persist, el elemento se mantiene vivo entre páginas.
+  // Pero lo buscamos dentro de los eventos por seguridad.
 
-  function observeAll() {
-    document.querySelectorAll('.reveal:not(.visible)').forEach((el) => observer.observe(el));
+  document.addEventListener('astro:before-preparation', () => {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+      loader.style.opacity = '1';
+      loader.style.width = '30%';
+
+      setTimeout(() => {
+        if (loader.style.opacity === '1') loader.style.width = '60%';
+      }, 400);
+      setTimeout(() => {
+        if (loader.style.opacity === '1') loader.style.width = '85%';
+      }, 1000);
+    }
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    const loader = document.getElementById('page-loader');
+    if (loader && loader.style.opacity === '1') {
+      loader.style.width = '100%';
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => (loader.style.width = '0%'), 300);
+      }, 200);
+    }
+  });
+
+  // --- 2. LÓGICA DEL REVEAL ANIMATION ---
+  let revealObserver: IntersectionObserver | null = null;
+
+  function initReveal() {
+    if (revealObserver) {
+      revealObserver.disconnect();
+    }
+
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver?.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.05, rootMargin: '0px' }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => {
+      el.classList.remove('visible');
+      revealObserver?.observe(el);
+    });
   }
 
-  observeAll();
-
-  document.addEventListener('astro:page-load', async () => {
-    await document.fonts.ready;
-
-    requestAnimationFrame(() => {
-      observeAll();
-    });
+  document.addEventListener('astro:page-load', () => {
+    requestAnimationFrame(initReveal);
   });
 </script>
