@@ -1,13 +1,12 @@
 <script lang="ts">
   import { readWeeks } from '@/lib/store/viaje-store';
-  import { fadein } from '@/lib/actions/fade';
 
   let { totalWeeks } = $props();
   let readCount = $derived($readWeeks.length);
   let pct = $derived(totalWeeks > 0 ? Math.round((readCount / totalWeeks) * 100) : 0);
 </script>
 
-<div use:fadein={{ delay: 0.24 }} class="mt-9 inline-flex flex-col items-center gap-2.5">
+<div class="reveal mt-9 inline-flex flex-col items-center gap-2.5">
   <div class="h-0.75 w-70 overflow-hidden rounded-sm bg-white/5">
     <div
       class="to-green-soft from-green-main h-full rounded-sm bg-linear-to-r transition-all duration-800"

@@ -7,6 +7,8 @@ import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
 import MaacaCard from '@/components/maaca/MaacaCard.astro';
 import { APP_ROUTER } from '@/lib/constants';
 
+export const prerender = true;
+
 const furtherTimeArticles = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
 
 const [featured, ...rest] = furtherTimeArticles?.data || [];

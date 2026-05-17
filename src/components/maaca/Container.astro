@@ -1,0 +1,17 @@
+---
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a href={href} class="group block pb-16 no-underline outline-none">
+  <div class="reveal" style={`--delay: 0.2s`}>
+    <div
+      class="bg-ash-main group-hover:border-blue-main/40 group-hover:shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(76, 168, 200, 0.25)] relative h-130 w-full overflow-hidden rounded-3xl border border-white/8 shadow-2xl transition-[opacity,transform] duration-500 ease-out group-hover:-translate-y-1 md:h-120"
+    >
+      <slot />
+    </div>
+  </div>
+</a>
