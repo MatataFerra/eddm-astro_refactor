@@ -1,0 +1,93 @@
+---
+import MainLayout from '@/layouts/Layout.astro';
+import { getLastArticleSlug } from '@/lib/api/get-last-article-slug';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Article } from '@/lib/interfaces/articles';
+
+type Response = Pick<Article, 'slug' | 'title'>;
+
+export const prerender = false;
+
+const lastArticle = await getLastArticleSlug<Response>();
+
+const links = [
+  {
+    title: 'Último Relato: ' + lastArticle?.data.title,
+    subtitle: 'Durante mi viaje por Nueva Zelanda y Australia registré cada día',
+    url: APP_ROUTER.ARTICLE(lastArticle?.data.slug ?? APP_ROUTER.JOURNEY),
+    highlight: true,
+  },
+  {
+    title: 'Índice del viaje',
+    subtitle: 'El diario completo',
+    url: APP_ROUTER.JOURNEY,
+    highlight: false,
+  },
+  {
+    title: 'El origen del miedo',
+    subtitle: 'Relato que da una idea cómo se inició el miedo en el hombre',
+    url: APP_ROUTER.TALE('el-origen-del-miedo'),
+    highlight: false,
+  },
+];
+---
+
+<MainLayout title="Enlaces | El Diario de Mati">
+  <main class="mx-auto flex max-w-md flex-col justify-between px-6 pt-16 pb-4 text-center">
+    <header class="flex flex-col items-center gap-3">
+      <div
+        class="bg-ash-main relative h-16 w-16 overflow-hidden rounded-full border border-white/10 p-1"
+      >
+        <div
+          class="from-orange-main absolute inset-0 h-full w-full rounded-full bg-linear-to-tr to-transparent opacity-40"
+        >
+        </div>
+        <span
+          class="font-fraunces relative flex h-full w-full items-center justify-center text-xl font-bold text-white"
+          >M</span
+        >
+      </div>
+
+      <div class="space-y-1">
+        <h1 class="font-fraunces text-2xl font-semibold tracking-tight text-white">
+          el diario de mati
+        </h1>
+        <div class="flex items-center justify-center gap-2">
+          <span class="bg-green-soft h-1.5 w-1.5 animate-pulse rounded-full"></span>
+          <p class="font-dm text-ash-soft text-[10px] tracking-widest uppercase">
+            bitácora digital // en vivo
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section class="my-auto mt-12 flex flex-col gap-4 py-8">
+      {
+        links.map((link) => (
+          <a
+            href={link.url}
+            class={`group relative flex flex-col items-start rounded-xl border p-4 text-left backdrop-blur-md transition-all duration-300 hover:scale-[1.01] ${
+              link.highlight
+                ? 'border-orange-main/30 bg-orange-main/3 hover:border-orange-main/60 hover:bg-orange-main/6'
+                : 'border-white/5 bg-white/2 hover:border-white/20 hover:bg-white/4'
+            }`}
+          >
+            {link.highlight && (
+              <span class="font-dm text-orange-main absolute top-3 right-4 text-[8px] font-medium tracking-widest uppercase">
+                Reciente
+              </span>
+            )}
+
+            <span
+              class={`font-fraunces text-base font-medium transition-colors ${link.highlight ? 'text-orange-main' : 'group-hover:text-green-soft text-white'}`}
+            >
+              {link.title}
+            </span>
+
+            <span class="font-dm text-ash-soft mt-0.5 text-xs">{link.subtitle}</span>
+          </a>
+        ))
+      }
+    </section>
+  </main>
+</MainLayout>
