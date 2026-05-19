@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 import { imageSize } from 'image-size';
 
-type ProcessedSection = {
+export type ProcessedSection = {
   title: string | undefined;
   htmlContent: string | Promise<string>;
   media: {

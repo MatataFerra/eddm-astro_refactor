@@ -1,26 +1,32 @@
 ---
 import MainLayout from '@/layouts/Layout.astro';
-import { getLastArticleSlug } from '@/lib/api/get-last-article-slug';
+import { getLastArticle } from '@/lib/api/get-last-article';
+import { getLastEntry } from '@/lib/api/get-last-entry';
 import { APP_ROUTER } from '@/lib/constants';
 import type { Article } from '@/lib/interfaces/articles';
+import type { Category } from '@/lib/interfaces/share';
 
-type Response = Pick<Article, 'slug' | 'title'>;
+type Response = (Pick<Article, 'slug' | 'title'> | null) & {
+  category: { name: Category['name'] | null } | null;
+  href: string;
+};
 
 export const prerender = false;
 
-const lastArticle = await getLastArticleSlug<Response>();
+const lastArticle = await getLastArticle<Response>();
+const lastEntry = await getLastEntry<Response>();
 
 const links = [
   {
-    title: 'Último Relato: ' + lastArticle?.data.title,
-    subtitle: 'Durante mi viaje por Nueva Zelanda y Australia registré cada día',
-    url: APP_ROUTER.ARTICLE(lastArticle?.data.slug ?? APP_ROUTER.JOURNEY),
+    title: 'Último Relato: ' + lastEntry?.data.title,
+    subtitle: 'Última nota subida',
+    url: lastEntry?.data.href ?? APP_ROUTER.JOURNEY,
     highlight: true,
   },
   {
-    title: 'Índice del viaje',
-    subtitle: 'El diario completo',
-    url: APP_ROUTER.JOURNEY,
+    title: 'Última semana publicada',
+    subtitle: 'Durante mi viaje entre 2024 y 2025 publiqué todos los días.',
+    url: APP_ROUTER.ARTICLE(lastArticle?.data.slug ?? APP_ROUTER.JOURNEY),
     highlight: false,
   },
   {

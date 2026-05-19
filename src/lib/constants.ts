@@ -38,7 +38,8 @@ export const EXTERNAL_API_ENDPOINTS = {
   ARTICLE: (slug: string) => `/articles/${slug}`,
   TALE: (slug: string) => `/tales/${slug}`,
   FURTHER_TIME_ARTICLE: (slug: string) => `/further-time/${slug}`,
-  LAST_ARTICLE_SLUG: '/articles/last',
+  LAST_ARTICLE: '/articles/last',
+  LAST_ENTRY: '/entries/last',
 } as const;
 
 export const FALLBACK_SLUG = '__placeholder__' as const;
