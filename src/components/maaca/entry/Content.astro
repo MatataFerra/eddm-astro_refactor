@@ -2,6 +2,7 @@
 import Article from '@/components/share/Article.astro';
 import { APP_ROUTER } from '@/lib/constants';
 import { processDiario } from '@/lib/markdown/process';
+import { htmlContent } from '@/lib/utils';
 
 interface Props {
   relato: {
@@ -14,10 +15,6 @@ interface Props {
 
 const { relato, nextRelato } = Astro.props;
 const section = await processDiario(relato.content);
-
-const htmlContent = (content: unknown) => {
-  if (content && Array.isArray(content)) return content[0];
-};
 ---
 
 <section class="mx-auto max-w-2xl px-6 py-16 md:py-24">

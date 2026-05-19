@@ -2,6 +2,7 @@
 import { processDiario } from '@/lib/markdown/process';
 import { APP_ROUTER } from '@/lib/constants';
 import Article from '@/components/share/Article.astro';
+import { htmlContent } from '@/lib/utils';
 
 interface Props {
   relato: {
@@ -14,7 +15,6 @@ interface Props {
 
 const { relato, nextRelato } = Astro.props;
 const section = await processDiario(relato.content);
-const { htmlContent } = section[0];
 ---
 
 <section class="mx-auto max-w-2xl px-6 py-16 md:py-24">
@@ -52,7 +52,7 @@ const { htmlContent } = section[0];
     <div class="h-px flex-1 bg-white/6"></div>
   </div>
 
-  <Article {htmlContent} />
+  <Article htmlContent={htmlContent(section)} />
 
   <div class="reveal mt-16 flex flex-col items-center gap-4" style="--delay: 0.2s">
     <div class="flex gap-2">
