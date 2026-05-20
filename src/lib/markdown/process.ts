@@ -1,54 +1,21 @@
 import { marked } from 'marked';
-import { imageSize } from 'image-size';
+import { getMediaSize } from '@/lib/media/dimensions';
+import { getVideoPoster } from '@/lib/media/poster';
 
 export type ProcessedSection = {
   title: string | undefined;
   htmlContent: string | Promise<string>;
-  media: {
-    type: 'image' | 'video';
-    alt: string;
-    src: string;
-    poster?: string;
-    width?: number;
-    height?: number;
-  }[];
+  media:
+    | {
+        type: 'image' | 'video';
+        alt: string;
+        src: string;
+        poster?: string;
+        width?: number;
+        height?: number;
+      }[]
+    | undefined;
 };
-
-async function getImageSize(url: string) {
-  try {
-    // Cloudinary fast-path
-    if (url.includes('res.cloudinary.com')) {
-      const infoUrl = url.replace('/upload/', '/upload/fl_getinfo/');
-
-      const response = await fetch(infoUrl);
-      const json = await response.json();
-
-      return {
-        width: json.input.width,
-        height: json.input.height,
-      };
-    }
-
-    // Generic images (Notion, etc)
-    const response = await fetch(url);
-
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const dimensions = imageSize(buffer);
-
-    if (!dimensions.width || !dimensions.height) {
-      return null;
-    }
-
-    return {
-      width: dimensions.width,
-      height: dimensions.height,
-    };
-  } catch {
-    return null;
-  }
-}
 
 export async function processDiario(content: string | undefined): Promise<ProcessedSection[]> {
   if (!content) return [];
@@ -60,13 +27,9 @@ export async function processDiario(content: string | undefined): Promise<Proces
 
   const processedSections = await Promise.all(
     sections.map(async (section) => {
-      // Busca heading opcional
       const titleMatch = section.match(/^###\s+(.*)$/m);
-
       const title = titleMatch?.[1]?.trim();
-
       const mediaRegex = /(?:!\[(.*?)\]|\[(.*?)\])\((https?:\/\/.*?)\)/g;
-
       const mediaMatches = [...section.matchAll(mediaRegex)];
 
       const media = await Promise.all(
@@ -82,24 +45,21 @@ export async function processDiario(content: string | undefined): Promise<Proces
           };
 
           if (!isVideo) {
-            const response = await getImageSize(url);
+            const response = await getMediaSize(url);
 
             if (response) {
               dimensions = response;
             }
           }
 
+          const mediaType: 'image' | 'video' = isVideo ? 'video' : 'image';
+
           return {
-            type: isVideo ? ('video' as const) : ('image' as const),
+            type: mediaType,
             alt: altOrName,
             src: url,
 
-            poster:
-              isVideo && url.includes('res.cloudinary.com')
-                ? url
-                    .replace('/video/upload/', '/video/upload/so_1,f_jpg/')
-                    .replace(/\.[^.]+$/, '.jpg')
-                : undefined,
+            poster: isVideo ? getVideoPoster(url) : undefined,
 
             ...dimensions,
           };
