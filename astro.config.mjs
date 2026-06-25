@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, logHandlers } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import svelte from '@astrojs/svelte';
 import vercel from '@astrojs/vercel';
@@ -10,7 +10,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-
+  logger: logHandlers.console({ level: 'debug' }),
   integrations: [svelte()],
   adapter: vercel({
     webAnalytics: {
