@@ -20,7 +20,13 @@ export async function getTaleContentFromNotion<T>({
 
     return response;
   } catch (error) {
-    logError(error, { function: 'getTaleContentFromNotion', query, strategy });
+    logError(error, {
+      function: 'getTaleContentFromNotion',
+      query,
+      strategy,
+      file: 'src/lib/api/get-notion-content.ts',
+      endpoint: EXTERNAL_API_ENDPOINTS.NOTION_TALE,
+    });
     return null;
   }
 }
@@ -38,7 +44,13 @@ export async function getArticleContentFromNotion<T>({
 
     return response;
   } catch (error) {
-    logError(error, { function: 'getArticleContentFromNotion', query, strategy });
+    logError(error, {
+      function: 'getArticleContentFromNotion',
+      query,
+      strategy,
+      file: 'src/lib/api/get-notion-content.ts',
+      endpoint: EXTERNAL_API_ENDPOINTS.NOTION_ARTICLE,
+    });
     return null;
   }
 }
@@ -56,7 +68,13 @@ export async function getFurtherTimeArticlesContentFromNotion<T>({
 
     return response;
   } catch (error) {
-    logError(error, { function: 'getFurtherTimeArticlesContentFromNotion', query, strategy });
+    logError(error, {
+      function: 'getFurtherTimeArticlesContentFromNotion',
+      query,
+      strategy,
+      file: 'src/lib/api/get-notion-content.ts',
+      endpoint: EXTERNAL_API_ENDPOINTS.NOTION_FURTHER_TIME_ARTICLE,
+    });
     return null;
   }
 }

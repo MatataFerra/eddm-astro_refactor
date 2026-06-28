@@ -1,5 +1,5 @@
 import type { Article } from '@/lib/interfaces/articles';
-import { generateToken } from '@/lib/jwt';
+import { getAuthToken } from '@/lib/jwt';
 
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 type AvailableFields<T> = Exclude<keyof T, 'cover' | 'header' | 'media' | 'blocks'>;
@@ -56,13 +56,6 @@ const formatParams = (params: Record<string, ParamValue>): Record<string, string
   return formatted;
 };
 
-const AUTH = (() => {
-  return `Bearer ${generateToken({
-    user: import.meta.env.TOKEN_USER,
-    password: import.meta.env.TOKEN_PASSWORD,
-  })}`;
-})();
-
 async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResponse<T>> {
   const { params = {}, method = 'GET', isExternalUrl = false, fields, headers } = opts;
 
@@ -81,7 +74,7 @@ async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResp
   const res = await fetch(fullUrl, {
     method,
     headers: {
-      Authorization: AUTH,
+      Authorization: getAuthToken(),
       'Content-Type': 'application/json',
       'Cache-Control': 's-maxage=3600, stale-while-revalidate=600',
       'x-debug-req-id': `ID-From_Astro-${Math.random().toString(36).substring(2, 15)}`,

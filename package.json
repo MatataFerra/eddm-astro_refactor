@@ -12,7 +12,8 @@
     "vercel": "pnpm dlx vercel dev",
     "astro": "astro",
     "stop": "astro dev stop",
-    "logs": "astro dev logs"
+    "logs": "astro dev logs",
+    "status": "astro dev status"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",

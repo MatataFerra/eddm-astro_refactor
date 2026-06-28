@@ -6,7 +6,11 @@ export async function getLastEntry<T>(): Promise<ApiResponse<T> | null> {
   try {
     return await fetchData<T>(EXTERNAL_API_ENDPOINTS.LAST_ENTRY);
   } catch (error) {
-    logError(error, { function: 'getContentNavigateTales' });
+    logError(error, {
+      function: 'getLastEntry',
+      endpoint: EXTERNAL_API_ENDPOINTS.LAST_ENTRY,
+      file: 'src/lib/api/get-last-entry.ts',
+    });
     return null;
   }
 }
