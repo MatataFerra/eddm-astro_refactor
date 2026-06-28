@@ -9,16 +9,18 @@ interface Props {
 }
 
 const { item, delay = 0, tag }: Props = Astro.props;
+
+console.log('PROPS, ', JSON.stringify(Astro.props));
 ---
 
 <div class="reveal" style={`--delay: ${delay}s`}>
-  <a href={APP_ROUTER.TALE(item.slug)} class="group block no-underline">
+  <a href={APP_ROUTER.TALE(item?.slug)} class="group block no-underline">
     <div
       class="group-hover:border-accent-main/30 relative min-h-55 overflow-hidden rounded-[20px] border border-white/10 transition-all duration-300 group-hover:-translate-y-0.5 md:h-45"
     >
       <img
-        src={item.header?.url}
-        alt={item.title}
+        src={item?.header?.url}
+        alt={item?.title}
         class="absolute inset-0 block h-full w-full object-cover"
       />
 
@@ -40,12 +42,12 @@ const { item, delay = 0, tag }: Props = Astro.props;
           <div
             class="font-fraunces text-ash-text text-[22px] leading-[1.1] font-bold tracking-[-0.02em] md:text-[28px]"
           >
-            {item.title}
+            {item?.title}
           </div>
           <p
             class="font-dm text-ash-hard mt-2 line-clamp-2 max-w-125 text-[12px] font-light md:line-clamp-none md:text-[13px]"
           >
-            {item.summary}
+            {item?.summary}
           </p>
         </div>
 

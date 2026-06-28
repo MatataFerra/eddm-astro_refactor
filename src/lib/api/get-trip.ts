@@ -8,7 +8,11 @@ export async function getTrip<T>(): Promise<ApiResponse<T> | null> {
 
     return response;
   } catch (error) {
-    logError(error, { function: 'getTrip' });
+    logError(error, {
+      function: 'getTrip',
+      endpoint: EXTERNAL_API_ENDPOINTS.TRIP,
+      file: 'src/lib/api/get-trip.ts',
+    });
     return null;
   }
 }

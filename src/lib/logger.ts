@@ -25,6 +25,7 @@ export async function logError(error: unknown, context?: Record<string, string |
     context: {
       ...context,
       app: 'eddm-astro-frontend-v2.2026',
+      env: import.meta.env.MODE,
     },
   };
 
