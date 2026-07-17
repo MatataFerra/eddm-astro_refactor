@@ -2,12 +2,12 @@ import eslintPluginAstro from 'eslint-plugin-astro';
 import tseslint from 'typescript-eslint';
 import sveltePlugin from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
-import astroParser from 'astro-eslint-parser';
+import * as astroParser from 'astro-eslint-parser';
 
 export default [
   // 1. Configuraciones base de los plugins
   ...eslintPluginAstro.configs.recommended,
-  ...sveltePlugin.configs['flat/recommended'],
+  ...sveltePlugin.configs.recommended,
   ...tseslint.configs.recommended,
 
   // 2. Configuración específica para ASTRO
@@ -55,6 +55,6 @@ export default [
 
   // 5. Ignorar carpetas de build
   {
-    ignores: ['dist/', '.astro/', 'node_modules/'],
+    ignores: ['dist/', '.astro/', 'node_modules/', '.vercel/'],
   },
 ];

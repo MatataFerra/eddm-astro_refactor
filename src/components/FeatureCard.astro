@@ -9,8 +9,6 @@ interface Props {
 }
 
 const { item, delay = 0, tag }: Props = Astro.props;
-
-console.log('PROPS, ', JSON.stringify(Astro.props));
 ---
 
 <div class="reveal" style={`--delay: ${delay}s`}>
