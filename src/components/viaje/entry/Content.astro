@@ -2,6 +2,7 @@
 import { processDiario } from '@/lib/markdown/process';
 import MediaBlock from '@/components/viaje/entry/MediaBlock.astro';
 import Article from '@/components/share/Article.astro';
+import type { MediaItem } from '@/lib/interfaces/media';
 
 interface Props {
   content: string;
@@ -15,7 +16,7 @@ const DIAS = await processDiario(content);
 <div class="mx-auto max-w-180 px-6 py-14">
   {
     DIAS?.map((dia) => {
-      const isSingular = dia.media.length === 1;
+      const isSingular = dia?.media?.length === 1;
 
       return (
         <div class="mb-20">
@@ -27,11 +28,11 @@ const DIAS = await processDiario(content);
 
           <Article htmlContent={dia.htmlContent} />
 
-          {dia.media.length > 0 && (
+          {dia && dia?.media?.length && dia.media.length > 0 && (
             <div class="reveal mt-10">
               <MediaBlock
-                items={dia.media}
-                caption={`${dia.media.length} ${isSingular ? 'archivo' : 'archivos'} de ${dia.title}`}
+                items={dia.media as MediaItem[]}
+                caption={`${dia?.media?.length} ${isSingular ? 'archivo' : 'archivos'} de ${dia?.title}`}
               />
             </div>
           )}

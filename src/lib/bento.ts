@@ -1,6 +1,6 @@
 // lib/bento.ts
 
-import type { MediaItem } from '@/components/viaje/entry/MediaBlock.astro';
+import type { MediaItem } from '@/lib/interfaces/media';
 
 export type BentoSlot = {
   span: string;
