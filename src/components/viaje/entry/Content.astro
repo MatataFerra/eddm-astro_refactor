@@ -28,14 +28,14 @@ const DIAS = await processDiario(content);
 
           <Article htmlContent={dia.htmlContent} />
 
-          {dia && dia?.media?.length && dia.media.length > 0 && (
+          {!!dia?.media?.length && dia?.media?.length > 0 ? (
             <div class="reveal mt-10">
               <MediaBlock
                 items={dia.media as MediaItem[]}
                 caption={`${dia?.media?.length} ${isSingular ? 'archivo' : 'archivos'} de ${dia?.title}`}
               />
             </div>
-          )}
+          ) : null}
         </div>
       );
     })
