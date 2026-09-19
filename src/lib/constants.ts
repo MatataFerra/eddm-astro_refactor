@@ -40,6 +40,7 @@ export const EXTERNAL_API_ENDPOINTS = {
   FURTHER_TIME_ARTICLE: (slug: string) => `/further-time/${slug}`,
   LAST_ARTICLE: '/articles/last',
   LAST_ENTRY: '/entries/last',
+  LOCATION: '/location',
 } as const;
 
 export const FALLBACK_SLUG = '__placeholder__' as const;

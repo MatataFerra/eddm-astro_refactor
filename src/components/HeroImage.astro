@@ -3,8 +3,11 @@ import { APP_ROUTER, TRANSLATIONS } from '@/lib/constants';
 import ImagePlaceholder from '@/components/share/ImgPlaceholder.astro';
 import { getAllStats } from '@/lib/api/get-stats';
 import type { Stats } from '@/lib/interfaces/stats';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import type { Location } from '@/lib/interfaces/location';
 
 const allStats = await getAllStats<Stats>();
+const currentLocation = await getCurrentLocation<Location>();
 ---
 
 <div class="reveal h-full" style="--delay: 0.2s">
@@ -74,10 +77,12 @@ const allStats = await getAllStats<Stats>();
     <div
       class="border-accent-main/20 absolute bottom-40 -left-5 flex items-center gap-2.5 rounded-xl border bg-[#0a0a12]/90 px-4 py-2.5 shadow-xl backdrop-blur-md"
     >
-      <span class="text-[22px]">🏖️</span>
+      <span class="text-[22px]">{currentLocation?.data?.metadata?.emoji || '🏖️'}</span>
       <div>
         <div class="font-dm text-ash-soft text-[9px] tracking-widest uppercase">Próximo</div>
-        <div class="font-fraunces text-accent-text text-[15px] font-semibold">Mallorca</div>
+        <div class="font-fraunces text-accent-text text-[15px] font-semibold">
+          {currentLocation?.data?.name || 'Mallorca'}
+        </div>
       </div>
     </div>
   </div>

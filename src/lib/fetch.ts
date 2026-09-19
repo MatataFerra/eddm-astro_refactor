@@ -66,9 +66,7 @@ async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResp
   };
 
   const qs = new URLSearchParams(formatParams(mergedParams)).toString();
-
   const base = isExternalUrl ? String(url) : `${import.meta.env.API_URL}/api${url}`;
-
   const fullUrl = qs ? `${base}${base.includes('?') ? '&' : '?'}${qs}` : base;
 
   const res = await fetch(fullUrl, {
