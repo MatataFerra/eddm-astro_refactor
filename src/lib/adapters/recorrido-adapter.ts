@@ -29,8 +29,11 @@ function obtenerBandera(pais: string): string {
     Filipinas: '🇵🇭',
     Japon: '🇯🇵',
     'Korea del Sur': '🇰🇷',
+    'Corea del Sur': '🇰🇷',
+    Corea: '🇰🇷',
     'South Korea': '🇰🇷',
     China: '🇨🇳',
+    Alemania: '🇩🇪',
   };
   return banderas[pais] || banderas['default'];
 }
