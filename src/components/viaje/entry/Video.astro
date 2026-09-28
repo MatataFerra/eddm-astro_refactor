@@ -1,5 +1,7 @@
 ---
 import defaultPoster from '@/assets/images/vide-fallback.webp';
+import { detectProvider } from '@/lib/media/detect';
+
 interface Props {
   item: {
     src: string;
@@ -11,23 +13,22 @@ interface Props {
 
 const { item }: Props = Astro.props;
 
-const videoPoster = item.poster || defaultPoster.src;
+const provider = detectProvider(item.src);
+const finalPoster = item.poster || defaultPoster.src;
+const videoSrc = provider === 'cloudflare' ? `${item.src}#t=0.5` : item.src;
 ---
 
 <div class="group bg-ash-main relative h-full w-full overflow-hidden rounded-xl">
   <video
-    src={item.src}
-    poster={videoPoster}
+    src={videoSrc}
+    poster={finalPoster}
     controls
     playsinline
-    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
     preload="metadata"
-  >
-  </video>
+    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+  ></video>
 
-  <div
-    class="bg-ash-main/70 pointer-events-none absolute top-3 left-3 z-10 rounded-md border border-white/10 px-2.5 py-1 backdrop-blur-md transition-opacity group-hover:opacity-0"
-  >
+  <div class="bg-ash-main/70 pointer-events-none absolute top-3 left-3 z-10 rounded-md border border-white/10 px-2.5 py-1 backdrop-blur-md transition-opacity group-hover:opacity-0">
     <div class="flex items-center gap-1.5">
       <span class="bg-green-soft h-1.5 w-1.5 animate-pulse rounded-full"></span>
       <span class="font-dm text-green-soft text-[10px] font-medium tracking-widest uppercase">
