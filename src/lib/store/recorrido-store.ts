@@ -12,7 +12,7 @@ export const filteredParadasStore = computed(
   [paradasStore, filterPaisStore, filterYearStore],
   (paradas, pais, year) => {
     return paradas.filter((p) => {
-      const pasaPais = pais === 'Todos' || p.pais === pais || p.tipo === 'origen';
+      const pasaPais = pais === 'Todos' || p.pais === pais;
 
       const pasaAno = year === 'Todos' || p.year.toString() === year;
 
