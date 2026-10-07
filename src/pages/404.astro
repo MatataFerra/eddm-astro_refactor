@@ -1,0 +1,90 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import Layout from '@/layouts/Layout.astro';
+
+const salidas = [
+  {
+    href: APP_ROUTER.JOURNEY,
+    label: 'Un año viajando',
+    hint: 'Diario semana a semana',
+    dot: 'bg-green-main',
+    text: 'text-green-main',
+  },
+  {
+    href: APP_ROUTER.TALES,
+    label: 'Relatos y notas',
+    hint: 'Escritura y ficción',
+    dot: 'bg-accent-main',
+    text: 'text-accent-main',
+  },
+  {
+    href: APP_ROUTER.FURTHER_TIME,
+    label: 'Más acá en el tiempo',
+    hint: 'Historias recientes',
+    dot: 'bg-blue-main',
+    text: 'text-blue-main',
+  },
+];
+---
+
+<Layout title="Página no encontrada — El diario de Mati">
+  <main class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-32 text-center">
+    <div class="pointer-events-none absolute left-1/2 top-[38%] h-105 w-180 max-w-[140vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,var(--color-accent-glow)_0%,transparent_65%)]"></div>
+    <div class="w-fit border-accent-main/25 bg-accent-soft mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5">
+      <div class="bg-accent-main h-1.5 w-1.5 animate-pulse rounded-full"></div>
+      <span class="font-dm text-accent-text text-[10px] font-medium tracking-[0.14em] uppercase">
+        Fuera del mapa
+      </span>
+    </div>
+    <p class="relative w-full text-[clamp(120px,22vw,260px)] font-fraunces italic leading-[0.85] tracking-tighter bg-[linear-gradient(135deg,#fff_25%,var(--color-accent-text)_100%)] bg-clip-text text-transparent">
+      404
+    </p>
+    <h1 class="relative mt-8 max-w-160 w-full text-[clamp(28px,4vw,44px)] font-fraunces font-semibold leading-[1.1] tracking-[-0.02em] text-balance">
+      Esta página no figura en el recorrido
+    </h1>
+    <p class="relative mx-auto mt-5 max-w-115 text-base font-light leading-[1.75] text-ash-hard text-pretty">
+      Puede que el enlace esté roto o que la entrada todavía no se haya escrito. Desde acá podés
+      retomar el camino.
+    </p>
+    <div class="relative mt-10 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href={APP_ROUTER.HOME}
+        class="bg-accent-main font-dm text-ash-main inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[13px] font-medium tracking-[0.06em] no-underline transition-opacity hover:opacity-85"
+      >
+        Volver al inicio →
+      </a>
+      <a
+        href={APP_ROUTER.TRIP}
+        class="font-dm inline-flex items-center gap-2 rounded-full border border-white/15 px-7 py-3.5 text-[13px] text-[#aaa] no-underline transition-colors hover:border-white/40 hover:text-white"
+      >
+        Ver el recorrido
+      </a>
+    </div>
+    <div class="relative mt-20 w-full max-w-215">
+      <div class="mb-6 flex items-center gap-4">
+        <div class="h-px flex-1 bg-white/6"></div>
+        <span class="text-[10px] uppercase tracking-[0.12em] text-dim">Otras rutas</span>
+        <div class="h-px flex-1 bg-white/6"></div>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {salidas.map((s) => (
+          <a
+            href={s.href}
+            class="group flex flex-col items-start gap-2 rounded-2xl border border-white/[0.07] bg-white/2.5 px-5 py-5 text-left no-underline backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
+          >
+            <span class="flex items-center gap-2">
+              <span class={`size-1.5 rounded-full ${s.dot}`}></span>
+              <span class="text-[10px] uppercase tracking-widest text-dim">{s.hint}</span>
+            </span>
+            <span class="font-display text-lg font-semibold leading-tight tracking-[-0.01em] text-fg">
+              {s.label}
+            </span>
+            <span class={`flex items-center gap-1 text-xs ${s.text}`}>
+              Ir <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</Layout>
