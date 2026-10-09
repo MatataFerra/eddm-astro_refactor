@@ -13,17 +13,10 @@ const currentLocation = await getCurrentLocation<Location>();
 <div class="reveal h-full" style="--delay: 0.2s">
   <div class="relative h-120">
     <a href={APP_ROUTER.JOURNEY} class="no-underline">
-      <div
-        class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]"
-      >
+      <div class="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,168,67,0.15)]">
         <ImagePlaceholder />
-        <div
-          class="from-ash-main/90 via-ash-main/20 absolute inset-0 bg-linear-to-t to-transparent"
-        >
-        </div>
-        <div
-          class="absolute right-0 bottom-0 left-0 border-t border-white/10 bg-[#08080e]/55 p-7 backdrop-blur-md"
-        >
+        <div class="from-ash-main/90 via-ash-main/20 absolute inset-0 bg-linear-to-t to-transparent"></div>
+        <div class="absolute right-0 bottom-0 left-0 border-t border-white/10 bg-[#08080e]/55 p-7 backdrop-blur-md">
           <div class="text-accent-text font-dm mb-1.5 text-[10px] tracking-[0.12em] uppercase">
             2024 — 2025
           </div>
@@ -37,36 +30,26 @@ const currentLocation = await getCurrentLocation<Location>();
       </div>
     </a>
 
-    <div
-      class="border-accent-main/30 absolute -top-4 -right-4 flex items-center gap-5 rounded-2xl border bg-[#0a0a12]/85 px-5 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_20px_var(--color-accent-glow)] backdrop-blur-md"
-    >
+    <div class="border-accent-main/30 absolute -top-4 -right-4 flex items-center gap-5 rounded-2xl border bg-[#0a0a12]/85 px-5 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_20px_var(--color-accent-glow)] backdrop-blur-md">
       <div class="border-r border-white/10 pr-5 text-center">
-        <div
-          class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
-        >
-          {
-            allStats && allStats.data?.countries
-              ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
-                  allStats!.data?.countries || 0
-                )
-              : null
-          }
+        <div class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic">
+          {allStats && allStats.data?.countries
+            ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
+                allStats!.data?.countries || 0
+              )
+            : null}
         </div>
         <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">
           {TRANSLATIONS.es.countries}
         </div>
       </div>
       <div class="text-center">
-        <div
-          class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic"
-        >
-          {
-            allStats && allStats.data?.km
-              ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
-                  allStats!.data?.km || 0
-                )
-              : null
-          }
+        <div class="font-fraunces text-accent-text text-[26px] leading-none font-light tracking-[-0.02em] italic">
+          {allStats && allStats.data?.km
+            ? new Intl.NumberFormat('es-AR', { notation: 'compact' }).format(
+                allStats!.data?.km || 0
+              )
+            : null}
         </div>
         <div class="font-dm text-ash-soft mt-1 text-[9px] tracking-widest uppercase">
           {TRANSLATIONS.es.km}
@@ -74,14 +57,12 @@ const currentLocation = await getCurrentLocation<Location>();
       </div>
     </div>
 
-    <div
-      class="border-accent-main/20 absolute bottom-40 -left-5 flex items-center gap-2.5 rounded-xl border bg-[#0a0a12]/90 px-4 py-2.5 shadow-xl backdrop-blur-md"
-    >
-      <span class="text-[22px]">{currentLocation?.data?.metadata?.emoji || '🏖️'}</span>
+    <div class="border-accent-main/20 absolute bottom-40 -left-5 flex items-center gap-2.5 rounded-xl border bg-[#0a0a12]/90 px-4 py-2.5 shadow-xl backdrop-blur-md">
+      <span class="text-[22px]">{currentLocation?.data?.metadata?.emoji || '🔥'}</span>
       <div>
-        <div class="font-dm text-ash-soft text-[9px] tracking-widest uppercase">Próximo</div>
+        <div class="font-dm text-ash-soft text-[9px] tracking-widest uppercase">Ahora en</div>
         <div class="font-fraunces text-accent-text text-[15px] font-semibold">
-          {currentLocation?.data?.name || 'Mallorca'}
+          {currentLocation?.data?.name || 'Descubrilo pronto...'}
         </div>
       </div>
     </div>
