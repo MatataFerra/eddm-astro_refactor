@@ -7,6 +7,7 @@ const BaseArticleSchema = z.object({
   title: z.string().min(1, 'El título es obligatorio'),
   description: z.string().optional(),
   content: z.string().optional(),
+  type: z.enum(['prose', 'poem']),
   slug: z
     .string()
     .min(1, 'El slug es obligatorio')

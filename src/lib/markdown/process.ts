@@ -2,6 +2,8 @@ import { marked } from 'marked';
 import { getMediaSize } from '@/lib/media/dimensions';
 import { getVideoPoster } from '@/lib/media/poster';
 
+export type RelatoType = 'prose' | 'poem';
+
 export type ProcessedSection = {
   title: string | undefined;
   htmlContent: string | Promise<string>;
@@ -17,8 +19,21 @@ export type ProcessedSection = {
     | undefined;
 };
 
-export async function processDiario(content: string | undefined): Promise<ProcessedSection[]> {
+function preparePoem(text: string): string {
+  return text
+    .split('\n')
+    .map((line) =>
+      line.replace(/^[ \t]+/, (ws) => '&nbsp;'.repeat(ws.replace(/\t/g, '    ').length))
+    )
+    .join('\n');
+}
+
+export async function processDiario(
+  content: string | undefined,
+  type: RelatoType = 'prose'
+): Promise<ProcessedSection[]> {
   if (!content) return [];
+  const isPoem = type === 'poem';
 
   const sections = content
     .split(/(?=^###\s)/gm)
@@ -73,7 +88,9 @@ export async function processDiario(content: string | undefined): Promise<Proces
 
       return {
         title,
-        htmlContent: marked.parse(rawText),
+        htmlContent: marked.parse(isPoem ? preparePoem(rawText) : rawText, {
+          breaks: isPoem,
+        }),
         media,
       };
     })
