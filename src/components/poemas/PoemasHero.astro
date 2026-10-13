@@ -1,0 +1,48 @@
+---
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  eyebrow = 'Escritura',
+  title = 'Poemas',
+  subtitle = 'Versos sueltos escritos en el camino.',
+} = Astro.props;
+---
+
+<section class="relative pt-28 pb-16 text-center">
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute top-1/2 left-1/2 h-75 w-125 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-lilac-glow)_0%,transparent_70%)] opacity-70"
+  >
+  </div>
+
+  <div class="reveal">
+    <div
+      class="bg-lilac-soft border-lilac-main/27 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
+    >
+      <div class="bg-lilac-main h-1.25 w-1.25 rounded-full"></div>
+      <span class="font-dm text-lilac-text text-[11px] tracking-[0.12em] uppercase">
+        {eyebrow}
+      </span>
+    </div>
+  </div>
+
+  <div class="reveal" style="--delay: 0.08s">
+    <h1
+      class="font-fraunces text-ash-text relative text-[clamp(48px,7vw,80px)] leading-[0.95] font-extrabold tracking-[-0.04em]"
+    >
+      {title}
+    </h1>
+  </div>
+
+  <div class="reveal" style="--delay: 0.16s">
+    <p
+      class="font-dm text-ash-muted mx-auto mt-6 max-w-120 px-6 text-base leading-[1.7] font-light"
+    >
+      {subtitle}
+    </p>
+  </div>
+</section>

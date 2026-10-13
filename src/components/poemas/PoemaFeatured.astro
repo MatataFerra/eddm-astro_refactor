@@ -1,0 +1,55 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import { poemaMeta, type Poema } from '@/lib/poems';
+
+interface Props {
+  poema: Poema;
+  delay?: number;
+}
+
+const { poema, delay = 0.1 } = Astro.props;
+const meta = poemaMeta(poema);
+---
+
+<div class="reveal" style={`--delay: ${delay}s`}>
+  <a
+    href={APP_ROUTER.POEM(poema.slug)}
+    class="group border-lilac-main/20 hover:border-lilac-main/40 relative block overflow-hidden rounded-3xl border bg-white/2 p-[clamp(36px,6vw,72px)] no-underline transition-colors duration-300"
+  >
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-30 -right-30 h-90 w-90 rounded-full bg-[radial-gradient(circle,var(--color-lilac-glow)_0%,transparent_70%)]"
+    >
+    </div>
+
+    <div class="relative mb-7 flex flex-wrap items-center gap-2.5">
+      <span
+        class="font-dm text-lilac-text bg-lilac-soft border-lilac-main/27 rounded-xl border px-2.5 py-1 text-[9px] tracking-[0.16em] uppercase"
+      >
+        Destacado
+      </span>
+      {meta && <span class="font-dm text-ash-muted text-[11px] tracking-[0.06em]">{meta}</span>}
+    </div>
+
+    <h2
+      class="font-fraunces text-ash-text relative mb-8 text-[clamp(36px,4.5vw,56px)] leading-none font-extrabold tracking-[-0.03em]"
+    >
+      {poema.title}
+    </h2>
+
+    {
+      poema.excerpt && (
+        <p class="verse text-ash-verse-strong relative max-w-140 text-[clamp(20px,2.2vw,26px)] leading-[1.6]">
+          {poema.excerpt}
+        </p>
+      )
+    }
+
+    <span
+      class="font-dm text-lilac-text relative mt-8 inline-flex items-center gap-1 text-[13px] tracking-[0.04em]"
+    >
+      Leer poema
+      <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
+    </span>
+  </a>
+</div>

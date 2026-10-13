@@ -12,6 +12,7 @@ interface Props {
 const topLevelRoutes = [
   APP_ROUTER.JOURNEY,
   APP_ROUTER.TALES,
+  APP_ROUTER.POEMS,
   APP_ROUTER.FURTHER_TIME,
   APP_ROUTER.TRIP,
 ] as const;
@@ -19,15 +20,39 @@ const topLevelRoutes = [
 const { links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[] } = Astro.props;
 
 const LINK_MAP = {
-  viaje: { name: 'Un año viajando', color: 'green' },
-  relatos: { name: 'Relatos', color: 'accent' },
-  'mas-aca-en-el-tiempo': { name: 'Más acá en el tiempo', color: 'blue' },
-  trip: { name: 'Recorrido', color: 'accent' },
+  viaje: {
+    name: 'Un año viajando',
+    hover: 'hover:text-green-main',
+    active: 'text-green-main',
+  },
+  relatos: {
+    name: 'Relatos',
+    hover: 'hover:text-accent-text',
+    active: 'text-accent-text',
+  },
+  'mas-aca-en-el-tiempo': {
+    name: 'Más acá en el tiempo',
+    hover: 'hover:text-blue-soft',
+    active: 'text-blue-soft',
+  },
+  poemas: {
+    name: 'Poemas',
+    hover: 'hover:text-lilac-text',
+    active: 'text-lilac-text',
+  },
+  recorrido: {
+    name: 'Recorrido',
+    hover: 'hover:text-accent-text',
+    active: 'text-accent-text',
+  },
 } as const;
 
 type LinkKey = keyof typeof LINK_MAP;
 
 const currentPath = Astro.url.pathname;
+
+const isActive = (link: LinkKey) =>
+  currentPath === `/${link}` || currentPath.startsWith(`/${link}/`);
 ---
 
 <header>
@@ -37,38 +62,39 @@ const currentPath = Astro.url.pathname;
     data-navbar
     class="bg-ash-main/30 fixed inset-x-0 top-0 z-30 flex h-15 items-center justify-between border-b border-transparent px-6 transition-[background-color,border-color,backdrop-filter] duration-400 ease-in-out will-change-[backdrop-filter] md:px-10"
   >
-    {
-      currentPath === APP_ROUTER.HOME ? (
-        <span class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic">
-          el diario de mati
-        </span>
-      ) : (
-        <a
-          href={APP_ROUTER.HOME}
-          class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic transition-opacity hover:opacity-70"
-        >
-          el diario de mati
-        </a>
-      )
-    }
+    {currentPath === APP_ROUTER.HOME ? (
+      <span class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic">
+        el diario de mati
+      </span>
+    ) : (
+      <a
+        href={APP_ROUTER.HOME}
+        class="font-fraunces text-ash-text text-lg font-semibold tracking-tight italic transition-opacity hover:opacity-70"
+      >
+        el diario de mati
+      </a>
+    )}
 
     <!-- DESKTOP -->
     <div class="hidden items-center gap-8 lg:flex">
-      {
-        links.map((link) => (
+      {(links as LinkKey[]).map((link) => {
+        const item = LINK_MAP[link];
+        const active = isActive(link);
+
+        return (
           <a
             href={`/${link}`}
+            aria-current={active ? 'page' : undefined}
             class={cn(
-              'font-dm hover:text-accent-text text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
-              currentPath === `/${link}` || currentPath.includes(link)
-                ? 'text-accent-text underline'
-                : 'text-ash-text no-underline'
+              'font-dm text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
+              item?.hover,
+              active ? `${item.active} underline` : 'text-ash-text no-underline'
             )}
           >
-            {LINK_MAP[link]?.name || link}
+            {item?.name}
           </a>
-        ))
-      }
+        );
+      })}
     </div>
   </nav>
 
@@ -89,19 +115,17 @@ const currentPath = Astro.url.pathname;
     id="mobile-menu"
     class="mobile-menu bg-ash-main/95 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl lg:hidden"
   >
-    {
-      links.map((link) => (
-        <a
-          href={`/${link}`}
-          class={cn(
-            'font-fraunces hover:text-accent-text text-2xl capitalize italic transition-colors',
-            currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-text no-underline'
-          )}
-        >
-          {LINK_MAP[link]?.name || link}
-        </a>
-      ))
-    }
+    {links.map((link) => (
+      <a
+        href={`/${link}`}
+        class={cn(
+          'font-fraunces hover:text-accent-text text-2xl capitalize italic transition-colors',
+          currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-text no-underline'
+        )}
+      >
+        {LINK_MAP[link]?.name || link}
+      </a>
+    ))}
 
     <!-- <span
       class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors"

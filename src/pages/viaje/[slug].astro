@@ -12,7 +12,6 @@ import Hero from '@/components/viaje/entry/Hero.astro';
 const { slug } = Astro.params;
 
 const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
-  strategy: 'slug',
   query: slug,
 });
 
@@ -25,11 +24,9 @@ const article = response.data;
   <Hero {article} />
 
   <main class="mx-auto max-w-180 px-6 py-14">
-    {
-      article.geolocations && article.summary && (
-        <LocationBar geolocations={article.geolocations} dateRange={article.summary} />
-      )
-    }
+    {article.geolocations && article.summary && (
+      <LocationBar geolocations={article.geolocations} dateRange={article.summary} />
+    )}
 
     <Divider />
 
@@ -38,9 +35,12 @@ const article = response.data;
     <MarcarLeido identifier={article.slug} client:visible />
 
     <footer class="reveal mt-20 flex justify-between border-t border-white/5 pt-8">
-      <a href="/viaje" class="font-dm hover:text-green-soft text-ash-hard text-sm transition-colors"
-        >← Índice</a
+      <a
+        href="/viaje"
+        class="font-dm hover:text-green-soft text-ash-hard text-sm transition-colors"
       >
+        ← Índice
+      </a>
     </footer>
   </main>
 </MainLayout>

@@ -26,6 +26,11 @@
   --color-green-main: #5d9e6b;
   --color-green-soft: #8ac49a;
 
+  --color-lilac-main: #b3a6ff;
+  --color-lilac-soft: rgba(179, 166, 255, 0.12);
+  --color-lilac-glow: rgba(179, 166, 255, 0.18);
+  --color-lilac-text: #cfc6ff;
+
   --color-blue-main: #4ca8c8;
   --color-blue-soft: #7ecde0;
   --color-blue-text: #e0dcff;
@@ -85,6 +90,12 @@
 
 .heading-1 {
   @apply font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em];
+}
+
+@utility verse {
+  white-space: pre-line;
+  text-wrap: pretty;
+  @apply font-fraunces font-light italic;
 }
 
 @keyframes pulse-dot {

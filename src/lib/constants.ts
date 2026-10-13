@@ -4,6 +4,7 @@ export const APP_ROUTES = {
   tales: '/relatos',
   trip: '/recorrido',
   furtherTime: '/mas-aca-en-el-tiempo',
+  poems: '/poemas',
 } as const;
 
 export type RoutePaths = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];
@@ -18,26 +19,33 @@ export const APP_ROUTER = {
   TRIP: `${APP_ROUTES.trip}`,
   FURTHER_TIME: `${APP_ROUTES.furtherTime}`,
   FURTHER_TIME_ARTICLE: (slug: string) => `${APP_ROUTES.furtherTime}/${slug}`,
+  POEMS: `${APP_ROUTES.poems}`,
+  POEM: (slug: string) => `${APP_ROUTES.poems}/${slug}`,
 } as const;
 
+type NavigateSection = 'articles' | 'further' | 'tales' | 'poems';
+
 export const EXTERNAL_API_ENDPOINTS = {
-  SETTINGS: '/settings',
   TALES: '/tales',
   ARTICLES: '/articles',
-  TALES_CONTENT_NAVIGATE: '/tales/content-navigate',
-  ARTICLES_CONTENT_NAVIGATE: '/articles/content-navigate',
-  FURTHER_TIME_CONTENT_NAVIGATE: '/further-time/content-navigate',
-  NOTION_TALE: '/notion/tale',
-  NOTION_ARTICLE: '/notion/article',
-  NOTION_FURTHER_TIME_ARTICLE: '/notion/further-time',
-  INDEX_CONTENT: '/index-content',
-  STATS: '/stats',
-  TRIP: '/trip',
+  POEMS: '/poems',
   FURTHER_TIME: '/further-time',
-  CONTENT_NAVIGATE: '/content-navigate',
+  //Entries by slug
   ARTICLE: (slug: string) => `/articles/${slug}`,
   TALE: (slug: string) => `/tales/${slug}`,
   FURTHER_TIME_ARTICLE: (slug: string) => `/further-time/${slug}`,
+  POEM: (slug: string) => `/poems/${slug}`,
+  // Content Navigates
+  CONTENT_NAVIGATE: '/content-navigate',
+  SECTION_CONTENT_NAVIGATE: (section: NavigateSection) => `/content-navigate/${section}`,
+
+  // Notion
+  NOTION_TALE: '/notion/tale',
+  NOTION_ARTICLE: '/notion/article',
+  NOTION_FURTHER_TIME_ARTICLE: '/notion/further-time',
+  // Misc
+  STATS: '/stats',
+  TRIP: '/trip',
   LAST_ARTICLE: '/articles/last',
   LAST_ENTRY: '/entries/last',
   LOCATION: '/location',

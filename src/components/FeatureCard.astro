@@ -13,45 +13,30 @@ const { item, delay = 0, tag }: Props = Astro.props;
 
 <div class="reveal" style={`--delay: ${delay}s`}>
   <a href={APP_ROUTER.TALE(item?.slug)} class="group block no-underline">
-    <div
-      class="group-hover:border-accent-main/30 relative min-h-55 overflow-hidden rounded-[20px] border border-white/10 transition-all duration-300 group-hover:-translate-y-0.5 md:h-45"
-    >
+    <div class="group-hover:border-accent-main/30 relative min-h-55 overflow-hidden rounded-[20px] border border-white/10 transition-all duration-300 group-hover:-translate-y-0.5 md:h-45">
       <img
         src={item?.header?.url}
         alt={item?.title}
         class="absolute inset-0 block h-full w-full object-cover"
       />
 
-      <div
-        class="from-ash-main via-ash-main/80 to-ash-main/20 md:from-ash-main/95 md:via-ash-main/40 absolute inset-0 bg-linear-to-t md:bg-linear-to-r md:to-transparent"
-      >
-      </div>
+      <div class="from-ash-main via-ash-main/80 to-ash-main/20 md:from-ash-main/95 md:via-ash-main/40 absolute inset-0 bg-linear-to-t md:bg-linear-to-r md:to-transparent"></div>
 
-      <div
-        class="relative flex h-full flex-col items-start gap-4 px-6 py-8 md:flex-row md:items-center md:gap-6 md:px-10 md:py-0"
-      >
-        <span
-          class="text-accent-text font-dm bg-accent-soft border-accent-main/30 shrink-0 rounded-full border px-2 py-0.75 text-[9px] tracking-[0.14em] uppercase"
-        >
+      <div class="relative flex h-full flex-col items-start gap-4 px-6 py-8 md:flex-row md:items-center md:gap-6 md:px-10 md:py-0">
+        <span class="text-accent-text font-dm bg-accent-soft border-accent-main/30 shrink-0 rounded-full border px-2 py-0.75 text-[9px] tracking-[0.14em] uppercase">
           {tag}
         </span>
 
         <div class="flex-1">
-          <div
-            class="font-fraunces text-ash-text text-[22px] leading-[1.1] font-bold tracking-[-0.02em] md:text-[28px]"
-          >
+          <div class="font-fraunces text-ash-text text-[22px] leading-[1.1] font-bold tracking-[-0.02em] md:text-[28px]">
             {item?.title}
           </div>
-          <p
-            class="font-dm text-ash-hard mt-2 line-clamp-2 max-w-125 text-[12px] font-light md:line-clamp-none md:text-[13px]"
-          >
+          <p class="font-dm text-ash-text/65 mt-2 line-clamp-2 max-w-125 text-[12px] font-light md:line-clamp-none md:text-[13px]">
             {item?.summary}
           </p>
         </div>
 
-        <span
-          class="text-accent-text hidden shrink-0 text-xl transition-transform duration-300 group-hover:translate-x-1.5 md:block"
-        >
+        <span class="text-accent-text hidden shrink-0 text-xl transition-transform duration-300 group-hover:translate-x-1.5 md:block">
           →
         </span>
       </div>
