@@ -4,12 +4,12 @@ import { logError } from '@/lib/logger';
 
 export async function getContentNavigateArticles<T>(): Promise<ApiResponse<T> | null> {
   try {
-    const result = await fetchData<T>(EXTERNAL_API_ENDPOINTS.ARTICLES_CONTENT_NAVIGATE);
+    const result = await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('articles'));
     return result;
   } catch (error) {
     logError(error, {
       function: 'getContentNavigateArticles',
-      endpoint: EXTERNAL_API_ENDPOINTS.ARTICLES_CONTENT_NAVIGATE,
+      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('articles'),
       file: 'src/lib/api/get-content-navigate.ts',
     });
     return null;
@@ -18,11 +18,11 @@ export async function getContentNavigateArticles<T>(): Promise<ApiResponse<T> | 
 
 export async function getContentNavigateFurtherTimeArticles<T>(): Promise<ApiResponse<T> | null> {
   try {
-    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.FURTHER_TIME_CONTENT_NAVIGATE);
+    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('further'));
   } catch (error) {
     logError(error, {
       function: 'getContentNavigateFurtherTimeArticles',
-      endpoint: EXTERNAL_API_ENDPOINTS.FURTHER_TIME_CONTENT_NAVIGATE,
+      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('further'),
       file: 'src/lib/api/get-content-navigate.ts',
     });
     return null;
@@ -31,37 +31,24 @@ export async function getContentNavigateFurtherTimeArticles<T>(): Promise<ApiRes
 
 export async function getContentNavigateTales<T>(): Promise<ApiResponse<T> | null> {
   try {
-    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.TALES_CONTENT_NAVIGATE);
+    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('tales'));
   } catch (error) {
     logError(error, {
       function: 'getContentNavigateTales',
-      endpoint: EXTERNAL_API_ENDPOINTS.TALES_CONTENT_NAVIGATE,
+      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('tales'),
       file: 'src/lib/api/get-content-navigate.ts',
     });
     return null;
   }
 }
 
-export async function getterHandler<T>(
-  contentType: 'articles' | 'tales' | 'further-time'
-): Promise<ApiResponse<T> | null> {
-  const endpointMap = {
-    articles: EXTERNAL_API_ENDPOINTS.ARTICLES_CONTENT_NAVIGATE,
-    tales: EXTERNAL_API_ENDPOINTS.TALES_CONTENT_NAVIGATE,
-    'further-time': EXTERNAL_API_ENDPOINTS.FURTHER_TIME_CONTENT_NAVIGATE,
-  };
+export async function getContentNavigatePoems<T>(): Promise<ApiResponse<T> | null> {
   try {
-    const endpoint = endpointMap[contentType];
-    if (!endpoint) {
-      throw new Error(`Invalid content type: ${contentType}`);
-    }
-
-    return await fetchData<T>(endpoint);
+    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('poems'));
   } catch (error) {
     logError(error, {
-      function: 'getContentNavigate',
-      contentType,
-      endpoint: endpointMap[contentType],
+      function: 'getContentNavigatePoems',
+      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('poems'),
       file: 'src/lib/api/get-content-navigate.ts',
     });
     return null;

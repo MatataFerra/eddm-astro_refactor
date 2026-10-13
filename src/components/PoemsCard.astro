@@ -1,0 +1,41 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+
+interface Props {
+  item: ContentNavigate;
+  delay?: number;
+}
+
+const { item, delay = 0 } = Astro.props;
+
+const formattedDate = new Date(item.createdAt ?? Date.now()).toLocaleDateString('es-ES', {
+  month: 'long',
+  year: 'numeric',
+});
+const meta = [item.description, formattedDate].filter(Boolean).join(' · ');
+---
+
+<div class="reveal h-full" style={`--delay: ${delay}s`}>
+  <a
+    href={APP_ROUTER.POEM(item.slug)}
+    class="group hover:border-lilac-main/35 flex h-full flex-col rounded-[20px] border border-white/7 bg-white/2 px-7.5 py-8 no-underline transition-all duration-300 hover:-translate-y-0.75"
+  >
+    {meta && (
+      <div class="font-dm mb-5 text-[10px] tracking-[0.12em] text-[#888] uppercase">{meta}</div>
+    )}
+
+    <p class="font-fraunces flex-1 text-[19px] leading-[1.6] font-light whitespace-pre-line text-[#cfcbe0] italic">
+      {item.summary}
+    </p>
+
+    <div class="mt-7 flex items-baseline justify-between gap-4">
+      <span class="font-fraunces text-ash-text text-xl leading-snug font-semibold tracking-[-0.01em]">
+        {item.title}
+      </span>
+      <span class="text-lilac-main text-base transition-transform duration-200 group-hover:translate-x-1">
+        →
+      </span>
+    </div>
+  </a>
+</div>

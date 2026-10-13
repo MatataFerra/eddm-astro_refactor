@@ -1,0 +1,14 @@
+---
+import PoemaRow from './PoemaRow.astro';
+import type { Poema } from '@/lib/poemas';
+
+interface Props {
+  poemas: Poema[];
+}
+
+const { poemas } = Astro.props;
+---
+
+<section class="mx-auto max-w-250 px-6 pb-30 md:px-12">
+  {poemas.map((poema, i) => <PoemaRow poema={poema} index={i} />)}
+</section>

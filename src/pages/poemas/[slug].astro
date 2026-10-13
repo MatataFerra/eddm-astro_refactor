@@ -1,0 +1,49 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import PoemaDetail from '@/components/poemas/PoemaDetail.astro';
+import { getContentNavigatePoems } from '@/lib/api/get-content-navigate';
+import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import type { Article } from '@/lib/interfaces/articles';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const response = await getContentNavigatePoems<ContentNavigate[]>();
+  const poems = response?.data || [];
+
+  const sortedPoems = [...poems].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return sortedPoems.map((tale, index) => {
+    const nextPoem = sortedPoems[index + 1]
+      ? { title: sortedPoems[index + 1].title, slug: sortedPoems[index + 1].slug }
+      : null;
+
+    const prevPoem = sortedPoems[index - 1]
+      ? { title: sortedPoems[index - 1].title, slug: sortedPoems[index - 1].slug }
+      : null;
+
+    return {
+      params: { slug: tale.slug },
+      props: {
+        nav: { nextPoem, prevPoem },
+      },
+    };
+  });
+}
+
+const { slug } = Astro.params;
+const { nav } = Astro.props;
+
+const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
+  query: slug,
+});
+
+if (!response || !response.data) return Astro.redirect('/404');
+
+const poema = response.data;
+---
+
+<Layout title={`${poema.title} — Poemas`}>
+  <PoemaDetail poema={poema} nav={nav} />
+</Layout>

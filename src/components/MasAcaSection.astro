@@ -11,9 +11,7 @@ const maaca = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
   <div class="reveal">
     <div class="mb-9 flex items-baseline gap-4">
       <div class="flex items-center gap-2.5">
-        <h2
-          class="font-fraunces text-ash-text text-[30px] font-semibold tracking-[-0.02em] not-italic"
-        >
+        <h2 class="font-fraunces text-ash-text text-[30px] font-semibold tracking-[-0.02em] not-italic">
           Más acá en el tiempo
         </h2>
       </div>
@@ -25,12 +23,9 @@ const maaca = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
         Ver todas →
       </a>
     </div>
-    <p class="font-dm text-ash-soft mb-7 text-[14px] font-light tracking-[0.01em]">
-      Historias que pasaron recientemente y que quizás no sean correlativas.
-    </p>
   </div>
 
   <div class="grid gap-4 md:grid-cols-3">
-    {maaca?.data.map((item, i) => <MasAcaCard item={item} delay={i * 0.1} />)}
+    {maaca?.data ? maaca.data.map((item, i) => <MasAcaCard item={item} delay={i * 0.1} />) : null}
   </div>
 </section>

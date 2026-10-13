@@ -1,0 +1,46 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import type { Poema } from '@/lib/poems';
+
+interface Props {
+  poema: Poema;
+  index: number;
+}
+
+const { poema, index } = Astro.props;
+const number = String(index + 1).padStart(2, '0');
+---
+
+<div class="reveal" style={`--delay: ${index * 0.06}s`}>
+  <a
+    href={APP_ROUTER.POEM(poema.slug)}
+    class="group grid grid-cols-1 gap-4 border-t border-white/7 py-12 no-underline md:grid-cols-[200px_minmax(0,1fr)] md:gap-12"
+  >
+    <div class="font-dm">
+      <div class="font-fraunces text-lilac-text mb-2.5 text-[15px] italic">{number}</div>
+      {
+        poema.place && (
+          <div class="text-ash-muted text-[11px] tracking-widest uppercase">{poema.place}</div>
+        )
+      }
+      {poema.date && <div class="text-ash-hard mt-1 text-xs">{poema.date}</div>}
+    </div>
+
+    <div>
+      <h3
+        class="font-fraunces text-ash-text group-hover:text-lilac-text mb-5 text-[32px] leading-[1.1] font-semibold tracking-[-0.02em] transition-colors"
+      >
+        {poema.title}
+      </h3>
+
+      {poema.excerpt && <p class="verse text-ash-verse text-xl leading-[1.65]">{poema.excerpt}</p>}
+
+      <span
+        class="font-dm text-lilac-text mt-5 inline-flex items-center gap-1 text-[13px] tracking-[0.04em]"
+      >
+        Leer poema
+        <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
+      </span>
+    </div>
+  </a>
+</div>

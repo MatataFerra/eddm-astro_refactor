@@ -1,0 +1,67 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import { processDiario } from '@/lib/markdown/process';
+import { htmlContent } from '@/lib/utils';
+import { formatPoemaDate, poemaMeta } from '@/lib/poems';
+
+type NavLink = { title: string; slug: string } | null;
+
+interface Props {
+  poema: {
+    title: string;
+    md_content?: string | null;
+    createdAt?: Date | string | null;
+  };
+  place?: string | null;
+  nav?: { nextPoem: NavLink; prevPoem: NavLink };
+}
+
+const { poema, place, nav } = Astro.props;
+
+const sections = await processDiario(poema.md_content ?? undefined, 'poem');
+const meta = poemaMeta({ place: place ?? undefined, date: formatPoemaDate(poema.createdAt) });
+---
+
+<section class="relative mx-auto max-w-2xl px-6 pt-28 pb-24">
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute top-24 left-1/2 h-75 w-125 -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-lilac-glow)_0%,transparent_70%)] opacity-60"
+  ></div>
+
+  <header class="reveal relative mb-14">
+    {meta && (
+      <div class="font-dm text-ash-muted mb-5 text-[11px] tracking-[0.12em] uppercase">{meta}</div>
+    )}
+    <h1 class="font-fraunces text-ash-text text-[clamp(40px,6vw,64px)] leading-none font-extrabold tracking-[-0.03em]">
+      {poema.title}
+    </h1>
+  </header>
+
+  <!-- marked con breaks: true → <p> por estrofa, <br> por verso -->
+  <div
+    class="reveal verse text-ash-verse-strong relative text-[clamp(20px,2.2vw,24px)] leading-[1.65] [&_em]:not-italic [&_p]:mb-[1.65em] [&_p:last-child]:mb-0 [&_strong]:text-lilac-text [&_strong]:font-normal"
+    style="--delay: 0.1s"
+    set:html={htmlContent(sections)}
+  />
+
+  <div class="reveal mt-16 flex justify-center gap-2" style="--delay: 0.2s">
+    <div class="bg-ash-softest h-1 w-1 rounded-full"></div>
+    <div class="bg-lilac-main h-1 w-1 rounded-full"></div>
+    <div class="bg-ash-softest h-1 w-1 rounded-full"></div>
+  </div>
+
+  <nav class="font-dm mt-16 flex items-center justify-between gap-6 border-t border-white/6 pt-8 text-[13px]">
+    <a href={APP_ROUTER.POEMS} class="text-ash-hard hover:text-lilac-text transition-colors">
+      ← Todos los poemas
+    </a>
+
+    {nav?.nextPoem && (
+      <a
+        href={APP_ROUTER.POEM(nav.nextPoem.slug)}
+        class="text-ash-hard hover:text-lilac-text text-right transition-colors"
+      >
+        <span class="font-fraunces italic">{nav.nextPoem.title}</span> →
+      </a>
+    )}
+  </nav>
+</section>

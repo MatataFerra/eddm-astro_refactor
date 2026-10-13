@@ -1,0 +1,31 @@
+---
+import { getContentNavigatePoems } from '@/lib/api/get-content-navigate';
+import { APP_ROUTER } from '@/lib/constants';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+import PoemsCard from './PoemsCard.astro';
+
+const poems = await getContentNavigatePoems<ContentNavigate[]>();
+---
+
+<section>
+  <div class="reveal">
+    <div class="mb-9 flex items-baseline gap-4">
+      <div class="flex items-center gap-2.5">
+        <h2 class="font-fraunces text-ash-text text-[30px] font-semibold tracking-[-0.02em] not-italic">
+          Poemas
+        </h2>
+      </div>
+      <div class="h-px flex-1 bg-white/5"></div>
+      <a
+        href={APP_ROUTER.POEMS}
+        class="font-dm text-lilac-text text-xs tracking-[0.06em] whitespace-nowrap no-underline"
+      >
+        Ver todas →
+      </a>
+    </div>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-3">
+    {poems ? poems.data.map((p, i) => <PoemsCard item={p} delay={i * 0.1} />) : null}
+  </div>
+</section>
