@@ -4,10 +4,10 @@ import PoemasHero from '@/components/poemas/PoemasHero.astro';
 import PoemaFeatured from '@/components/poemas/PoemaFeatured.astro';
 import PoemaList from '@/components/poemas/PoemaList.astro';
 import { splitFeatured, toPoema } from '@/lib/poems';
-import { getContentNavigatePoems } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 
-const data = await getContentNavigatePoems<ContentNavigate[]>();
+const data = await getContentNavigate<ContentNavigate[]>('poems');
 
 const poemas = (data?.data ?? []).map((item) => toPoema(item));
 const { featured, rest } = splitFeatured(poemas);
@@ -16,13 +16,11 @@ const { featured, rest } = splitFeatured(poemas);
 <Layout title="Poemas — El diario de Mati">
   <PoemasHero />
 
-  {
-    featured && (
-      <section class="mx-auto max-w-250 px-6 pb-14 md:px-12">
-        <PoemaFeatured poema={featured} />
-      </section>
-    )
-  }
+  {featured && (
+    <section class="mx-auto max-w-250 px-6 pb-14 md:px-12">
+      <PoemaFeatured poema={featured} />
+    </section>
+  )}
 
   {rest.length > 0 && <PoemaList poemas={rest} />}
 </Layout>

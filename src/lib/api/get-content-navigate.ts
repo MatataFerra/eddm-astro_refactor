@@ -1,54 +1,17 @@
 import { fetchData, type ApiResponse } from '@/lib/fetch';
-import { EXTERNAL_API_ENDPOINTS } from '@/lib/constants';
+import { EXTERNAL_API_ENDPOINTS, type NavigateSection } from '@/lib/constants';
 import { logError } from '@/lib/logger';
 
-export async function getContentNavigateArticles<T>(): Promise<ApiResponse<T> | null> {
+export async function getContentNavigate<T>(
+  section: NavigateSection
+): Promise<ApiResponse<T> | null> {
   try {
-    const result = await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('articles'));
+    const result = await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE(section));
     return result;
   } catch (error) {
     logError(error, {
-      function: 'getContentNavigateArticles',
-      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('articles'),
-      file: 'src/lib/api/get-content-navigate.ts',
-    });
-    return null;
-  }
-}
-
-export async function getContentNavigateFurtherTimeArticles<T>(): Promise<ApiResponse<T> | null> {
-  try {
-    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('further'));
-  } catch (error) {
-    logError(error, {
-      function: 'getContentNavigateFurtherTimeArticles',
-      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('further'),
-      file: 'src/lib/api/get-content-navigate.ts',
-    });
-    return null;
-  }
-}
-
-export async function getContentNavigateTales<T>(): Promise<ApiResponse<T> | null> {
-  try {
-    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('tales'));
-  } catch (error) {
-    logError(error, {
-      function: 'getContentNavigateTales',
-      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('tales'),
-      file: 'src/lib/api/get-content-navigate.ts',
-    });
-    return null;
-  }
-}
-
-export async function getContentNavigatePoems<T>(): Promise<ApiResponse<T> | null> {
-  try {
-    return await fetchData<T>(EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('poems'));
-  } catch (error) {
-    logError(error, {
-      function: 'getContentNavigatePoems',
-      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE('poems'),
+      function: 'getContentNavigate',
+      endpoint: EXTERNAL_API_ENDPOINTS.SECTION_CONTENT_NAVIGATE(section),
       file: 'src/lib/api/get-content-navigate.ts',
     });
     return null;

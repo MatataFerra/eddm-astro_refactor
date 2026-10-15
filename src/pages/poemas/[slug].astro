@@ -1,7 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import PoemaDetail from '@/components/poemas/PoemaDetail.astro';
-import { getContentNavigatePoems } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
 import type { Article } from '@/lib/interfaces/articles';
@@ -9,7 +9,7 @@ import type { Article } from '@/lib/interfaces/articles';
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const response = await getContentNavigatePoems<ContentNavigate[]>();
+  const response = await getContentNavigate<ContentNavigate[]>('poems');
   const poems = response?.data || [];
 
   const sortedPoems = [...poems].sort((a, b) => (a.order || 0) - (b.order || 0));

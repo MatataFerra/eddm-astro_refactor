@@ -4,14 +4,14 @@ import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
 import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
 
-import { getContentNavigateFurtherTimeArticles } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import Hero from '@/components/maaca/entry/Hero.astro';
 import Content from '@/components/maaca/entry/Content.astro';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const response = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
+  const response = await getContentNavigate<ContentNavigate[]>('further');
   const furtherTales = response?.data || [];
 
   const sortedTales = [...furtherTales].sort((a, b) => (a.order || 0) - (b.order || 0));

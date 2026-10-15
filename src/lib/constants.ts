@@ -23,7 +23,7 @@ export const APP_ROUTER = {
   POEM: (slug: string) => `${APP_ROUTES.poems}/${slug}`,
 } as const;
 
-type NavigateSection = 'articles' | 'further' | 'tales' | 'poems';
+export type NavigateSection = 'articles' | 'further' | 'tales' | 'poems';
 
 export const EXTERNAL_API_ENDPOINTS = {
   TALES: '/tales',
