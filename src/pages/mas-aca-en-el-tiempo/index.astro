@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { getContentNavigateFurtherTimeArticles } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import MainCard from '@/components/maaca/MainCard.astro';
 import RelatoDivider from '@/components/relatos/RelatoDivider.astro';
@@ -9,29 +9,26 @@ import { APP_ROUTER } from '@/lib/constants';
 
 export const prerender = true;
 
-const furtherTimeArticles = await getContentNavigateFurtherTimeArticles<ContentNavigate[]>();
+const furtherTimeArticles = await getContentNavigate<ContentNavigate[]>('further');
 
 const [featured, ...rest] = furtherTimeArticles?.data || [];
 ---
 
 <Layout title="Más acá en el tiempo | El Diario de Mati">
   <main class="bg-ash-main relative min-h-screen overflow-hidden">
-    <div
-      class="pointer-events-none absolute top-[20%] left-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-blue-glow)_0%,transparent_70%)] opacity-60"
-    >
-    </div>
+    <div class="pointer-events-none absolute top-[20%] left-1/2 h-100 w-150 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,var(--color-blue-glow)_0%,transparent_70%)] opacity-60"></div>
 
     <section class="relative px-6 pt-28 pb-16 text-center">
-      <div
-        class="reveal text-blue-soft font-dm bg-blue-glow border-blue-main/60 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-      >
+      <div class="reveal text-blue-soft font-dm bg-blue-glow border-blue-main/60 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5">
         <div class="bg-blue-main h-1.5 w-1.5 animate-pulse rounded-full"></div>
         <span class="font-dm text-[10px] font-medium tracking-[0.14em] uppercase">
           Historias recientes
         </span>
       </div>
 
-      <h1 class="reveal heading-1" style="--delay: 0.1s">Más acá en el tiempo</h1>
+      <h1 class="reveal heading-1" style="--delay: 0.1s">
+        Más acá en el tiempo
+      </h1>
 
       <p
         class="reveal font-dm text-ash-hard mx-auto mt-8 max-w-120 text-base leading-relaxed font-light"
@@ -54,20 +51,18 @@ const [featured, ...rest] = furtherTimeArticles?.data || [];
       />
       <RelatoDivider />
       <div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-        {
-          rest.map((relato, index) => (
-            <MaacaCard
-              relato={{
-                href: APP_ROUTER.FURTHER_TIME_ARTICLE(relato.slug),
-                cover: relato.header?.url || '',
-                title: relato.title || 'Relato sin título',
-                summary: relato.summary || 'Sin resumen disponible.',
-                tag: 'Más acá',
-              }}
-              delay={`${(index % 3) * 0.1}s`}
-            />
-          ))
-        }
+        {rest.map((relato, index) => (
+          <MaacaCard
+            relato={{
+              href: APP_ROUTER.FURTHER_TIME_ARTICLE(relato.slug),
+              cover: relato.header?.url || '',
+              title: relato.title || 'Relato sin título',
+              summary: relato.summary || 'Sin resumen disponible.',
+              tag: 'Más acá',
+            }}
+            delay={`${(index % 3) * 0.1}s`}
+          />
+        ))}
       </div>
     </section>
   </main>

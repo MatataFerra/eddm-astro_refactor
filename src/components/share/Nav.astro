@@ -15,11 +15,19 @@ const topLevelRoutes = [
   APP_ROUTER.POEMS,
   APP_ROUTER.FURTHER_TIME,
   APP_ROUTER.TRIP,
+  APP_ROUTER.GALLERY,
 ] as const;
 
 const { links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[] } = Astro.props;
 
-const LINK_MAP = {
+type LinkMapProps = {
+  name: string;
+  hover: string;
+  active: string;
+};
+type LinkMap = Record<string, Record<keyof LinkMapProps, string>>;
+
+const LINK_MAP: LinkMap = {
   viaje: {
     name: 'Un año viajando',
     hover: 'hover:text-green-main',
@@ -44,6 +52,11 @@ const LINK_MAP = {
     name: 'Recorrido',
     hover: 'hover:text-accent-text',
     active: 'text-accent-text',
+  },
+  galeria: {
+    name: 'Galeria',
+    hover: 'hover:text-coral-text',
+    active: 'text-coral-text',
   },
 } as const;
 

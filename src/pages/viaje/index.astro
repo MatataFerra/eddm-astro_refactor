@@ -1,13 +1,13 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import Tracker from '@/components/viaje/Tracker.astro';
-import { getContentNavigateArticles } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import { adaptArticlesToMeses } from '@/lib/adapters/viaje-adapter';
 
 export const prerender = true;
 
-const articles = await getContentNavigateArticles<ContentNavigate[]>();
+const articles = await getContentNavigate<ContentNavigate[]>('articles');
 const mesesData = adaptArticlesToMeses(articles?.data || []);
 ---
 

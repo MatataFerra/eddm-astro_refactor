@@ -1,0 +1,36 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import CityIndex from '@/components/galeria/svelte/CityIndex.svelte';
+import Lightbox from '@/components/galeria/svelte/Lightbox.svelte';
+import { getGalleryWithPhotos } from '@/lib/api/get-gallery';
+
+export const prerender = true;
+
+const lugares = await getGalleryWithPhotos();
+---
+
+<Layout title="Galería — El diario de Mati | Fotos de viaje, por ciudad">
+  <header class="px-5 pt-30 pb-12 text-center md:px-12">
+    <div class="reveal">
+      <div class="bg-coral-soft border-coral/30 text-coral-text mb-5.5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] tracking-[0.12em] uppercase">
+        <i class="bg-coral size-1.5 rounded-full"></i>Fotos
+      </div>
+    </div>
+
+    <div class="reveal" style="--delay: 0.08s">
+      <h1 class="font-fraunces text-ash-text text-[clamp(48px,7vw,80px)] leading-[.95] font-extrabold tracking-[-0.04em]">
+        Galería
+      </h1>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-300 px-5 pb-36 md:px-12">
+    {lugares.length > 0 ? (
+      <CityIndex client:load lugares={lugares} />
+    ) : (
+      <p class="font-dm text-ash-muted text-center">Todavía no hay fotos.</p>
+    )}
+  </main>
+
+  <Lightbox client:idle />
+</Layout>

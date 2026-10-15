@@ -1,10 +1,10 @@
 ---
-import { getContentNavigatePoems } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import { APP_ROUTER } from '@/lib/constants';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 import PoemsCard from './PoemsCard.astro';
 
-const poems = await getContentNavigatePoems<ContentNavigate[]>();
+const poems = await getContentNavigate<ContentNavigate[]>('poems');
 ---
 
 <section>

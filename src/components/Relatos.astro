@@ -1,24 +1,22 @@
 ---
 import GlassCard from '@/components/GlassCard.astro';
 import FeatureCard from '@/components/FeatureCard.astro';
-import { getContentNavigateTales } from '@/lib/api/get-content-navigate';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import type { ContentNavigate } from '@/lib/interfaces/share';
 
-const relatos = await getContentNavigateTales<ContentNavigate[]>();
+const relatos = await getContentNavigate<ContentNavigate[]>('tales');
 ---
 
 <Fragment>
-  {
-    relatos?.data && (
-      <Fragment>
-        <div class="mb-4 grid grid-rows-[420px] gap-8 md:grid-cols-[1.6fr_1fr_1fr] md:gap-4">
-          {relatos?.data?.slice(0, 3).map((r, i) => (
-            <GlassCard delay={i * 0.1} tag={'Relato'} item={r} />
-          ))}
-        </div>
+  {relatos?.data && (
+    <Fragment>
+      <div class="mb-4 grid grid-rows-[420px] gap-8 md:grid-cols-[1.6fr_1fr_1fr] md:gap-4">
+        {relatos?.data?.slice(0, 3).map((r, i) => (
+          <GlassCard delay={i * 0.1} tag={'Relato'} item={r} />
+        ))}
+      </div>
 
-        <FeatureCard item={relatos!.data[3]} delay={0.4} tag="Relato destacado" />
-      </Fragment>
-    )
-  }
+      <FeatureCard item={relatos!.data[3]} delay={0.4} tag="Relato destacado" />
+    </Fragment>
+  )}
 </Fragment>

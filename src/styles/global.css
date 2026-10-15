@@ -52,6 +52,10 @@
   --font-fraunces: 'Fraunces', Georgia, 'Times New Roman', serif;
 
   --animate-pulse-dot: pulse-dot 3s infinite;
+
+  --color-coral: var(--color-orange-main);
+  --color-coral-soft: var(--color-orange-soft);
+  --color-coral-text: var(--color-orange-text);
 }
 
 @layer base {
