@@ -5,6 +5,7 @@ export const APP_ROUTES = {
   trip: '/recorrido',
   furtherTime: '/mas-aca-en-el-tiempo',
   poems: '/poemas',
+  gallery: '/galeria',
 } as const;
 
 export type RoutePaths = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];
@@ -21,6 +22,7 @@ export const APP_ROUTER = {
   FURTHER_TIME_ARTICLE: (slug: string) => `${APP_ROUTES.furtherTime}/${slug}`,
   POEMS: `${APP_ROUTES.poems}`,
   POEM: (slug: string) => `${APP_ROUTES.poems}/${slug}`,
+  GALLERY: `${APP_ROUTES.gallery}`,
 } as const;
 
 export type NavigateSection = 'articles' | 'further' | 'tales' | 'poems';
@@ -49,6 +51,8 @@ export const EXTERNAL_API_ENDPOINTS = {
   LAST_ARTICLE: '/articles/last',
   LAST_ENTRY: '/entries/last',
   LOCATION: '/location',
+  GALLERY: '/gallery',
+  GALLERY_PLACE: (slug: string) => `/gallery/${slug}`,
 } as const;
 
 export const FALLBACK_SLUG = '__placeholder__' as const;
