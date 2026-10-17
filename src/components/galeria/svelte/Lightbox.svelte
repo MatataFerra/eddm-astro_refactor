@@ -104,7 +104,7 @@
 
 {#if isOpen}
   <div
-    class="fixed inset-0 z-200 bg-[rgba(6,6,9,.6)] backdrop-blur-xl"
+    class="fixed inset-0 z-200"
     role="dialog"
     aria-modal="true"
     aria-label="Visor de fotos"
@@ -115,6 +115,10 @@
     ontouchstart={release}
     onwheel={release}
   >
+    <div
+      class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-lvh bg-[rgba(6,6,9,.6)] backdrop-blur-xl"
+      aria-hidden="true"
+    ></div>
     {#if multi}
       <p
         class="text-ash-muted absolute top-9 left-6 z-10 font-mono text-[11px] tracking-widest"
