@@ -1,6 +1,5 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
-  import { SvelteSet } from 'svelte/reactivity';
   import type { GalleryPlaceDetail } from '@/lib/interfaces/gallery';
   import { formatCount, pad } from '@/lib/gallery';
   import Mosaic from '@/components/galeria/svelte/Mosaic.svelte';
@@ -11,17 +10,16 @@
 
   let { lugares }: Props = $props();
 
-  const open = new SvelteSet<string>();
+  let open = $state<string | null>(null);
 
   function toggle(slug: string) {
-    if (open.has(slug)) open.delete(slug);
-    else open.add(slug);
+    open = open === slug ? null : slug;
   }
 </script>
 
 <div class="border-t border-white/7">
   {#each lugares as lugar, i (lugar.slug)}
-    {@const isOpen = open.has(lugar.slug)}
+    {@const isOpen = open === lugar.slug}
     {@const panelId = `galeria-${lugar.slug}`}
 
     <div class="border-b border-white/7">
