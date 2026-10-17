@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
   import { slide } from 'svelte/transition';
   import { SvelteSet } from 'svelte/reactivity';
   import type { GalleryPlaceDetail } from '@/lib/interfaces/gallery';
@@ -12,7 +11,7 @@
 
   let { lugares }: Props = $props();
 
-  const open = new SvelteSet<string>(untrack(() => (lugares[0] ? [lugares[0].slug] : [])));
+  const open = new SvelteSet<string>();
 
   function toggle(slug: string) {
     if (open.has(slug)) open.delete(slug);
