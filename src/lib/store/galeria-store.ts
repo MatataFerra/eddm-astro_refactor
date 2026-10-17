@@ -15,3 +15,5 @@ export function stepLightbox(dir: 1 | -1) {
   const { photos, index } = lightbox.get();
   if (photos.length) lightbox.setKey('index', (index + dir + photos.length) % photos.length);
 }
+
+export const setLightboxIndex = (index: number) => lightbox.setKey('index', index);
