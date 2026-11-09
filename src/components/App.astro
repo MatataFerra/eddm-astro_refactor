@@ -1,7 +1,5 @@
 ---
-import StatsBar from '@/components/StatsBar.astro';
 import MasAcaSection from '@/components/MasAcaSection.astro';
-import CurrentDestinationTeaser from '@/components/CurrentDestinationTeaser.astro';
 import Relatos from '@/components/Relatos.astro';
 import Hero from '@/components/Hero.astro';
 import { APP_ROUTER } from '@/lib/constants';
@@ -10,10 +8,6 @@ import PoemsSection from '@/components/PoemsSection.astro';
 
 <main>
   <Hero />
-
-  <section class="p-10 md:px-20 md:pb-20">
-    <StatsBar />
-  </section>
 
   <section class="p-10 md:px-20 md:pb-20">
     <div class="reveal mb-12 flex items-baseline gap-4">
@@ -38,9 +32,5 @@ import PoemsSection from '@/components/PoemsSection.astro';
 
   <section class="p-10 md:px-20 md:pb-20">
     <MasAcaSection />
-  </section>
-
-  <section class="p-10 md:px-20 md:pb-30">
-    <CurrentDestinationTeaser />
   </section>
 </main>

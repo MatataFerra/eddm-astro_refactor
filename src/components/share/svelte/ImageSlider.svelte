@@ -1,129 +1,112 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
+  import { resizeImage, resizeSrcset } from '@/lib/media/resize';
 
-  interface Location {
+  interface Slide {
+    id: string;
     url: string;
     city: string;
-    id: string;
+    country?: string;
   }
 
-  let { locations = [] }: { locations: Location[] } = $props();
+  interface Props {
+    slides: Slide[];
+    interval?: number;
+  }
 
-  let shuffledLocations = $state<Location[]>([]);
+  let { slides, interval = 7000 }: Props = $props();
+
+  const WIDTHS = [828, 1280, 1920, 2560];
+
   let currentIndex = $state(0);
-  let displayText = $state('');
-  let isScrambling = $state(false);
+  let paused = $state(false);
+  let reducedMotion = $state(false);
 
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@&?<>[]';
-
-  function shuffleArray(array: Location[]): Location[] {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
-
-  async function scramble(target: string) {
-    if (!target) return;
-    isScrambling = true;
-    let iteration = 0;
-    const maxIterations = 15;
-
-    const interval = setInterval(() => {
-      displayText = target
-        .split('')
-        .map((char, index) => {
-          if (index < iteration / (maxIterations / target.length)) {
-            return target[index];
-          }
-          return chars[Math.floor(Math.random() * chars.length)];
-        })
-        .join('');
-
-      if (iteration >= maxIterations) {
-        clearInterval(interval);
-        displayText = target;
-        isScrambling = false;
-      }
-      iteration += 1;
-    }, 40);
-  }
+  let current = $derived(slides[currentIndex]);
+  let canPlay = $derived(slides.length > 1 && !reducedMotion);
 
   onMount(() => {
-    if (locations.length === 0) return;
-
-    shuffledLocations = shuffleArray(locations);
-    scramble(shuffledLocations[currentIndex].city);
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = media.matches;
+    const onChange = (e: MediaQueryListEvent) => (reducedMotion = e.matches);
+    media.addEventListener('change', onChange);
 
     const timer = setInterval(() => {
-      currentIndex = (currentIndex + 1) % shuffledLocations.length;
-      scramble(shuffledLocations[currentIndex].city);
-    }, 6000);
+      if (!canPlay || paused || document.hidden) return;
+      currentIndex = (currentIndex + 1) % slides.length;
+    }, interval);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      media.removeEventListener('change', onChange);
+    };
   });
 </script>
 
-<div class="relative size-full overflow-hidden">
-  {#each shuffledLocations as loc, i (loc.id)}
+<div class="absolute inset-0 overflow-hidden">
+  {#each slides as slide, i (slide.id)}
     {#if currentIndex === i}
-      <div
-        class="absolute inset-0 overflow-hidden rounded-t-xl"
-        in:fade={{ duration: 2000 }}
-        out:fade={{ duration: 2000 }}
-      >
-        <img
-          src={loc.url}
-          alt={loc.city}
-          class="animate-ken-burns size-full object-cover opacity-60"
-        />
-        <div class="bg-noise absolute inset-0 opacity-[0.03]"></div>
-      </div>
+      <img
+        src={resizeImage(slide.url, 1920)}
+        srcset={resizeSrcset(slide.url, WIDTHS)}
+        sizes="100vw"
+        alt={`${slide.city}${slide.country ? `, ${slide.country}` : ''}`}
+        fetchpriority={i === 0 ? 'high' : 'auto'}
+        decoding="async"
+        class="slide absolute inset-0 size-full object-cover"
+        transition:fade={{ duration: 1400 }}
+      />
     {/if}
   {/each}
-
-  <div
-    class="pointer-events-none absolute inset-0 flex -translate-y-1/8 items-center justify-center"
-  >
-    <div class="flex flex-col items-center gap-2">
-      <div class="bg-ash-main/60 rounded-xs border border-white/10 px-6 py-3 backdrop-blur-md">
-        <span class="text-ash-text font-mono text-[13px] leading-none tracking-[0.25em] uppercase">
-          {displayText}
-        </span>
-      </div>
-
-      <div class="flex items-center gap-4 opacity-40">
-        <div class="h-px w-8 bg-white/30"></div>
-        <span class="text-ash-softest font-mono text-[9px] tracking-widest uppercase">
-          {isScrambling ? 'Searching...' : 'Locked'}
-        </span>
-        <div class="h-px w-8 bg-white/30"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="absolute top-4 left-4 size-3 border-t border-l border-white/20"></div>
-  <div class="absolute right-4 bottom-4 size-3 border-r border-b border-white/20"></div>
 </div>
 
+{#if current}
+  <div
+    class="absolute top-20 right-6 z-10 flex items-center gap-3 md:top-auto md:right-20 md:bottom-8"
+  >
+    <p class="font-fraunces text-ash-text/80 text-sm italic" aria-live="polite">
+      {current.city}{current.country ? `, ${current.country}` : ''}
+    </p>
+
+    {#if canPlay}
+      <button
+        type="button"
+        onclick={() => (paused = !paused)}
+        aria-label={paused ? 'Reanudar fotos' : 'Pausar fotos'}
+        class="text-ash-text/70 hover:text-ash-text flex size-8 cursor-pointer items-center justify-center rounded-full border border-white/15 transition-colors hover:border-white/40"
+      >
+        {#if paused}
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M2 1l7 4-7 4z" fill="currentColor" />
+          </svg>
+        {:else}
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M2 1h2v8H2zM6 1h2v8H6z" fill="currentColor" />
+          </svg>
+        {/if}
+      </button>
+    {/if}
+  </div>
+{/if}
+
 <style>
-  @keyframes ken-burns {
+  @keyframes drift {
     from {
-      transform: scale(1.05);
+      transform: scale(1);
     }
     to {
-      transform: scale(1.15);
+      transform: scale(1.06);
     }
   }
 
-  .animate-ken-burns {
-    animation: ken-burns 8s ease-in-out infinite alternate;
+  .slide {
+    animation: drift 14s ease-out both;
   }
 
-  .bg-noise {
-    background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+  @media (prefers-reduced-motion: reduce) {
+    .slide {
+      animation: none;
+    }
   }
 </style>

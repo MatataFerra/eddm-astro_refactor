@@ -1,20 +1,100 @@
 ---
-import HeroImage from '@/components/HeroImage.astro';
-import HeroTitle from '@/components/HeroTitle.astro';
+import ImageSlider from '@/components/share/svelte/ImageSlider.svelte';
+import { APP_ROUTER } from '@/lib/constants';
+import { getTrip } from '@/lib/api/get-trip';
+import { getAllStats } from '@/lib/api/get-stats';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import type { Trip } from '@/lib/interfaces/recorrido';
+import type { Stats } from '@/lib/interfaces/stats';
+import type { Location } from '@/lib/interfaces/location';
+
+const MAX_SLIDES = 12;
+const FALLBACK_SLIDE = {
+  id: 'fallback',
+  url: 'https://res.cloudinary.com/docq8rbdu/image/upload/v1777827696/el-diario-de-mati/trips/Whitehaven_Beach_tr341v.webp',
+  city: 'Whitehaven Beach',
+  country: 'Australia',
+};
+
+const [trip, stats, location] = await Promise.all([
+  getTrip<Trip>(),
+  getAllStats<Stats>(),
+  getCurrentLocation<Location>(),
+]);
+
+const stops = (trip?.data?.stops ?? []).filter((stop) => stop.stopImage);
+const shuffled = [...stops].sort(() => Math.random() - 0.5).slice(0, MAX_SLIDES);
+const slides = shuffled.length
+  ? shuffled.map((stop) => ({
+      id: stop.id,
+      url: stop.stopImage as string,
+      city: stop.city,
+      country: stop.country,
+    }))
+  : [FALLBACK_SLIDE];
+
+const number = new Intl.NumberFormat('es-AR');
+const s = stats?.data;
+const tally = s
+  ? `${number.format(s.notes)} notas, ${number.format(s.countries)} países, ${number.format(s.km)} km y ${number.format(s.days)} días de camino.`
+  : null;
+
+const here = location?.data;
 ---
 
-<section class="relative mt-4 flex h-275 min-h-screen items-center overflow-hidden lg:h-auto">
-  <div
-    class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(212,168,67,0.12)_0%,transparent_60%)]"
-  >
-  </div>
-  <div class="from-ash-main absolute right-0 bottom-0 left-0 h-75 bg-linear-to-t to-transparent">
-  </div>
+<section class="bg-ash-main relative isolate flex min-h-[max(640px,100svh)] items-end overflow-hidden">
+  <ImageSlider client:load slides={slides} />
 
-  <div
-    class="relative z-10 mx-auto grid w-full max-w-350 items-center gap-20 px-10 pt-15 pb-10 md:px-20 md:pt-30 md:pb-20 lg:grid-cols-2"
-  >
-    <HeroTitle />
-    <HeroImage />
+  <div class="from-ash-main via-ash-main/60 pointer-events-none absolute inset-0 bg-linear-to-t from-5% via-40% to-transparent to-75%"></div>
+  <div class="from-ash-main/60 pointer-events-none absolute inset-0 bg-linear-to-r to-transparent lg:to-60%"></div>
+
+  <div class="relative mx-auto grid w-full max-w-350 gap-12 px-6 pt-36 pb-24 md:px-20 md:pb-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-end lg:gap-20">
+    <div>
+      <h1 class="reveal font-fraunces text-ash-text text-[clamp(64px,10vw,168px)] leading-[0.88] font-extrabold tracking-[-0.045em] text-balance">
+        El diario de Mati
+      </h1>
+      <p
+        class="reveal font-dm text-ash-text/80 mt-8 max-w-[46ch] text-[17px] leading-relaxed font-light"
+        style="--delay: 0.12s"
+      >
+        Escribo desde que tengo memoria. La escritura no me ha abandonado, sea por desahogo o para
+        ordenar pensamientos.
+      </p>
+      <div class="reveal mt-10 flex flex-wrap items-center gap-3" style="--delay: 0.2s">
+        <a
+          href={APP_ROUTER.JOURNEY}
+          class="bg-accent-main font-dm text-ash-main hover:bg-accent-text inline-flex items-center rounded-full px-7 py-3.5 text-sm font-medium no-underline transition-colors active:scale-[0.98]"
+        >
+          Leer el viaje
+        </a>
+        <a
+          href={APP_ROUTER.TALES}
+          class="font-dm text-ash-text inline-flex items-center rounded-full border border-white/20 px-7 py-3.5 text-sm no-underline transition-colors hover:border-white/50 active:scale-[0.98]"
+        >
+          Leer relatos
+        </a>
+      </div>
+    </div>
+
+    {(here || tally) && (
+      <div class="reveal border-accent-main/40 border-l pl-6" style="--delay: 0.32s">
+        {here && (
+          <Fragment>
+            <p class="font-fraunces text-ash-text text-[clamp(22px,2.2vw,30px)] leading-tight italic">
+              Hoy escribo desde <span class="text-accent-text not-italic">{here.name}</span>
+              {here.metadata?.emoji && <span aria-hidden="true">{here.metadata.emoji}</span>}
+            </p>
+            {here.metadata?.description && (
+              <p class="font-dm text-ash-hard mt-3 text-sm leading-relaxed font-light">
+                {here.metadata.description}
+              </p>
+            )}
+          </Fragment>
+        )}
+        {tally && (
+          <p class="font-dm text-ash-soft mt-5 text-sm leading-relaxed">Hasta ahora: {tally}</p>
+        )}
+      </div>
+    )}
   </div>
 </section>
