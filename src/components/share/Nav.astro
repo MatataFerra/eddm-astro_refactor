@@ -54,7 +54,7 @@ const LINK_MAP: LinkMap = {
     active: 'text-accent-text',
   },
   galeria: {
-    name: 'Galeria',
+    name: 'Galería',
     hover: 'hover:text-coral-text',
     active: 'text-coral-text',
   },
@@ -115,7 +115,8 @@ const isActive = (link: LinkKey) =>
   <button
     id="menu-btn"
     class="fixed top-5 right-6 z-50 flex cursor-pointer flex-col gap-1.5 lg:hidden"
-    aria-label="Menu"
+    aria-label="Menú"
+    aria-controls="mobile-menu"
     aria-expanded="false"
   >
     <div class="line-1 bg-ash-text h-0.5 w-6 origin-center"></div>
@@ -131,9 +132,10 @@ const isActive = (link: LinkKey) =>
     {links.map((link) => (
       <a
         href={`/${link}`}
+        aria-current={isActive(link) ? 'page' : undefined}
         class={cn(
-          'font-fraunces hover:text-accent-text text-2xl capitalize italic transition-colors',
-          currentPath === `/${link}` ? 'text-accent-text underline' : 'text-ash-text no-underline'
+          'font-fraunces hover:text-accent-text text-2xl italic transition-colors',
+          isActive(link) ? 'text-accent-text underline' : 'text-ash-text no-underline'
         )}
       >
         {LINK_MAP[link]?.name || link}
@@ -324,7 +326,7 @@ const isActive = (link: LinkKey) =>
     });
 
     window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         closeMenu();
       }
     });

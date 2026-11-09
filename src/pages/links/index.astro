@@ -18,7 +18,7 @@ const lastEntry = await getLastEntry<Response>();
 
 const links = [
   {
-    title: 'Último Relato: ' + lastEntry?.data.title,
+    title: lastEntry?.data.title ? `Último relato: ${lastEntry.data.title}` : 'Último relato',
     subtitle: 'Última nota subida',
     url: lastEntry?.data.href ?? APP_ROUTER.JOURNEY,
     highlight: true,

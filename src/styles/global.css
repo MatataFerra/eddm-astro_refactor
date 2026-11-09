@@ -46,6 +46,7 @@
   --color-ash-hard: #666666;
   --color-ash-soft: #555555;
   --color-ash-softest: #444444;
+  --color-ash-muted: #8b8996;
   --color-ash-text: #f0eeff;
 
   --font-dm: 'DM Sans', system-ui, sans-serif;
@@ -87,7 +88,7 @@
     background: #0a0a0f;
   }
   ::-webkit-scrollbar-thumb {
-    background: #7c6fff55;
+    background: var(--color-accent-glow);
     border-radius: 2px;
   }
 }

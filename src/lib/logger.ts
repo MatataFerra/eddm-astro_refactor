@@ -15,6 +15,9 @@ export async function logError(error: unknown, context?: Record<string, string |
   if (Date.now() - last < THROTTLE_MS) return;
   seen.set(key, Date.now());
 
+  // eslint-disable-next-line no-console -- solo en dev, para no perder errores silenciados
+  if (import.meta.env.DEV) console.error('[logError]', context, error);
+
   const isError = error instanceof Error;
 
   const payload = {
