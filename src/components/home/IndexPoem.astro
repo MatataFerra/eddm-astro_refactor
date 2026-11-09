@@ -1,0 +1,39 @@
+---
+import IndexHeader from '@/components/home/IndexHeader.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import { poemaMeta, type Poema } from '@/lib/poems';
+
+interface Props {
+  poema: Poema;
+  total: number;
+}
+
+const { poema, total }: Props = Astro.props;
+const meta = poemaMeta(poema);
+---
+
+<section class="grid gap-8 border-t border-white/8 py-14 md:py-20 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
+  <IndexHeader
+    title="Poemas"
+    href={APP_ROUTER.POEMS}
+    blurb="Versos sueltos escritos en el camino."
+    countLabel={total === 1 ? '1 poema' : `${total} poemas`}
+    linkLabel={total === 1 ? 'Ir a poemas' : `Ver los ${total} poemas`}
+    tone="lilac"
+  />
+
+  <a
+    href={APP_ROUTER.POEM(poema.slug)}
+    class="group block no-underline transition-transform duration-200 active:scale-[0.99]"
+  >
+    <blockquote class="verse text-ash-text/90 max-w-[32ch] text-[clamp(24px,2.8vw,40px)] leading-[1.45]">
+      {poema.excerpt}
+    </blockquote>
+    <p class="mt-8 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+      <span class="font-fraunces text-ash-text group-hover:text-lilac-text group-focus-visible:text-lilac-text text-xl font-semibold transition-colors duration-200">
+        {poema.title}
+      </span>
+      {meta && <span class="font-dm text-ash-soft text-sm">{meta}</span>}
+    </p>
+  </a>
+</section>

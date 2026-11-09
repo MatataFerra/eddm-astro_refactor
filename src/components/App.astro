@@ -1,36 +1,62 @@
 ---
-import MasAcaSection from '@/components/MasAcaSection.astro';
-import Relatos from '@/components/Relatos.astro';
 import Hero from '@/components/Hero.astro';
+import IndexSection, { type IndexItem } from '@/components/home/IndexSection.astro';
+import IndexPoem from '@/components/home/IndexPoem.astro';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import { APP_ROUTER } from '@/lib/constants';
-import PoemsSection from '@/components/PoemsSection.astro';
+import { toPoema } from '@/lib/poems';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+
+const ITEMS_PER_SECTION = 4;
+
+const [tales, poems, further] = await Promise.all([
+  getContentNavigate<ContentNavigate[]>('tales'),
+  getContentNavigate<ContentNavigate[]>('poems'),
+  getContentNavigate<ContentNavigate[]>('further'),
+]);
+
+const toItems = (entries: ContentNavigate[], href: (slug: string) => string): IndexItem[] =>
+  entries.slice(0, ITEMS_PER_SECTION).map((entry) => ({
+    href: href(entry.slug),
+    title: entry.title,
+    summary: entry.summary,
+    image: entry.header?.url,
+  }));
+
+const talesData = tales?.data ?? [];
+const furtherData = further?.data ?? [];
+const poemsData = poems?.data ?? [];
+const latestPoem = poemsData[0] ? toPoema(poemsData[0], poemsData[0].description) : null;
 ---
 
 <main>
   <Hero />
 
-  <section class="p-10 md:px-20 md:pb-20">
-    <div class="reveal mb-12 flex items-baseline gap-4">
-      <h2 class="font-fraunces text-ash-text text-4xl font-semibold tracking-[-0.02em]">
-        Relatos y escritos
-      </h2>
-      <div class="h-px flex-1 bg-white/10"></div>
-      <a
+  <div class="mx-auto max-w-350 px-6 pt-8 pb-16 md:px-20 md:pb-24">
+    {talesData.length > 0 && (
+      <IndexSection
+        title="Relatos"
         href={APP_ROUTER.TALES}
-        class="font-dm text-accent-text text-xs tracking-[0.06em] whitespace-nowrap no-underline"
-      >
-        Ver todos →
-      </a>
-    </div>
+        blurb="Historias que nacieron en cuadernos, servilletas y apps de notas alrededor del mundo."
+        countLabel={`${talesData.length} relatos`}
+        linkLabel={`Ver los ${talesData.length} relatos`}
+        tone="accent"
+        items={toItems(talesData, APP_ROUTER.TALE)}
+      />
+    )}
 
-    <Relatos />
-  </section>
+    {latestPoem && <IndexPoem poema={latestPoem} total={poemsData.length} />}
 
-  <section class="p-10 md:px-20 md:pb-20">
-    <PoemsSection />
-  </section>
-
-  <section class="p-10 md:px-20 md:pb-20">
-    <MasAcaSection />
-  </section>
+    {furtherData.length > 0 && (
+      <IndexSection
+        title="Más acá en el tiempo"
+        href={APP_ROUTER.FURTHER_TIME}
+        blurb="Historias que pasaron recientemente y que quizás no sean correlativas."
+        countLabel={`${furtherData.length} historias`}
+        linkLabel={`Ver las ${furtherData.length} historias`}
+        tone="blue"
+        items={toItems(furtherData, APP_ROUTER.FURTHER_TIME_ARTICLE)}
+      />
+    )}
+  </div>
 </main>

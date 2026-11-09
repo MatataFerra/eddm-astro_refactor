@@ -1,0 +1,117 @@
+---
+import { cn } from '@/lib/utils';
+import { resizeImage } from '@/lib/media/resize';
+import IndexHeader, { type IndexTone } from '@/components/home/IndexHeader.astro';
+
+export interface IndexItem {
+  href: string;
+  title: string;
+  summary?: string | null;
+  image?: string | null;
+}
+
+interface Props {
+  title: string;
+  href: string;
+  blurb: string;
+  countLabel: string;
+  linkLabel: string;
+  tone: IndexTone;
+  items: IndexItem[];
+}
+
+const { title, href, blurb, countLabel, linkLabel, tone, items }: Props = Astro.props;
+
+const HOVER: Record<IndexTone, string> = {
+  accent: 'group-hover:text-accent-text group-focus-visible:text-accent-text',
+  blue: 'group-hover:text-blue-soft group-focus-visible:text-blue-soft',
+  lilac: 'group-hover:text-lilac-text group-focus-visible:text-lilac-text',
+};
+
+const withImage = items.filter((item) => item.image);
+---
+
+<section
+  data-index
+  class="grid gap-8 border-t border-white/8 py-14 md:py-20 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)_20rem]"
+>
+  <IndexHeader {title} {href} {blurb} {countLabel} {linkLabel} {tone} />
+
+  <ol>
+    {items.map((item, i) => (
+      <li>
+        <a
+          href={item.href}
+          data-index-item={i}
+          class="group flex items-start gap-4 border-b border-white/6 py-5 no-underline transition-transform duration-200 first:pt-0 active:scale-[0.99] lg:py-6"
+        >
+          {item.image && (
+            <img
+              src={resizeImage(item.image, 192)}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="size-16 shrink-0 rounded-lg object-cover xl:hidden"
+            />
+          )}
+          <span class="min-w-0">
+            <span
+              class={cn(
+                'font-fraunces text-ash-text block text-[clamp(22px,2.4vw,32px)] leading-[1.1] font-semibold tracking-[-0.02em] text-balance transition-colors duration-200',
+                HOVER[tone]
+              )}
+            >
+              {item.title}
+            </span>
+            {item.summary && (
+              <span class="font-dm text-ash-soft mt-2 line-clamp-2 max-w-[60ch] text-sm leading-relaxed font-light">
+                {item.summary}
+              </span>
+            )}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ol>
+
+  {withImage.length > 0 && (
+    <div class="hidden xl:block" aria-hidden="true">
+      <div class="sticky top-24 aspect-4/5 overflow-hidden rounded-2xl border border-white/8">
+        {items.map(
+          (item, i) =>
+            item.image && (
+              <img
+                src={resizeImage(item.image, 800)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                data-index-img={i}
+                data-active={item === withImage[0] ? '' : undefined}
+                class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 data-active:opacity-100"
+              />
+            )
+        )}
+      </div>
+    </div>
+  )}
+</section>
+
+<script>
+  // El preview de la derecha sigue al título con hover o foco
+  document.querySelectorAll<HTMLElement>('[data-index]').forEach((section) => {
+    const images = section.querySelectorAll<HTMLElement>('[data-index-img]');
+    if (!images.length) return;
+
+    section.querySelectorAll<HTMLElement>('[data-index-item]').forEach((item) => {
+      const show = () => {
+        const target = item.dataset.indexItem;
+        if (![...images].some((img) => img.dataset.indexImg === target)) return;
+        images.forEach((img) =>
+          img.toggleAttribute('data-active', img.dataset.indexImg === target)
+        );
+      };
+      item.addEventListener('pointerenter', show);
+      item.addEventListener('focus', show);
+    });
+  });
+</script>

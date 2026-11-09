@@ -1,0 +1,44 @@
+---
+import { cn } from '@/lib/utils';
+
+export type IndexTone = 'accent' | 'blue' | 'lilac';
+
+interface Props {
+  title: string;
+  href: string;
+  blurb: string;
+  countLabel: string;
+  linkLabel: string;
+  tone: IndexTone;
+}
+
+const { title, href, blurb, countLabel, linkLabel, tone }: Props = Astro.props;
+
+const TEXT: Record<IndexTone, string> = {
+  accent: 'text-accent-text',
+  blue: 'text-blue-soft',
+  lilac: 'text-lilac-text',
+};
+---
+
+<header>
+  <h2
+    class={cn(
+      'font-fraunces text-[clamp(30px,3vw,40px)] leading-none font-semibold tracking-[-0.02em] italic',
+      TEXT[tone]
+    )}
+  >
+    {title}
+  </h2>
+  <p class="font-dm text-ash-soft mt-3 text-sm">{countLabel}</p>
+  <p class="font-dm text-ash-hard mt-4 max-w-[34ch] text-sm leading-relaxed font-light">{blurb}</p>
+  <a
+    href={href}
+    class={cn(
+      'font-dm mt-6 inline-block text-sm underline decoration-current/30 underline-offset-4 transition-colors duration-200 hover:decoration-current',
+      TEXT[tone]
+    )}
+  >
+    {linkLabel}
+  </a>
+</header>

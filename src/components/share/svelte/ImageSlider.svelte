@@ -54,7 +54,7 @@
         alt={`${slide.city}${slide.country ? `, ${slide.country}` : ''}`}
         fetchpriority={i === 0 ? 'high' : 'auto'}
         decoding="async"
-        class="slide absolute inset-0 size-full object-cover"
+        class="slide absolute inset-0 size-full object-cover text-transparent"
         transition:fade={{ duration: 1400 }}
       />
     {/if}
