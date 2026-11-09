@@ -38,7 +38,7 @@
       </div>
     {:else}
       <div class="text-center">
-        <div class="font-fraunces mb-1.5 text-xl font-semibold text-[#888] italic">
+        <div class="font-fraunces mb-1.5 text-xl font-semibold text-ash-muted italic">
           ¿Terminaste la semana?
         </div>
         <div class="font-dm text-ash-soft text-[13px]">

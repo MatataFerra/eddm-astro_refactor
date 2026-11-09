@@ -20,7 +20,11 @@ if (!response || !response.data) return Astro.redirect('/404');
 const article = response.data;
 ---
 
-<MainLayout title={article.title}>
+<MainLayout
+  title={`${article.title} — Un año viajando`}
+  description={article.summary || undefined}
+  image={article.header?.url}
+>
   <Hero {article} />
 
   <main class="mx-auto max-w-180 px-6 py-14">

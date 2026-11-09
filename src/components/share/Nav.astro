@@ -1,71 +1,9 @@
 ---
 import { APP_ROUTER } from '@/lib/constants';
+import { NAV_SECTIONS, isActivePath } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
-interface Props {
-  variant?: 'main' | 'detail';
-  color?: 'green' | 'blue' | 'accent';
-  title?: string;
-  links?: LinkKey[];
-}
-
-const topLevelRoutes = [
-  APP_ROUTER.JOURNEY,
-  APP_ROUTER.TALES,
-  APP_ROUTER.POEMS,
-  APP_ROUTER.FURTHER_TIME,
-  APP_ROUTER.TRIP,
-  APP_ROUTER.GALLERY,
-] as const;
-
-const { links = topLevelRoutes.map((path) => path.replace('/', '')) as LinkKey[] } = Astro.props;
-
-type LinkMapProps = {
-  name: string;
-  hover: string;
-  active: string;
-};
-type LinkMap = Record<string, Record<keyof LinkMapProps, string>>;
-
-const LINK_MAP: LinkMap = {
-  viaje: {
-    name: 'Un año viajando',
-    hover: 'hover:text-green-main',
-    active: 'text-green-main',
-  },
-  relatos: {
-    name: 'Relatos',
-    hover: 'hover:text-accent-text',
-    active: 'text-accent-text',
-  },
-  'mas-aca-en-el-tiempo': {
-    name: 'Más acá en el tiempo',
-    hover: 'hover:text-blue-soft',
-    active: 'text-blue-soft',
-  },
-  poemas: {
-    name: 'Poemas',
-    hover: 'hover:text-lilac-text',
-    active: 'text-lilac-text',
-  },
-  recorrido: {
-    name: 'Recorrido',
-    hover: 'hover:text-accent-text',
-    active: 'text-accent-text',
-  },
-  galeria: {
-    name: 'Galería',
-    hover: 'hover:text-coral-text',
-    active: 'text-coral-text',
-  },
-} as const;
-
-type LinkKey = keyof typeof LINK_MAP;
-
 const currentPath = Astro.url.pathname;
-
-const isActive = (link: LinkKey) =>
-  currentPath === `/${link}` || currentPath.startsWith(`/${link}/`);
 ---
 
 <header>
@@ -90,21 +28,20 @@ const isActive = (link: LinkKey) =>
 
     <!-- DESKTOP -->
     <div class="hidden items-center gap-8 lg:flex">
-      {(links as LinkKey[]).map((link) => {
-        const item = LINK_MAP[link];
-        const active = isActive(link);
+      {NAV_SECTIONS.map((item) => {
+        const active = isActivePath(currentPath, item.href);
 
         return (
           <a
-            href={`/${link}`}
+            href={item.href}
             aria-current={active ? 'page' : undefined}
             class={cn(
               'font-dm text-xs tracking-widest uppercase underline-offset-4 transition-colors duration-200',
-              item?.hover,
+              item.hover,
               active ? `${item.active} underline` : 'text-ash-text no-underline'
             )}
           >
-            {item?.name}
+            {item.name}
           </a>
         );
       })}
@@ -129,24 +66,20 @@ const isActive = (link: LinkKey) =>
     id="mobile-menu"
     class="mobile-menu bg-ash-main/95 fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 backdrop-blur-xl lg:hidden"
   >
-    {links.map((link) => (
+    {NAV_SECTIONS.map((item) => (
       <a
-        href={`/${link}`}
-        aria-current={isActive(link) ? 'page' : undefined}
+        href={item.href}
+        aria-current={isActivePath(currentPath, item.href) ? 'page' : undefined}
         class={cn(
           'font-fraunces hover:text-accent-text text-2xl italic transition-colors',
-          isActive(link) ? 'text-accent-text underline' : 'text-ash-text no-underline'
+          isActivePath(currentPath, item.href)
+            ? 'text-accent-text underline'
+            : 'text-ash-text no-underline'
         )}
       >
-        {LINK_MAP[link]?.name || link}
+        {item.name}
       </a>
     ))}
-
-    <!-- <span
-      class="border-accent-main text-accent-text font-dm bg-accent-soft mt-4 rounded-full border px-8 py-3 text-sm tracking-widest uppercase transition-colors"
-    >
-      Mallorca →
-    </span> -->
   </div>
 </header>
 

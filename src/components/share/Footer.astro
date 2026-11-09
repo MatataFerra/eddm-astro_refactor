@@ -1,0 +1,45 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import { NAV_SECTIONS } from '@/lib/navigation';
+import { cn } from '@/lib/utils';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/6 px-6 pt-16 pb-10 md:px-20">
+  <div class="mx-auto flex max-w-350 flex-col gap-12 md:flex-row md:items-end md:justify-between">
+    <div class="max-w-90">
+      <a
+        href={APP_ROUTER.HOME}
+        class="font-fraunces text-ash-text text-2xl font-semibold tracking-tight italic no-underline"
+      >
+        el diario de mati
+      </a>
+      <p class="font-dm text-ash-soft mt-3 text-sm leading-relaxed font-light">
+        Relatos, poemas y un año de viaje escrito semana a semana.
+      </p>
+    </div>
+
+    <nav aria-label="Secciones">
+      <ul class="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-3">
+        {NAV_SECTIONS.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class={cn(
+                'font-dm text-ash-hard text-sm no-underline transition-colors duration-200',
+                item.hover
+              )}
+            >
+              {item.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  <p class="font-dm text-ash-softest mx-auto mt-14 max-w-350 text-xs">
+    © {year} Matias Ferraro
+  </p>
+</footer>

@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Nav from '@/components/share/Nav.astro';
+import Footer from '@/components/share/Footer.astro';
 import frauncesFont from '@/assets/fonts/fraunces.woff2';
 import dmSansFont from '@/assets/fonts/dm-sans.woff2';
 import Analytics from '@vercel/analytics/astro';
@@ -8,9 +9,15 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
+  description?: string;
+  image?: string;
 }
 
-const { title } = Astro.props;
+const {
+  title,
+  description = 'Relatos, poemas y un año de viaje por Nueva Zelanda y Australia, escrito semana a semana.',
+  image,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -18,7 +25,14 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="es_AR" />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
     <link rel="preload" href={frauncesFont} as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href={dmSansFont} as="font" type="font/woff2" crossorigin="anonymous" />
 
@@ -31,6 +45,7 @@ const { title } = Astro.props;
     <div id="page-loader"></div>
     <Nav variant="main" data-navbar />
     <slot />
+    <Footer />
   </body>
 </html>
 

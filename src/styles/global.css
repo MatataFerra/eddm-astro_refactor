@@ -14,7 +14,7 @@
   src: url('@/assets/fonts/fraunces.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @theme {
@@ -43,10 +43,11 @@
   --color-orange-dim: #c4783a;
 
   --color-ash-main: #0a0a0f;
-  --color-ash-hard: #666666;
-  --color-ash-soft: #555555;
-  --color-ash-softest: #444444;
-  --color-ash-muted: #8b8996;
+  /* grises sobre ash-main: hard 7:1, soft/muted 5.7:1, softest 3.7:1 (sólo texto grande o decorativo) */
+  --color-ash-hard: #9b99a6;
+  --color-ash-soft: #8b8996;
+  --color-ash-softest: #6b6976;
+  --color-ash-muted: var(--color-ash-soft);
   --color-ash-text: #f0eeff;
 
   --font-dm: 'DM Sans', system-ui, sans-serif;
@@ -62,6 +63,18 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-main);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 
   body {

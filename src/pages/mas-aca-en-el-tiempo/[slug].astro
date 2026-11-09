@@ -46,7 +46,11 @@ if (!response || !response.data) return Astro.redirect('/404');
 const tale = response.data;
 ---
 
-<Layout title={tale.title}>
+<Layout
+  title={`${tale.title} — El diario de Mati`}
+  description={tale.summary || undefined}
+  image={tale.header?.url}
+>
   <Hero {tale} />
   <Content
     relato={{

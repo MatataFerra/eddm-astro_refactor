@@ -44,6 +44,6 @@ if (!response || !response.data) return Astro.redirect('/404');
 const poema = response.data;
 ---
 
-<Layout title={`${poema.title} — Poemas`}>
+<Layout title={`${poema.title} — Poemas — El diario de Mati`}>
   <PoemaDetail poema={poema} nav={nav} />
 </Layout>
