@@ -16,7 +16,9 @@ const relatos = await getContentNavigate<ContentNavigate[]>('tales');
         ))}
       </div>
 
-      <FeatureCard item={relatos!.data[3]} delay={0.4} tag="Relato destacado" />
+      {relatos.data[3] && (
+        <FeatureCard item={relatos.data[3]} delay={0.4} tag="Relato destacado" />
+      )}
     </Fragment>
   )}
 </Fragment>

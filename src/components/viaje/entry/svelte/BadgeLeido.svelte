@@ -1,8 +1,13 @@
 <script lang="ts">
   import { readWeeks } from '@/lib/store/viaje-store';
   import { fadein } from '@/lib/actions/fade';
-  let { semanaNum } = $props();
-  let isRead = $derived($readWeeks.includes(semanaNum));
+
+  interface Props {
+    identifier: string;
+  }
+
+  let { identifier }: Props = $props();
+  let isRead = $derived($readWeeks.includes(identifier));
 </script>
 
 {#if isRead}

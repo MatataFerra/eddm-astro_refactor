@@ -17,8 +17,10 @@ const { article } = Astro.props;
         src={article.header.url}
         alt={article.title}
         class="absolute inset-0 h-full w-full object-cover"
-        width={200}
-        height={400}
+        width={1920}
+        height={1080}
+        loading="eager"
+        fetchpriority="high"
       />
     )
   }
@@ -51,6 +53,6 @@ const { article } = Astro.props;
       {article.summary}
     </p>
 
-    <BadgeLeido semanaNum={article.order || 0} client:load />
+    <BadgeLeido identifier={article.slug} client:load />
   </div>
 </section>

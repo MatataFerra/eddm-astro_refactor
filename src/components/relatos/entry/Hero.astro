@@ -1,5 +1,4 @@
 ---
-import BadgeLeido from '@/components/viaje/entry/svelte/BadgeLeido.svelte';
 import type { Article } from '@/lib/interfaces/articles';
 import { Image } from 'astro:assets';
 
@@ -17,8 +16,10 @@ const { tale: article } = Astro.props;
         src={article.header.url}
         alt={article.title}
         class="absolute inset-0 h-full w-full object-cover"
-        width={200}
-        height={400}
+        width={1920}
+        height={1080}
+        loading="eager"
+        fetchpriority="high"
       />
     )
   }
@@ -46,7 +47,5 @@ const { tale: article } = Astro.props;
     >
       {article.title}
     </h1>
-
-    <BadgeLeido semanaNum={article.order || 0} client:load />
   </div>
 </section>

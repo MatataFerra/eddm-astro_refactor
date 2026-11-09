@@ -13,7 +13,7 @@ const { content }: Props = Astro.props;
 const DIAS = await processDiario(content);
 ---
 
-<div class="mx-auto max-w-180 px-6 py-14">
+<div>
   {
     DIAS?.map((dia) => {
       const isSingular = dia?.media?.length === 1;

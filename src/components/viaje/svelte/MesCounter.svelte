@@ -8,7 +8,7 @@
   }
 
   let { weekNums, weeks }: Props = $props();
-  let leidas = $readWeeks.filter((w) => weeks.includes(w)).length;
+  let leidas = $derived($readWeeks.filter((w) => weeks.includes(w)).length);
 </script>
 
 <span class="font-dm text-ash-softest text-[10px]">
