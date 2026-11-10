@@ -1,37 +1,27 @@
 ---
-import ImageSlider from '@/components/share/svelte/ImageSlider.svelte';
-import { APP_ROUTER } from '@/lib/constants';
-import { getTrip } from '@/lib/api/get-trip';
+import LatestEntry, { type Latest } from '@/components/home/LatestEntry.astro';
+import TripRuler from '@/components/home/TripRuler.astro';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import { getAllStats } from '@/lib/api/get-stats';
 import { getCurrentLocation } from '@/lib/api/get-current-location';
-import type { Trip } from '@/lib/interfaces/recorrido';
+import { adaptArticlesToMeses } from '@/lib/adapters/viaje-adapter';
+import type { ContentNavigate } from '@/lib/interfaces/share';
 import type { Stats } from '@/lib/interfaces/stats';
 import type { Location } from '@/lib/interfaces/location';
 
-const MAX_SLIDES = 12;
-const FALLBACK_SLIDE = {
-  id: 'fallback',
-  url: 'https://res.cloudinary.com/docq8rbdu/image/upload/v1777827696/el-diario-de-mati/trips/Whitehaven_Beach_tr341v.webp',
-  city: 'Whitehaven Beach',
-  country: 'Australia',
-};
+interface Props {
+  latest: Latest | null;
+}
 
-const [trip, stats, location] = await Promise.all([
-  getTrip<Trip>(),
+const { latest }: Props = Astro.props;
+
+const [articles, stats, location] = await Promise.all([
+  getContentNavigate<ContentNavigate[]>('articles'),
   getAllStats<Stats>(),
   getCurrentLocation<Location>(),
 ]);
 
-const stops = (trip?.data?.stops ?? []).filter((stop) => stop.stopImage);
-const shuffled = [...stops].sort(() => Math.random() - 0.5).slice(0, MAX_SLIDES);
-const slides = shuffled.length
-  ? shuffled.map((stop) => ({
-      id: stop.id,
-      url: stop.stopImage as string,
-      city: stop.city,
-      country: stop.country,
-    }))
-  : [FALLBACK_SLIDE];
+const months = adaptArticlesToMeses(articles?.data ?? []);
 
 const number = new Intl.NumberFormat('es-AR');
 const s = stats?.data;
@@ -42,45 +32,30 @@ const tally = s
 const here = location?.data;
 ---
 
-<section class="bg-ash-main relative isolate flex min-h-[max(640px,100svh)] items-end overflow-hidden">
-  <ImageSlider client:load slides={slides} />
-
-  <div class="from-ash-main via-ash-main/60 pointer-events-none absolute inset-0 bg-linear-to-t from-5% via-40% to-transparent to-75%"></div>
-  <div class="from-ash-main/60 pointer-events-none absolute inset-0 bg-linear-to-r to-transparent lg:to-60%"></div>
-
-  <div class="relative mx-auto grid w-full max-w-350 gap-12 px-6 pt-36 pb-24 md:px-20 md:pb-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-end lg:gap-20">
+<section class="mx-auto max-w-350 px-6 pt-28 pb-4 md:px-20 md:pt-36">
+  <div class="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-x-20 lg:gap-y-14">
     <div>
-      <h1 class="reveal font-fraunces text-ash-text text-[clamp(64px,10vw,168px)] leading-[0.88] font-extrabold tracking-[-0.045em] text-balance">
+      <h1 class="reveal font-fraunces text-ash-text text-[clamp(56px,7.2vw,120px)] leading-[0.9] font-extrabold tracking-[-0.04em] text-balance">
         El diario de Mati
       </h1>
       <p
-        class="reveal font-dm text-ash-text/80 mt-8 max-w-[46ch] text-[17px] leading-relaxed font-light"
-        style="--delay: 0.12s"
+        class="reveal font-fraunces text-ash-text/90 mt-8 max-w-[30ch] text-[clamp(22px,2.3vw,32px)] leading-[1.35] font-light italic md:mt-10"
+        style="--delay: 0.1s"
       >
         Escribo desde que tengo memoria. La escritura no me ha abandonado, sea por desahogo o para
         ordenar pensamientos.
       </p>
-      <div class="reveal mt-10 flex flex-wrap items-center gap-3" style="--delay: 0.2s">
-        <a
-          href={APP_ROUTER.JOURNEY}
-          class="bg-accent-main font-dm text-ash-main hover:bg-accent-text inline-flex items-center rounded-full px-7 py-3.5 text-sm font-medium no-underline transition-colors active:scale-[0.98]"
-        >
-          Leer el viaje
-        </a>
-        <a
-          href={APP_ROUTER.TALES}
-          class="font-dm text-ash-text inline-flex items-center rounded-full border border-white/20 px-7 py-3.5 text-sm no-underline transition-colors hover:border-white/50 active:scale-[0.98]"
-        >
-          Leer relatos
-        </a>
-      </div>
+    </div>
+
+    <div class="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-end">
+      <LatestEntry {latest} />
     </div>
 
     {(here || tally) && (
-      <div class="reveal border-accent-main/40 border-l pl-6" style="--delay: 0.32s">
+      <aside class="reveal border-accent-main/40 max-w-[44ch] border-l pl-6" style="--delay: 0.25s">
         {here && (
           <Fragment>
-            <p class="font-fraunces text-ash-text text-[clamp(22px,2.2vw,30px)] leading-tight italic">
+            <p class="font-fraunces text-ash-text text-[clamp(20px,1.8vw,24px)] leading-tight italic">
               Hoy escribo desde <span class="text-accent-text not-italic">{here.name}</span>
               {here.metadata?.emoji && <span aria-hidden="true">{here.metadata.emoji}</span>}
             </p>
@@ -92,9 +67,11 @@ const here = location?.data;
           </Fragment>
         )}
         {tally && (
-          <p class="font-dm text-ash-soft mt-5 text-sm leading-relaxed">Hasta ahora: {tally}</p>
+          <p class="font-dm text-ash-soft mt-4 text-sm leading-relaxed">Hasta ahora: {tally}</p>
         )}
-      </div>
+      </aside>
     )}
   </div>
+
+  <TripRuler {months} />
 </section>

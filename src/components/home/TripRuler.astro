@@ -1,0 +1,129 @@
+---
+import YearStrip from '@/components/viaje/YearStrip.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Mes } from '@/lib/interfaces/viaje';
+
+interface Props {
+  months: Mes[];
+}
+
+const { months }: Props = Astro.props;
+const semanas = months.flatMap((mes) => mes.semanas);
+const total = semanas.length;
+const first = semanas[0];
+const startsWithPrologue = months[0]?.key === 'context';
+const conMes = months.filter((mes) => mes.corto);
+const desde = conMes[0];
+const hasta = conMes.at(-1);
+---
+
+{total > 0 && (
+  <section
+    aria-labelledby="home-viaje"
+    class="reveal mt-16 border-t border-white/8 pt-10 md:mt-20 md:pt-12"
+    style="--delay: 0.3s"
+  >
+    <div class="mb-8 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+      <h2
+        id="home-viaje"
+        class="font-fraunces text-ash-text text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em]"
+      >
+        <a
+          href={APP_ROUTER.JOURNEY}
+          class="decoration-accent-main/60 underline-offset-[6px] hover:underline"
+        >
+          Un año viajando
+        </a>
+      </h2>
+      {desde && hasta && (
+        <p class="font-dm text-ash-hard text-[15px]">
+          De {desde.mes.toLowerCase()} de {desde.year} a {hasta.mes.toLowerCase()} de {hasta.year},
+          una entrada por semana.
+        </p>
+      )}
+    </div>
+
+    <div class="trip-ruler">
+      <YearStrip months={months} hrefFor={APP_ROUTER.ARTICLE} />
+    </div>
+
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+      <p class="font-dm text-ash-text text-base" data-home-progress aria-live="polite">
+        {total} semanas publicadas.
+      </p>
+      {first && (
+        <a
+          href={APP_ROUTER.ARTICLE(first.slug)}
+          data-home-resume
+          class="font-dm text-ash-text inline-flex h-11 items-center rounded-full border border-white/20 px-6 text-sm no-underline transition-[background-color,border-color,transform] duration-150 hover:-translate-y-px hover:border-white/45 hover:bg-white/5 active:translate-y-px active:scale-[0.985]"
+        >
+          {startsWithPrologue ? 'Empezá por el prólogo' : `Empezá por ${first.titulo}`}
+        </a>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  /* La regla se dibuja una sola vez al cargar, de izquierda a derecha */
+  @media (prefers-reduced-motion: no-preference) {
+    .trip-ruler :global([data-tick-line]) {
+      transform-origin: bottom;
+      animation: tick-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(300ms + var(--i, 0) * 14ms);
+    }
+  }
+
+  @keyframes tick-rise {
+    from {
+      transform: scaleY(0.2);
+      opacity: 0.3;
+    }
+  }
+</style>
+
+<script>
+  import { readWeeks } from '@/lib/store/viaje-store';
+  import { APP_ROUTER } from '@/lib/constants';
+
+  const ticks = [...document.querySelectorAll<HTMLElement>('.trip-ruler [data-tick]')];
+  const weeks = ticks.map((tick) => ({ slug: tick.dataset.tick ?? '', title: tick.title }));
+  const progress = document.querySelector<HTMLElement>('[data-home-progress]');
+  const resume = document.querySelector<HTMLAnchorElement>('[data-home-resume]');
+  const initial = {
+    progress: progress?.textContent?.trim() ?? '',
+    resumeHref: resume?.getAttribute('href') ?? '',
+    resumeText: resume?.textContent?.trim() ?? '',
+  };
+
+  // Igual que en /viaje: el HTML sale neutro y lo leído (localStorage) se pinta al hidratar
+  readWeeks.subscribe((list) => {
+    const read = new Set(list);
+    const readCount = weeks.filter((week) => read.has(week.slug)).length;
+    const next = readCount ? weeks.find((week) => !read.has(week.slug)) : undefined;
+    const finished = weeks.length > 0 && readCount === weeks.length;
+
+    ticks.forEach((tick) => {
+      const slug = tick.dataset.tick ?? '';
+      tick.toggleAttribute('data-read', read.has(slug));
+      tick.toggleAttribute('data-next', slug === next?.slug);
+    });
+
+    if (progress) {
+      progress.textContent = !readCount
+        ? initial.progress
+        : finished
+          ? `Leíste las ${weeks.length} semanas.`
+          : `Leíste ${readCount} de ${weeks.length} semanas.`;
+    }
+
+    if (resume) {
+      resume.href = next ? APP_ROUTER.ARTICLE(next.slug) : initial.resumeHref;
+      resume.textContent = next
+        ? `Seguí con ${next.title.replace(/^Semana/, 'la semana')}`
+        : finished
+          ? 'Volver a empezar'
+          : initial.resumeText;
+    }
+  });
+</script>

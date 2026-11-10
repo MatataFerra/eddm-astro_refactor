@@ -1,5 +1,6 @@
 ---
 import Hero from '@/components/Hero.astro';
+import type { Latest, LatestKind } from '@/components/home/LatestEntry.astro';
 import IndexSection, { type IndexItem } from '@/components/home/IndexSection.astro';
 import IndexPoem from '@/components/home/IndexPoem.astro';
 import { getContentNavigate } from '@/lib/api/get-content-navigate';
@@ -27,10 +28,34 @@ const talesData = tales?.data ?? [];
 const furtherData = further?.data ?? [];
 const poemsData = poems?.data ?? [];
 const latestPoem = poemsData[0] ? toPoema(poemsData[0], poemsData[0].description) : null;
+
+// Lo último que escribí, sea relato, poema o historia: el hero lo ofrece como primera lectura
+const toLatest = (
+  entries: ContentNavigate[],
+  kind: LatestKind,
+  href: (slug: string) => string
+): Latest[] =>
+  entries.map((entry) => ({
+    kind,
+    href: href(entry.slug),
+    title: entry.title,
+    excerpt: entry.summary?.trim() ?? '',
+    createdAt: entry.createdAt ? new Date(entry.createdAt).toISOString() : '',
+    place: kind === 'poema' ? entry.description : null,
+  }));
+
+const latest =
+  [
+    ...toLatest(talesData, 'relato', APP_ROUTER.TALE),
+    ...toLatest(poemsData, 'poema', APP_ROUTER.POEM),
+    ...toLatest(furtherData, 'historia', APP_ROUTER.FURTHER_TIME_ARTICLE),
+  ]
+    .filter((entry) => entry.createdAt)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
 ---
 
 <main>
-  <Hero />
+  <Hero {latest} />
 
   <div class="mx-auto max-w-350 px-6 pt-8 pb-16 md:px-20 md:pb-24">
     {talesData.length > 0 && (

@@ -1,0 +1,88 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+
+export type LatestKind = 'relato' | 'poema' | 'historia';
+
+export interface Latest {
+  kind: LatestKind;
+  href: string;
+  title: string;
+  excerpt: string;
+  createdAt: string;
+  place?: string | null;
+}
+
+interface Props {
+  latest: Latest | null;
+}
+
+const { latest }: Props = Astro.props;
+
+const LEAD: Record<LatestKind, string> = {
+  relato: 'un relato',
+  poema: 'un poema',
+  historia: 'una historia de Más acá en el tiempo',
+};
+
+const ACTION: Record<LatestKind, string> = {
+  relato: 'Leer el relato',
+  poema: 'Leer el poema',
+  historia: 'Leer la historia',
+};
+
+const date = latest
+  ? new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+      new Date(latest.createdAt)
+    )
+  : null;
+const meta = [date, latest?.place].filter(Boolean).join(' · ');
+// En los poemas el corte de verso es parte del texto: se muestran los primeros versos tal cual
+const verses = latest?.excerpt.split('\n') ?? [];
+const excerpt =
+  latest?.kind === 'poema'
+    ? verses.slice(0, 3).join('\n') + (verses.length > 3 ? ' …' : '')
+    : latest?.excerpt;
+
+const button =
+  'bg-accent-main font-dm text-ash-main hover:bg-accent-text focus-visible:outline-accent-text inline-flex h-12 items-center gap-2 rounded-full px-7 text-sm font-medium no-underline transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-offset-4 active:scale-[0.98]';
+---
+
+<article
+  class="reveal border-t border-white/10 pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12"
+  style="--delay: 0.2s"
+>
+  {latest ? (
+    <Fragment>
+      <p class="font-fraunces text-ash-hard text-lg italic">
+        Lo último que escribí es {LEAD[latest.kind]}:
+      </p>
+      <h2 class="font-fraunces text-ash-text mt-3 text-[clamp(32px,3.4vw,48px)] leading-[1.05] font-semibold tracking-[-0.02em] text-balance">
+        {latest.title}
+      </h2>
+      {excerpt &&
+        (latest.kind === 'poema' ? (
+          <p class="font-fraunces mt-5 text-lg leading-[1.6] font-light whitespace-pre-line text-[#cfcbe0] italic">
+            {excerpt}
+          </p>
+        ) : (
+          <p class="font-dm text-ash-hard mt-5 line-clamp-3 max-w-[46ch] text-base leading-relaxed">
+            {excerpt}
+          </p>
+        ))}
+      {meta && <p class="font-dm text-ash-soft mt-5 text-sm">{meta}</p>}
+      <a href={latest.href} class:list={[button, 'mt-8']}>
+        {ACTION[latest.kind]}
+        <span aria-hidden="true">→</span>
+      </a>
+    </Fragment>
+  ) : (
+    <Fragment>
+      <p class="font-fraunces text-ash-hard text-lg italic">
+        Todo lo que escribo termina en los relatos.
+      </p>
+      <a href={APP_ROUTER.TALES} class:list={[button, 'mt-6']}>
+        Leer relatos
+      </a>
+    </Fragment>
+  )}
+</article>

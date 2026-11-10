@@ -3,23 +3,29 @@ import type { Mes } from '@/lib/interfaces/viaje';
 
 interface Props {
   months: Mes[];
+  /** A dónde lleva cada marca; por defecto, a su semana dentro de la misma página */
+  hrefFor?: (slug: string) => string;
 }
 
-const { months }: Props = Astro.props;
+const { months, hrefFor = (slug) => `#${slug}` }: Props = Astro.props;
 const meses = months.filter((mes) => mes.corto);
 const desde = meses[0];
 const hasta = meses.at(-1);
+// Posición de la primera semana de cada mes en el año, para escalonar el dibujo de la regla
+const offsets = months.map((_, m) =>
+  months.slice(0, m).reduce((sum, mes) => sum + mes.semanas.length, 0)
+);
 ---
 
-<!-- Atajo visual: el índice accesible es la lista de semanas de abajo -->
+<!-- Atajo visual: el índice accesible es la lista de semanas (o el botón para seguir leyendo) -->
 <div aria-hidden="true">
   <ol class="flex">
-    {months.map((mes) => (
+    {months.map((mes, m) => (
       <li class="flex min-w-0 flex-col" style={`flex: ${mes.semanas.length} 1 0%`}>
         <span class="flex">
           {mes.semanas.map((semana, i) => (
             <a
-              href={`#${semana.slug}`}
+              href={hrefFor(semana.slug)}
               tabindex="-1"
               title={semana.titulo}
               data-tick={semana.slug}
@@ -28,6 +34,8 @@ const hasta = meses.at(-1);
               <span class="flex flex-col items-center gap-1">
                 <span class="bg-ash-text hidden size-1.5 rounded-full group-data-next/tick:block" />
                 <span
+                  data-tick-line
+                  style={`--i: ${offsets[m] + i}`}
                   class:list={[
                     'w-px bg-white/25 transition-colors duration-150 group-hover/tick:bg-ash-text group-data-read/tick:bg-green-soft group-data-next/tick:bg-ash-text sm:w-0.5',
                     i === 0 ? 'h-7 sm:h-9' : 'h-3.5 sm:h-4.5',
