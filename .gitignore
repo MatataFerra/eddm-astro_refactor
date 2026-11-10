@@ -23,3 +23,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vercel
+graphify-out/*
+
+# impeccable (local design context)
+PRODUCT.md
+DESIGN.md
+.impeccable/
