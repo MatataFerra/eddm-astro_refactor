@@ -10,19 +10,21 @@ const { geolocations, dateRange } = Astro.props;
 ---
 
 <div class="reveal z-50 mb-11">
-  <div class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/7 bg-white/3 px-5.5 py-4.5">
+  <div
+    class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/7 bg-white/3 px-5.5 py-4.5"
+  >
     <div class="flex flex-col gap-1.5">
       <span class="font-dm text-ash-soft text-[9px] font-medium tracking-[0.14em] uppercase">
         Locaciones esta semana
       </span>
 
       <div class="flex flex-wrap gap-2">
-        {geolocations.map((geo) => (
-          <LocationPin geo={geo} client:load />
-        ))}
+        {geolocations.map((geo) => <LocationPin geo={geo} client:load />)}
       </div>
     </div>
 
-    <div class="font-dm text-ash-softest text-xs tracking-wide">📅 {dateRange}</div>
+    <div class="font-dm text-ash-softest text-xs tracking-wide">
+      📅 {dateRange}
+    </div>
   </div>
 </div>
