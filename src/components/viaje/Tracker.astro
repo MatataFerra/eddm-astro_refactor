@@ -36,7 +36,7 @@ const startsWithPrologue = months[0]?.key === 'context';
             <a
               href={APP_ROUTER.ARTICLE(first.slug)}
               data-resume
-              class="bg-green-main font-dm text-ash-main hover:bg-green-soft inline-flex items-center rounded-full px-6 py-3 text-sm font-medium no-underline transition-colors duration-200 active:scale-[0.98]"
+              class="font-dm text-ash-text inline-flex h-11 items-center rounded-full border border-white/20 px-6 text-sm no-underline transition-[background-color,border-color,transform] duration-150 hover:-translate-y-px hover:border-white/45 hover:bg-white/5 active:translate-y-px active:scale-[0.985]"
             >
               {startsWithPrologue ? 'Empezar por el prólogo' : `Empezar por ${first.titulo}`}
             </a>
