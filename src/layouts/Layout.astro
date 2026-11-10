@@ -3,33 +3,80 @@ import '../styles/global.css';
 import Nav from '@/components/share/Nav.astro';
 import frauncesFont from '@/assets/fonts/fraunces.woff2';
 import dmSansFont from '@/assets/fonts/dm-sans.woff2';
+import newsreaderFont from '@/assets/fonts/newsreader.woff2';
+import bodoniItalicFont from '@/assets/fonts/bodoni-moda-italic.woff2';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
+  /** `carta` es el diseño nuevo; `legacy` queda hasta que cada etapa reemplace su página. */
+  variant?: 'carta' | 'legacy';
+  /** Zona horaria del lugar desde donde escribo (IANA). Sin ella, la luz sigue la hora del visitante. */
+  timeZone?: string;
 }
 
-const { title } = Astro.props;
+const { title, variant = 'legacy', timeZone } = Astro.props;
+const isCarta = variant === 'carta';
+const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSansFont];
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" data-tz={isCarta ? timeZone : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="preload" href={frauncesFont} as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href={dmSansFont} as="font" type="font/woff2" crossorigin="anonymous" />
+    <meta name="theme-color" content={isCarta ? '#f4f4f1' : '#000000'} />
+    {isCarta && <script is:inline>
+      // La luz de la página es la de la hora donde estoy. Corre antes de pintar para no parpadear.
+      (() => {
+        const root = document.documentElement;
+        const dark = matchMedia('(prefers-color-scheme: dark)');
+        const phaseAt = (hour) =>
+          hour < 6 ? 'night' : hour < 9 ? 'dawn' : hour < 18 ? 'day' : hour < 21 ? 'dusk' : 'night';
+
+        function hourThere() {
+          try {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+              timeZone: root.dataset.tz || undefined,
+              hour: 'numeric',
+              minute: 'numeric',
+              hourCycle: 'h23',
+            }).formatToParts(new Date());
+            const get = (type) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+            return get('hour') + get('minute') / 60;
+          } catch {
+            const now = new Date();
+            return now.getHours() + now.getMinutes() / 60;
+          }
+        }
+
+        function paint() {
+          let phase = phaseAt(hourThere());
+          // Quien navega en modo oscuro nunca recibe la luz de día
+          if (dark.matches && (phase === 'day' || phase === 'dawn')) phase = 'night';
+          root.dataset.phase = phase;
+          const paper = getComputedStyle(root).getPropertyValue('--color-paper').trim();
+          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', paper);
+        }
+
+        paint();
+        dark.addEventListener('change', paint);
+        setInterval(paint, 5 * 60 * 1000);
+      })();
+    </script>}
+    {fonts.map((font) => (
+      <link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
+    ))}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <Analytics />
     <SpeedInsights />
   </head>
-  <body id="body-root">
+  <body id="body-root" class:list={{ carta: isCarta }}>
     <div id="page-loader"></div>
-    <Nav variant="main" data-navbar />
+    {!isCarta && <Nav variant="main" data-navbar />}
     <slot />
   </body>
 </html>

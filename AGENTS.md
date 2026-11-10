@@ -16,6 +16,9 @@ frontend; el contenido viene del backend `eddm-back-nextjs`.
   leen con `$store` y lo derivado va con `$derived`.
 - **Lenguaje:** TypeScript estricto (`astro/tsconfigs/strict`), prohibido `any`.
 - **Estilos:** Tailwind CSS v4. Los tokens viven en `@theme` dentro de `src/styles/global.css`.
+  Rediseño v2 en curso ("Carta"): las páginas nuevas usan `<Layout variant="carta">` y los tokens
+  `paper`, `ink`, `muted`, `rule`, `lamp`; los tokens `ash-*` y de color por sección son legado y se
+  borran cuando la última página deje de usarlos.
 - **Contenido:** Markdown procesado con `marked` (`src/lib/markdown/process.ts`); galería con
   PhotoSwipe.
 - **Imágenes:** Cloudinary, ImageKit y R2. Para pedir un ancho concreto usar
@@ -88,9 +91,14 @@ src/
 
 ## 6. Estándares de Diseño UX/UI
 
-- **Identidad:** fondo `ash-main`, Fraunces para títulos y texto literario, DM Sans para interfaz.
-  Cada sección tiene su color (`navigation.ts`): viaje verde, relatos dorado, poemas lila, más acá
-  azul, galería coral. El color identifica la sección; no es decoración.
+- **Identidad (Carta):** el sitio se lee como cartas fechadas: lugar y fecha arriba a la derecha
+  (`Dateline`), el texto (`Prose`) y la firma (`Signature`), en `src/components/share/carta/`.
+  Bodoni Moda (`font-bodoni`) para encabezados, Newsreader (`font-newsreader`) para texto e
+  interfaz; no hay sans, textura de papel ni letra manuscrita.
+- **Luz:** la página toma la luz de la hora del lugar desde donde escribo (`data-phase`: `dawn`,
+  `day`, `dusk`, `night`), que el script del `<head>` de `Layout.astro` elige con la zona horaria
+  de `timeZone`. Los colores salen siempre de los tokens, nunca de hex sueltos; `lamp` es el único
+  acento. Quien navega en modo oscuro nunca recibe la luz de día.
 - **No es un blog genérico:** evitar grillas de cards idénticas, etiquetas en mayúsculas encima de
   cada título, flechas `→` pegadas a cada link y fade-in card por card al hacer scroll. Preferir
   índices tipográficos, fotos grandes y un solo momento animado por página.
@@ -98,7 +106,7 @@ src/
 - **Jerarquía Visual y Espaciado:** escalas en múltiplos de 4 (`gap-2`, `p-4`, `space-y-6`) y
   jerarquías claras entre títulos y textos secundarios.
 - **Accesibilidad (A11y):** estados `:focus-visible` claros (hay un anillo global), `aria-label` en
-  botones con íconos, contraste AA usando los grises `ash-*` (no hex sueltos), respetar
+  botones con íconos, contraste AA en las cuatro luces (`muted` sobre `paper` ya lo cumple), respetar
   `prefers-reduced-motion` y botón de pausa en todo lo que se mueva solo más de 5 s.
 - **Componentes Atómicos:** componentes pequeños, reutilizables y limpios.
 - **Micro-interacciones:** transiciones suaves (`transition-colors duration-200`,
