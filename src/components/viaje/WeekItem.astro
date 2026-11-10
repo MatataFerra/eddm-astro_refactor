@@ -1,0 +1,61 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import { resizeImage, resizeSrcset } from '@/lib/media/resize';
+import type { Semana } from '@/lib/interfaces/viaje';
+import { cn } from '@/lib/utils';
+
+interface Props {
+  semana: Semana;
+  eager?: boolean;
+  class?: string;
+}
+
+const { semana, eager = false, class: className }: Props = Astro.props;
+---
+
+<a
+  id={semana.slug}
+  href={APP_ROUTER.ARTICLE(semana.slug)}
+  data-week={semana.slug}
+  data-title={semana.titulo}
+  class={cn(
+    'group block scroll-mt-24 no-underline transition-transform duration-200 active:scale-[0.98]',
+    className
+  )}
+>
+  <div class="aspect-3/2 overflow-hidden rounded-xl bg-white/5">
+    {semana.cover && (
+      <img
+        src={resizeImage(semana.cover, 640)}
+        srcset={resizeSrcset(semana.cover, [400, 640, 960])}
+        sizes="(min-width: 1280px) 15vw, (min-width: 768px) 30vw, 50vw"
+        alt=""
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        class="size-full object-cover text-transparent transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+      />
+    )}
+  </div>
+
+  <p class="font-fraunces text-ash-text group-hover:text-green-soft group-data-read:text-green-soft mt-3 text-lg leading-tight font-semibold transition-colors duration-200">
+    {semana.titulo}
+    <span class="sr-only hidden group-data-read:block">(leída)</span>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+      class="text-green-main ml-1 hidden align-baseline group-data-read:inline-block"
+    >
+      <path
+        d="M2 6l3 3 5-5"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+  </p>
+  <p class="font-dm text-ash-soft mt-1 text-sm">{semana.detalle}</p>
+</a>

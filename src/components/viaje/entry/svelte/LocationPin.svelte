@@ -124,7 +124,7 @@
     'font-dm flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2 text-xs tracking-wider transition-all duration-200',
     open
       ? 'text-green-soft border-green-main/40 bg-green-main/12'
-      : 'border-white/12 bg-white/5 text-ash-hard hover:border-white/20'
+      : 'text-ash-hard border-white/12 bg-white/5 hover:border-white/20'
   )}
 >
   <span class="text-sm">📍</span>

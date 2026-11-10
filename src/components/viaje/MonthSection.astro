@@ -1,0 +1,40 @@
+---
+import WeekItem from '@/components/viaje/WeekItem.astro';
+import type { Mes } from '@/lib/interfaces/viaje';
+
+interface Props {
+  mes: Mes;
+  eager?: boolean;
+}
+
+const { mes, eager = false }: Props = Astro.props;
+const total = mes.semanas.length;
+const headingId = `mes-${mes.key}`;
+---
+
+<section
+  aria-labelledby={headingId}
+  data-month={mes.semanas.map((s) => s.slug).join(' ')}
+  class="grid gap-6 border-t border-white/8 py-12 md:py-16 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12"
+>
+  <header class="lg:sticky lg:top-24 lg:self-start">
+    <h2
+      id={headingId}
+      class="font-fraunces text-ash-text text-[clamp(32px,3.4vw,44px)] leading-none font-semibold tracking-[-0.02em] italic"
+    >
+      {mes.mes}
+    </h2>
+    <p class="font-dm text-ash-soft mt-3 text-sm leading-relaxed">
+      {mes.year && <span class="block">{mes.year}</span>}
+      <span class="block" data-month-count>
+        {total === 1 ? '1 semana' : `${total} semanas`}
+      </span>
+    </p>
+  </header>
+
+  <div class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4 xl:grid-cols-5">
+    {mes.semanas.map((semana) => (
+      <WeekItem semana={semana} eager={eager} class={mes.key === 'context' ? 'col-span-2' : ''} />
+    ))}
+  </div>
+</section>

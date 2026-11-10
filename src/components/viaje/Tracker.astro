@@ -1,62 +1,117 @@
 ---
-import ProgressBar from '@/components/viaje/svelte/ProgressBar.svelte';
-import MesCounter from '@/components/viaje/svelte/MesCounter.svelte';
-import SemanaGrid from '@/components/viaje/svelte/SemanaGrid.svelte';
-import type { Mes, Semana } from '@/lib/interfaces/viaje';
+import MonthSection from '@/components/viaje/MonthSection.astro';
+import YearStrip from '@/components/viaje/YearStrip.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Mes } from '@/lib/interfaces/viaje';
 
 interface Props {
   months: Mes[];
 }
 
 const { months }: Props = Astro.props;
-const totalWeeks = months.reduce((s: number, m: Mes) => s + m.semanas.length, 0);
+const semanas = months.flatMap((mes) => mes.semanas);
+const total = semanas.length;
+const first = semanas[0];
+const startsWithPrologue = months[0]?.key === 'context';
 ---
 
-<div class="pb-24">
-  <section class="relative overflow-hidden pt-28 pb-14 text-center md:overflow-auto">
-    <div
-      class="pointer-events-none absolute top-1/2 left-1/2 h-87.5 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(93,158,107,0.2)_0%,transparent_70%)] opacity-80"
-    >
-    </div>
-
-    <div
-      class="reveal border-green-main/40 bg-green-main/12 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-      style={'--delay: 0.2s'}
-    >
-      <div class="bg-green-main h-1.5 w-1.5 rounded-full"></div>
-      <span class="font-dm text-green-soft text-[11px] tracking-[0.12em] uppercase">
-        Feb 2024 — Feb 2025
-      </span>
-    </div>
-
-    <h1 class="reveal heading-1" style={'--delay: 0.3s'}>
-      Un año<br />viajando
+<div class="mx-auto max-w-350 px-6 pb-16 md:px-20 md:pb-24">
+  <header class="pt-32 pb-12 md:pt-40 md:pb-16">
+    <h1 class="font-fraunces text-ash-text text-[clamp(56px,9vw,144px)] leading-[0.9] font-extrabold tracking-[-0.045em]">
+      Un año viajando
     </h1>
+    <p class="font-dm text-ash-hard mt-6 max-w-[48ch] text-[17px] leading-relaxed font-light">
+      De febrero de 2024 a febrero de 2025, una entrada por semana.
+    </p>
 
-    <ProgressBar {totalWeeks} client:load />
-  </section>
+    {total > 0 && (
+      <div class="mt-12 md:mt-16">
+        <YearStrip months={months} />
 
-  <div class="px-6 md:px-16">
-    {
-      months.map((mes: Mes) => (
-        <div class="reveal mb-16" style={'--delay: 0.1s'}>
-          <div class="mb-7 flex items-center gap-4">
-            <div class="flex items-baseline gap-2.5">
-              <h2 class="font-fraunces text-ash-text text-[28px] font-semibold italic">
-                {mes.mes}
-              </h2>
-              <span class="font-dm text-ash-softest text-xs">{mes.year}</span>
-            </div>
-            <div class="h-px flex-1 bg-white/5" />
-            <MesCounter
-              weeks={mes.semanas.map((s: Semana) => s.slug)}
-              weekNums={mes.semanas.map((s: Semana) => s.num)}
-              client:visible
-            />
-          </div>
-          <SemanaGrid semanas={mes.semanas} client:visible />
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <p class="font-dm text-ash-text text-base" data-progress aria-live="polite">
+            {total} semanas publicadas.
+          </p>
+          {first && (
+            <a
+              href={APP_ROUTER.ARTICLE(first.slug)}
+              data-resume
+              class="bg-green-main font-dm text-ash-main hover:bg-green-soft inline-flex items-center rounded-full px-6 py-3 text-sm font-medium no-underline transition-colors duration-200 active:scale-[0.98]"
+            >
+              {startsWithPrologue ? 'Empezar por el prólogo' : `Empezar por ${first.titulo}`}
+            </a>
+          )}
         </div>
-      ))
-    }
-  </div>
+      </div>
+    )}
+  </header>
+
+  {months.map((mes, i) => (
+    <MonthSection mes={mes} eager={i < 2} />
+  ))}
+
+  {total === 0 && (
+    <p class="font-dm text-ash-soft border-t border-white/8 py-16">
+      Todavía no hay semanas publicadas.
+    </p>
+  )}
 </div>
+
+<script>
+  import { readWeeks } from '@/lib/store/viaje-store';
+  import { APP_ROUTER } from '@/lib/constants';
+
+  const weeks = [...document.querySelectorAll<HTMLElement>('[data-week]')].map((el) => ({
+    slug: el.dataset.week ?? '',
+    title: el.dataset.title ?? '',
+  }));
+  const progress = document.querySelector<HTMLElement>('[data-progress]');
+  const resume = document.querySelector<HTMLAnchorElement>('[data-resume]');
+  const initial = {
+    progress: progress?.textContent?.trim() ?? '',
+    resumeHref: resume?.getAttribute('href') ?? '',
+    resumeText: resume?.textContent?.trim() ?? '',
+  };
+
+  // Lo leído vive en localStorage: el HTML sale neutro y esto lo marca (y reacciona entre pestañas)
+  readWeeks.subscribe((list) => {
+    const read = new Set(list);
+    const readCount = weeks.filter((week) => read.has(week.slug)).length;
+    const next = readCount ? weeks.find((week) => !read.has(week.slug)) : undefined;
+
+    document.querySelectorAll<HTMLElement>('[data-week], [data-tick]').forEach((el) => {
+      const slug = el.dataset.week ?? el.dataset.tick ?? '';
+      el.toggleAttribute('data-read', read.has(slug));
+      if (el.dataset.tick !== undefined) el.toggleAttribute('data-next', slug === next?.slug);
+    });
+
+    document.querySelectorAll<HTMLElement>('[data-month]').forEach((month) => {
+      const count = month.querySelector<HTMLElement>('[data-month-count]');
+      if (!count) return;
+      count.dataset.initial ??= count.textContent?.trim() ?? '';
+      const slugs = month.dataset.month?.split(' ') ?? [];
+      const done = slugs.filter((slug) => read.has(slug)).length;
+      count.textContent = !done
+        ? count.dataset.initial
+        : slugs.length === 1
+          ? 'Leída'
+          : `${done} de ${slugs.length} leídas`;
+    });
+
+    if (progress) {
+      progress.textContent = !readCount
+        ? initial.progress
+        : readCount === weeks.length
+          ? `Leíste las ${weeks.length} semanas.`
+          : `Leíste ${readCount} de ${weeks.length} semanas.`;
+    }
+
+    if (resume) {
+      resume.hidden = readCount === weeks.length;
+      resume.href = next ? APP_ROUTER.ARTICLE(next.slug) : initial.resumeHref;
+      resume.textContent = next
+        ? `Seguir con ${next.title.replace(/^Semana/, 'la semana')}`
+        : initial.resumeText;
+    }
+  });
+</script>

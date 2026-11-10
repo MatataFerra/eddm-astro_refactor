@@ -1,0 +1,46 @@
+---
+import type { Mes } from '@/lib/interfaces/viaje';
+
+interface Props {
+  months: Mes[];
+}
+
+const { months }: Props = Astro.props;
+const meses = months.filter((mes) => mes.corto);
+const desde = meses[0];
+const hasta = meses.at(-1);
+---
+
+<!-- Atajo visual: el índice accesible es la lista de semanas de abajo -->
+<div aria-hidden="true">
+  <ol class="flex items-start gap-1.5 sm:gap-2.5">
+    {months.map((mes) => (
+      <li class="flex min-w-0 flex-col gap-2" style={`flex: ${mes.semanas.length} 1 0%`}>
+        <span class="flex h-10 gap-0.5 sm:h-12">
+          {mes.semanas.map((semana) => (
+            <a
+              href={`#${semana.slug}`}
+              tabindex="-1"
+              title={semana.titulo}
+              data-tick={semana.slug}
+              class="data-next:ring-green-main flex-1 rounded-xs bg-white/12 transition-colors duration-200 hover:bg-white/35 data-next:ring-1 data-read:bg-green-main data-read:hover:bg-green-soft"
+            />
+          ))}
+        </span>
+        <span class="font-dm text-ash-soft hidden truncate text-[11px] sm:block">
+          {mes.corto || '\u00a0'}
+        </span>
+      </li>
+    ))}
+  </ol>
+  {desde && hasta && (
+    <p class="font-dm text-ash-soft mt-2 flex justify-between text-[11px] sm:hidden">
+      <span>
+        {desde.corto} {desde.year}
+      </span>
+      <span>
+        {hasta.corto} {hasta.year}
+      </span>
+    </p>
+  )}
+</div>

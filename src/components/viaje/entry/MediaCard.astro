@@ -21,31 +21,29 @@ const { item, containerClass = '', mediaClass = '' } = Astro.props;
 ---
 
 <div class:list={['overflow-hidden border border-white/5', containerClass]}>
-  {
-    item.type === 'video' ? (
-      <Video item={item} />
-    ) : (
-      <a
-        href={item.src}
-        {...(item.width &&
-          item.height && {
-            'data-pswp-width': item.width,
-            'data-pswp-height': item.height,
-          })}
-        target="_blank"
-        class="block h-full"
-      >
-        <img
-          src={item.src}
-          alt={item.alt}
-          loading="lazy"
-          decoding="async"
-          class:list={[
-            'h-full w-full cursor-zoom-in object-cover transition-transform duration-700 hover:scale-[1.02]',
-            mediaClass,
-          ]}
-        />
-      </a>
-    )
-  }
+  {item.type === 'video' ? (
+    <Video item={item} />
+  ) : (
+    <a
+      href={item.src}
+      {...(item.width &&
+        item.height && {
+          'data-pswp-width': item.width,
+          'data-pswp-height': item.height,
+        })}
+      target="_blank"
+      class="block h-full"
+    >
+      <img
+        src={item.src}
+        alt={item.alt}
+        loading="lazy"
+        decoding="async"
+        class:list={[
+          'h-full w-full cursor-zoom-in object-cover transition-transform duration-700 hover:scale-[1.02]',
+          mediaClass,
+        ]}
+      />
+    </a>
+  )}
 </div>
