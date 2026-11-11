@@ -1,25 +1,7 @@
 ---
-// El día entero en una línea: de 00:00 a la izquierda a 24:00 a la derecha, con el color del
-// cielo de cada hora. Lo vivido va a color pleno y lo que falta, apagado. Al abrir la página
-// pasa una sola cosa: una aurora vibra sobre la línea, sale el sol (o la luna, de noche) hasta
-// su lugar en el arco, y la aurora se calma hasta dejar los colores quietos.
-import { DAWN_START, DAY_START, DUSK_START, NIGHT_START } from '@/lib/day-phases';
-
-const at = (hour: number) => `${(hour / 24) * 100}%`;
-// Las paradas del color salen de los mismos cortes que las luces de la página
-const sky = [
-  `var(--color-sky-night) 0%`,
-  `var(--color-sky-night) ${at(DAWN_START - 0.5)}`,
-  `var(--color-sky-dawn) ${at(DAWN_START + 1)}`,
-  `var(--color-sky-gold) ${at(DAY_START - 0.75)}`,
-  `var(--color-sky-day) ${at(DAY_START + 1)}`,
-  `var(--color-sky-day) ${at(DUSK_START - 1)}`,
-  `var(--color-sky-gold) ${at(DUSK_START)}`,
-  `var(--color-sky-dusk) ${at(DUSK_START + 1.5)}`,
-  `var(--color-sky-blue-hour) ${at(NIGHT_START)}`,
-  `var(--color-sky-night) ${at(NIGHT_START + 1.5)}`,
-  `var(--color-sky-night) 100%`,
-].join(', ');
+// Un horizonte con el sol (o la luna) de la hora del lugar desde donde escribo, y la luz que
+// echa a los dos lados. Al abrir la página pasa una sola cosa: una aurora vibra sobre la línea,
+// el sol sube despacio hasta su lugar en el arco y la aurora se calma.
 
 // Rayos irregulares: largos y ángulos fijos (no aleatorios) para que el sol sea siempre el mismo
 const RAYS = [
@@ -40,27 +22,19 @@ const RAYS = [
 ];
 const rays = RAYS.map(([deg, length]) => {
   const rad = ((deg - 90) * Math.PI) / 180;
-  const from = 8.6;
-  const to = from + length;
   const point = (r: number) =>
     `${(20 + Math.cos(rad) * r).toFixed(2)} ${(20 + Math.sin(rad) * r).toFixed(2)}`;
-  return `M${point(from)}L${point(to)}`;
+  return `M${point(8.6)}L${point(8.6 + length)}`;
 }).join('');
 ---
 
-<div
-  class="horizon mx-auto mt-8 max-w-[700px] px-[22px]"
-  aria-hidden="true"
-  data-horizon
-  style={`--sky: linear-gradient(to right, ${sky}); --dawn-x: ${at((DAWN_START + DAY_START) / 2)}; --dusk-x: ${at((DUSK_START + NIGHT_START) / 2)};`}
->
+<div class="horizon mx-auto mt-8 max-w-[700px] px-[22px]" aria-hidden="true" data-horizon>
   <div class="sky-frame">
     <span class="aurora aurora-1"></span>
     <span class="aurora aurora-2"></span>
     <span class="aurora aurora-3"></span>
 
-    <span class="glow glow-dawn"></span>
-    <span class="glow glow-dusk"></span>
+    <span class="light"></span>
 
     <svg class="body sun" viewBox="0 0 40 40">
       <path d={rays} stroke="var(--color-sun)" stroke-width="1.3" stroke-linecap="round"></path>
@@ -70,7 +44,6 @@ const rays = RAYS.map(([deg, length]) => {
         r="6.2"
         fill="var(--color-sun-core)"
         stroke="var(--color-sun)"
-        stroke-width="1"
       ></circle>
     </svg>
     <svg class="body moon" viewBox="0 0 40 40" fill="currentColor">
@@ -78,20 +51,20 @@ const rays = RAYS.map(([deg, length]) => {
     </svg>
   </div>
 
-  <div class="line">
-    <span class="line-future"></span>
-    <span class="line-lived"></span>
-  </div>
+  <span class="line"></span>
 </div>
 
 <style>
   .horizon {
-    --x: 0%;
+    --x: 50%;
     --sun-y: 40px;
     --moon-y: 40px;
-    --saturation: 1;
+    /* Cuánto ilumina: crece con la altura del sol */
+    --light: 0;
+    --light-color: var(--color-sun-core);
     /* Sobre papel claro la aurora pesa más: va más tenue que de noche */
     --aurora-peak: 0.5;
+    --rise: 3800ms;
   }
 
   :global(:root[data-phase='dusk']) .horizon,
@@ -99,39 +72,56 @@ const rays = RAYS.map(([deg, length]) => {
     --aurora-peak: 0.75;
   }
 
+  :global(:root[data-hour-phase='dawn']) .horizon {
+    --light-color: var(--color-sky-dawn);
+  }
+
+  :global(:root[data-hour-phase='dusk']) .horizon {
+    --light-color: var(--color-sky-dusk);
+  }
+
+  :global(:root[data-hour-phase='night']) .horizon {
+    --light-color: var(--color-sky-day);
+  }
+
   /* Todo lo que está sobre la línea; lo que baja de ella se esconde */
   .sky-frame {
     position: relative;
-    height: 52px;
+    height: 56px;
     overflow: hidden;
   }
 
   .line {
-    position: relative;
-    height: 2px;
-    filter: saturate(var(--saturation));
-    transition: filter 1600ms ease;
+    display: block;
+    height: 1px;
+    background: var(--color-rule);
   }
 
-  .line > span {
+  /* La luz del sol a los dos lados, apoyada sobre el horizonte */
+  .light {
     position: absolute;
-    inset: 0;
-    background: var(--sky);
+    bottom: 0;
+    left: var(--x);
+    width: min(78%, 520px);
+    height: 64px;
+    translate: -50% 50%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      var(--light-color),
+      color-mix(in oklab, var(--light-color) 45%, transparent) 45%,
+      transparent
+    );
+    filter: blur(6px);
+    opacity: var(--light);
+    transition: opacity var(--rise) cubic-bezier(0.37, 0, 0.2, 1);
   }
 
-  .line-future {
-    opacity: 0.28;
-  }
-
-  .line-lived {
-    clip-path: inset(0 calc(100% - var(--x)) 0 0);
-  }
-
-  /* La aurora: bandas de luz que vibran mientras llega el sol y después se apagan */
+  /* La aurora: bandas de luz que vibran mientras sale el sol y después se apagan */
   .aurora {
     position: absolute;
     bottom: -14px;
-    height: 46px;
+    height: 50px;
     border-radius: 50%;
     filter: blur(12px);
     opacity: 0;
@@ -177,16 +167,16 @@ const rays = RAYS.map(([deg, length]) => {
   .is-arriving .aurora {
     animation:
       aurora-shimmer 900ms ease-in-out infinite alternate,
-      aurora-life 3400ms ease forwards;
+      aurora-life 4600ms ease forwards;
   }
 
   .is-arriving .aurora-2 {
-    animation-duration: 700ms, 3400ms;
+    animation-duration: 700ms, 4600ms;
     animation-delay: -250ms, 0ms;
   }
 
   .is-arriving .aurora-3 {
-    animation-duration: 1100ms, 3400ms;
+    animation-duration: 1100ms, 4600ms;
     animation-delay: -500ms, 0ms;
   }
 
@@ -203,51 +193,13 @@ const rays = RAYS.map(([deg, length]) => {
     0% {
       opacity: 0;
     }
-    18%,
-    55% {
+    15%,
+    45% {
       opacity: var(--aurora-peak);
     }
     100% {
       opacity: 0;
     }
-  }
-
-  /* La luz del amanecer y del atardecer, apoyada sobre la línea */
-  .glow {
-    position: absolute;
-    bottom: -18px;
-    width: 34%;
-    height: 44px;
-    translate: -50% 0;
-    border-radius: 50%;
-    filter: blur(14px);
-    opacity: 0.14;
-    transition: opacity 2400ms ease;
-  }
-
-  .glow-dawn {
-    left: var(--dawn-x);
-    background: radial-gradient(
-      closest-side,
-      var(--color-sky-dawn),
-      color-mix(in oklab, var(--color-sky-gold) 55%, transparent),
-      transparent
-    );
-  }
-
-  .glow-dusk {
-    left: var(--dusk-x);
-    background: radial-gradient(
-      closest-side,
-      var(--color-sky-dusk),
-      color-mix(in oklab, var(--color-sky-gold) 55%, transparent),
-      transparent
-    );
-  }
-
-  :global(:root[data-hour-phase='dawn']) .glow-dawn,
-  :global(:root[data-hour-phase='dusk']) .glow-dusk {
-    opacity: 0.6;
   }
 
   .body {
@@ -258,7 +210,8 @@ const rays = RAYS.map(([deg, length]) => {
     height: 34px;
     color: var(--color-ink);
     translate: -50% 50%;
-    transition: transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* Arranca y llega despacio: no hay salto a la cima */
+    transition: transform var(--rise) cubic-bezier(0.37, 0, 0.2, 1);
   }
 
   .sun {
@@ -270,8 +223,7 @@ const rays = RAYS.map(([deg, length]) => {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .line,
-    .glow,
+    .light,
     .body {
       transition: none;
     }
@@ -293,47 +245,35 @@ const rays = RAYS.map(([deg, length]) => {
   const DAY_LENGTH = NIGHT_START - DAWN_START;
   const NIGHT_LENGTH = 24 - DAY_LENGTH;
 
-  // Cuánto subió el sol o la luna: 0 sobre la línea al salir y al ponerse, máximo a mitad de camino
-  function heights(hour: number) {
+  // Altura del sol o de la luna: 0 sobre la línea al salir y al ponerse, 1 a mitad de camino
+  function altitude(hour: number) {
     const sunT = (hour - DAWN_START) / DAY_LENGTH;
+    if (sunT >= 0 && sunT <= 1) return { isDay: true, height: Math.sin(Math.PI * sunT) };
     const moonT = ((((hour - NIGHT_START) % 24) + 24) % 24) / NIGHT_LENGTH;
-    const isDay = sunT >= 0 && sunT <= 1;
-    return {
-      sun: isDay ? -Math.sin(Math.PI * sunT) * SUN_ARC : HIDDEN,
-      moon: isDay ? HIDDEN : -Math.sin(Math.PI * Math.min(moonT, 1)) * MOON_ARC,
-    };
+    return { isDay: false, height: Math.sin(Math.PI * Math.min(moonT, 1)) };
   }
 
   function place(hour: number) {
     if (!horizon) return;
-    const { sun, moon } = heights(hour);
+    const { isDay, height } = altitude(hour);
     horizon.style.setProperty('--x', `${(hour / 24) * 100}%`);
-    horizon.style.setProperty('--sun-y', `${sun}px`);
-    horizon.style.setProperty('--moon-y', `${moon}px`);
+    horizon.style.setProperty('--sun-y', `${isDay ? -height * SUN_ARC : HIDDEN}px`);
+    horizon.style.setProperty('--moon-y', `${isDay ? HIDDEN : -height * MOON_ARC}px`);
+    // De día la luz va de tenue (saliendo) a plena; la de la luna siempre es poca
+    horizon.style.setProperty('--light', String(isDay ? 0.35 + height * 0.4 : 0.2));
   }
 
   if (horizon && timeZone) {
     const now = hourIn(timeZone);
+    horizon.style.setProperty('--x', `${(now / 24) * 100}%`);
 
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       place(now);
     } else {
-      // La llegada, una sola vez: aurora y día que se pinta, sale el sol, todo se calma
+      // La llegada, una sola vez: la aurora vibra, el sol sube despacio y todo se calma
       horizon.classList.add('is-arriving');
-      horizon.style.setProperty('--saturation', '1.8');
-      horizon.style.setProperty('--x', `${(now / 24) * 100}%`);
-
-      const start = performance.now();
-      const draw = (time: number) => {
-        const t = Math.min(1, (time - start) / 1600);
-        horizon.style.setProperty('--x', `${((now * (1 - Math.pow(1 - t, 3))) / 24) * 100}%`);
-        if (t < 1) requestAnimationFrame(draw);
-      };
-      requestAnimationFrame(draw);
-
-      setTimeout(() => place(now), 1100);
-      setTimeout(() => horizon.style.setProperty('--saturation', '1'), 2000);
-      setTimeout(() => horizon.classList.remove('is-arriving'), 3500);
+      setTimeout(() => place(now), 600);
+      setTimeout(() => horizon.classList.remove('is-arriving'), 4700);
     }
 
     setInterval(() => place(hourIn(timeZone)), 30_000);
