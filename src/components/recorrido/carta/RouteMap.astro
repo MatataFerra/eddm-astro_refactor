@@ -1,30 +1,55 @@
 ---
 import { buildRouteMap } from '@/lib/route-map';
+import { placeKey } from '@/lib/adapters/trip-adapter';
 import type { RouteStop } from '@/lib/adapters/route-adapter';
 
 interface Props {
   stops: RouteStop[];
   /** Para el lector de pantalla: qué muestra el mapa */
   label: string;
+  /** Dónde estoy hoy: si es la última parada, su etiqueta dice "hoy" */
+  current?: string | null;
 }
 
-const { stops, label } = Astro.props;
+const { stops, label, current } = Astro.props;
 const map = buildRouteMap(stops.map((stop) => stop.coordinates));
 
-const first = stops[0];
-const last = stops.at(-1);
-const name = (stop: RouteStop) => [stop.city, stop.date?.slice(0, 4)].filter(Boolean).join(', ');
+type Label = { point: { x: number; y: number }; text: string; class: string };
 
-// La salida va debajo de su punto y la última parada a su derecha, para no tapar la ruta
-const labels = [
-  first && { point: map.points[0], text: name(first), class: 'translate-y-2 -translate-x-3' },
-  last &&
-    last !== first && {
-      point: map.points.at(-1)!,
-      text: name(last),
-      class: 'translate-x-2.5 -translate-y-1/2',
-    },
-].filter(Boolean) as { point: { x: number; y: number }; text: string; class: string }[];
+const first = stops[0];
+const last = stops.length > 1 ? stops.at(-1)! : null;
+const year = (stop: RouteStop) => stop.date?.slice(0, 4) ?? null;
+const isHere = !!last && !!current && placeKey(current) === placeKey(last.city);
+const lastWhen = isHere ? 'hoy' : last && year(last);
+
+// La salida va debajo de su punto y la última parada a su derecha, para no tapar la ruta. Si volví
+// al punto de partida, las dos comparten una sola etiqueta.
+const start = map.points[0];
+const end = map.points.at(-1)!;
+const backHome = !!last && Math.abs(start.x - end.x) < 2 && Math.abs(start.y - end.y) < 2;
+const below = 'translate-y-2 -translate-x-3';
+const labels: Label[] = !first
+  ? []
+  : backHome
+    ? [
+        {
+          point: start,
+          text: [last!.city, [year(first), lastWhen].filter(Boolean).join(' y ')].join(', '),
+          class: below,
+        },
+      ]
+    : [
+        { point: start, text: [first.city, year(first)].filter(Boolean).join(', '), class: below },
+        ...(last
+          ? [
+              {
+                point: end,
+                text: [last.city, lastWhen].filter(Boolean).join(', '),
+                class: 'translate-x-2.5 -translate-y-1/2',
+              },
+            ]
+          : []),
+      ];
 ---
 
 <figure class="relative mx-auto max-w-[1100px] md:px-[22px]">

@@ -33,12 +33,13 @@ const since = route.since ? formatMonthRange(route.since, null) : null;
 const mapLabel = stops.length
   ? `Mapa del recorrido: de ${stops[0].city} a ${stops.at(-1)!.city}, pasando por ${listFormat.format(countries)}.`
   : '';
-// Un país que aparece por segunda vez en el índice lleva "de nuevo"
-const seen = new Set<string>();
+// Un país al que volví lleva "de nuevo" en el índice, y "otra vez" si fue una tercera
+const visits = new Map<string, number>();
 const legLinks = legs.map((leg, index) => {
-  const again = seen.has(leg.country);
-  seen.add(leg.country);
-  return { href: `#tramo-${index + 1}`, label: again ? `${leg.country} de nuevo` : leg.country };
+  const visit = (visits.get(leg.country) ?? 0) + 1;
+  visits.set(leg.country, visit);
+  const again = visit === 1 ? '' : visit === 2 ? ' de nuevo' : ' otra vez';
+  return { href: `#tramo-${index + 1}`, label: `${leg.country}${again}` };
 });
 ---
 
@@ -65,7 +66,7 @@ const legLinks = legs.map((leg, index) => {
     {stops.length > 0 ? (
       <>
         <div class="mt-12">
-          <RouteMap {stops} label={mapLabel} />
+          <RouteMap {stops} label={mapLabel} current={location?.data?.name} />
         </div>
 
         <nav aria-label="Países" class="mx-auto mt-10 max-w-[700px] px-[22px]">

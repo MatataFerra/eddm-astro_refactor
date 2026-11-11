@@ -1,10 +1,11 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import Masthead from '@/components/share/carta/Masthead.astro';
-import MediaGrid from '@/components/share/carta/MediaGrid.astro';
+import Photo from '@/components/share/Photo.astro';
 import { getCurrentLocation } from '@/lib/api/get-current-location';
-import { getGallery } from '@/lib/adapters/gallery-adapter';
+import { getGallery, type GalleryPlace } from '@/lib/adapters/gallery-adapter';
 import { APP_ROUTER } from '@/lib/constants';
+import { formatMonthRange } from '@/lib/dates';
 import type { Location } from '@/lib/interfaces/location';
 
 export const prerender = true;
@@ -13,12 +14,14 @@ const [places, location] = await Promise.all([getGallery(), getCurrentLocation<L
 
 const total = places.reduce((sum, place) => sum + place.photos.length, 0);
 const count = (n: number) => (n === 1 ? '1 foto' : `${n} fotos`);
-const separator = (index: number) =>
-  index < places.length - 2 ? ', ' : index === places.length - 2 ? ' y ' : '';
+const detail = (place: GalleryPlace) =>
+  [count(place.photos.length), place.date && formatMonthRange(place.date, null)]
+    .filter(Boolean)
+    .join(', ');
 ---
 
 <Layout
-  title="Las fotos | El diario de Mati"
+  title="Galería | El diario de Mati"
   variant="carta"
   timeZone={location?.data?.metadata?.timeZone}
 >
@@ -26,46 +29,47 @@ const separator = (index: number) =>
   <main class="pb-24">
     <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
       <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em]">
-        Las fotos
+        Galería
       </h1>
       {places.length > 0 && (
         <p class="mt-6 text-[21px] leading-normal text-pretty">
-          {count(total)} de{' '}
-          {places.map((place, index) => (
-            <>
-              <a
-                href={`#${place.slug}`}
-                class="hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
-              >
-                {place.name}
-              </a>
-              {separator(index)}
-            </>
-          ))}
-          .
+          {count(total)} de {places.length} lugares. Elegí uno para verlas.
         </p>
       )}
     </header>
 
     {places.length > 0 ? (
-      places.map((place) => (
-        <section
-          id={place.slug}
-          aria-labelledby={`${place.slug}-titulo`}
-          class="mt-[clamp(72px,12vh,128px)] scroll-mt-8"
-        >
-          <header class="mx-auto max-w-[1100px] px-[22px]">
-            <h2
-              id={`${place.slug}-titulo`}
-              class="font-bodoni text-[clamp(36px,5.4vw,60px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance"
+      <ul class="border-rule mx-auto mt-14 max-w-[1100px] border-t px-[22px]">
+        {places.map((place, index) => (
+          <li class="border-rule border-b">
+            <a
+              href={place.href}
+              class="group grid items-center gap-5 py-8 no-underline sm:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] sm:gap-10"
             >
-              {place.name}
-            </h2>
-            <p class="text-muted mt-3 text-[17px]">{count(place.photos.length)}</p>
-          </header>
-          <MediaGrid items={place.photos} of={`de ${place.name}`} class="mt-8 max-w-[1100px]" />
-        </section>
-      ))
+              {place.photos[0] && (
+                <div class="overflow-hidden">
+                  <Photo
+                    src={place.photos[0].src}
+                    alt=""
+                    width={place.photos[0].width ?? 1200}
+                    height={place.photos[0].height ?? 900}
+                    widths={[480, 720, 1080]}
+                    sizes="(min-width: 1144px) 440px, (min-width: 640px) 40vw, 100vw"
+                    priority={index === 0}
+                    class="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                </div>
+              )}
+              <div>
+                <h2 class="font-bodoni group-hover:text-lamp text-[clamp(40px,6.5vw,72px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance transition-colors duration-200">
+                  {place.name}
+                </h2>
+                <p class="text-muted mt-3 text-[17px]">{detail(place)}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
     ) : (
       <p class="text-muted mx-auto mt-12 max-w-[700px] px-[22px]">
         Las fotos no cargaron. Probá de nuevo en un rato.

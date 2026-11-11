@@ -1,0 +1,70 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Masthead from '@/components/share/carta/Masthead.astro';
+import MediaGrid from '@/components/share/carta/MediaGrid.astro';
+import LetterNav from '@/components/share/carta/LetterNav.astro';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { getGallery, type GalleryPlace } from '@/lib/adapters/gallery-adapter';
+import { APP_ROUTER } from '@/lib/constants';
+import { formatMonthRange } from '@/lib/dates';
+import type { Neighbor } from '@/lib/adapters/reading-adapter';
+import type { Location } from '@/lib/interfaces/location';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const places = await getGallery();
+  const neighbor = (place: GalleryPlace | undefined): Neighbor =>
+    place ? { title: place.name, href: place.href } : null;
+
+  return places.map((place, index) => ({
+    params: { slug: place.slug },
+    props: { place, prev: neighbor(places[index - 1]), next: neighbor(places[index + 1]) },
+  }));
+}
+
+interface Props {
+  place: GalleryPlace;
+  prev: Neighbor;
+  next: Neighbor;
+}
+
+const { place, prev, next } = Astro.props;
+const location = await getCurrentLocation<Location>();
+
+const count = place.photos.length === 1 ? '1 foto' : `${place.photos.length} fotos`;
+const detail = [count, place.date && formatMonthRange(place.date, null)].filter(Boolean).join(', ');
+---
+
+<Layout
+  title={`${place.name} | Galería | El diario de Mati`}
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Masthead />
+  <main class="pb-24">
+    <header class="mx-auto max-w-[1100px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+      <p class="text-[17px]">
+        <a
+          href={APP_ROUTER.GALLERY}
+          class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          Galería
+        </a>
+      </p>
+      <h1 class="font-bodoni mt-3 text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
+        {place.name}
+      </h1>
+      <p class="text-muted mt-3 text-[17px]">{detail}</p>
+    </header>
+
+    <MediaGrid items={place.photos} of={`de ${place.name}`} priority class="mt-10 max-w-[1100px]" />
+
+    <LetterNav
+      {prev}
+      {next}
+      label="Otros lugares"
+      back={{ href: APP_ROUTER.GALLERY, label: 'Volver a la galería' }}
+    />
+  </main>
+</Layout>

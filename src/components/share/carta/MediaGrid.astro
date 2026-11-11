@@ -11,10 +11,12 @@ interface Props {
   items: NonNullable<ProcessedSection['media']>;
   /** "del 16 de febrero", "de Mallorca": arma el texto alternativo cuando la foto no trae uno */
   of: string;
+  /** La grilla abre la página: su primera foto carga ya */
+  priority?: boolean;
   class?: string;
 }
 
-const { items, of, class: className } = Astro.props;
+const { items, of, priority = false, class: className } = Astro.props;
 
 // Lo que se ve al ampliar: hasta 1920 px de ancho, nunca más grande que el original
 const LIGHTBOX_WIDTH = 1920;
@@ -67,7 +69,7 @@ const sizes = single
     className
   )}
 >
-  {media.map((item) =>
+  {media.map((item, index) =>
     item.type === 'video' ? (
       <video
         src={item.src}
@@ -93,6 +95,7 @@ const sizes = single
           width={item.width}
           height={item.height}
           sizes={sizes}
+          priority={priority && index === 0}
           class="h-auto w-full transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100"
         />
       </a>
