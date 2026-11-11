@@ -1,0 +1,100 @@
+---
+import Masthead from '@/components/share/carta/Masthead.astro';
+import Dateline from '@/components/share/carta/Dateline.astro';
+import Prose from '@/components/share/carta/Prose.astro';
+import Signature from '@/components/share/carta/Signature.astro';
+import LetterNav from '@/components/share/carta/LetterNav.astro';
+import Photo from '@/components/share/Photo.astro';
+import DayMedia from '@/components/viaje/carta/DayMedia.astro';
+import ReadMark from '@/components/viaje/carta/ReadMark.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import { formatDayRange, formatLongDate } from '@/lib/dates';
+import type { Neighbor } from '@/lib/adapters/reading-adapter';
+import type { TripDay, TripWeek } from '@/lib/adapters/trip-adapter';
+
+interface Props {
+  week: TripWeek;
+  /** Lo que acompaña a la semana cuando no tiene fechas (el prólogo) */
+  summary?: string | null;
+  days: TripDay[];
+  prev: Neighbor;
+  next: Neighbor;
+}
+
+const { week, summary, days, prev, next } = Astro.props;
+
+const listFormat = new Intl.ListFormat('es', { type: 'conjunction' });
+const places = listFormat.format(week.places.map((place) => place.name));
+
+function when() {
+  if (!week.from) return summary?.trim() || null;
+  const year = new Date(`${week.to ?? week.from}T00:00:00Z`).getUTCFullYear();
+  const range = formatDayRange(week.from, week.to);
+  const lead = week.to && week.to !== week.from ? 'Del' : 'El';
+  return `${lead} ${range} de ${year}${places ? `, desde ${places}` : ''}.`;
+}
+
+const dayLabel = (day: TripDay) =>
+  day.date ? formatLongDate(day.date).replace(/ de \d{4}$/, '') : (day.title ?? week.title);
+---
+
+<Masthead />
+
+<main class="pb-24">
+  <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+    <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
+      {week.title}
+    </h1>
+    {when() && <p class="text-muted mt-3 text-[17px] text-pretty">{when()}</p>}
+  </header>
+
+  {week.cover && (
+    <div class="mx-auto mt-12 max-w-[1100px] md:px-[22px]">
+      <Photo
+        src={week.cover}
+        alt={week.title}
+        width={1920}
+        height={1280}
+        sizes="(min-width: 1144px) 1100px, 100vw"
+        priority
+        class="aspect-[3/2] w-full object-cover"
+      />
+    </div>
+  )}
+
+  {days.map((day, index) => (
+    <section class={index === 0 ? 'mt-14' : 'mt-[clamp(64px,11vh,104px)]'}>
+      <div class="mx-auto max-w-[700px] px-[22px]">
+        <div class:list={[index > 0 && 'border-rule border-t pt-12']}>
+          {day.date ? (
+            <Dateline as="h2" place={day.place ?? undefined} date={day.date} />
+          ) : (
+            day.title && (
+              <h2 class="font-bodoni text-[clamp(24px,3.4vw,32px)] leading-[1.15] italic">
+                {day.title}
+              </h2>
+            )
+          )}
+          {day.html && (
+            <Prose class={day.date || day.title ? 'mt-8' : undefined}>
+              <Fragment set:html={day.html} />
+            </Prose>
+          )}
+        </div>
+      </div>
+      {!!day.media?.length && <DayMedia items={day.media} label={dayLabel(day)} />}
+    </section>
+  ))}
+
+  <div class="mx-auto mt-12 max-w-[700px] px-[22px]">
+    <Signature />
+    <ReadMark slug={week.slug} />
+  </div>
+
+  <LetterNav
+    {prev}
+    {next}
+    label="Otras semanas"
+    back={{ href: APP_ROUTER.JOURNEY, label: 'Volver al viaje' }}
+  />
+</main>

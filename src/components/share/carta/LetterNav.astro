@@ -1,0 +1,47 @@
+---
+import type { Neighbor } from '@/lib/adapters/reading-adapter';
+
+interface Props {
+  prev: Neighbor;
+  next: Neighbor;
+  /** El índice al que vuelve el pie: "Volver a todas las cartas", "Volver al viaje" */
+  back: { href: string; label: string };
+  /** Para el lector de pantalla: "Otras cartas", "Otras semanas" */
+  label?: string;
+}
+
+const { prev, next, back, label = 'Otras cartas' } = Astro.props;
+---
+
+<footer class="mx-auto mt-18 max-w-[700px] px-[22px]">
+  {(prev || next) && (
+    <nav aria-label={label} class="border-rule grid grid-cols-2 gap-6 border-t pt-6">
+      {prev ? (
+        <a href={prev.href} class="group no-underline">
+          <span class="text-muted block text-[15px]">Anterior</span>
+          <span class="group-hover:text-lamp font-bodoni text-xl leading-tight italic transition-colors duration-200">
+            {prev.title}
+          </span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <a href={next.href} class="group text-right no-underline">
+          <span class="text-muted block text-[15px]">Siguiente</span>
+          <span class="group-hover:text-lamp font-bodoni text-xl leading-tight italic transition-colors duration-200">
+            {next.title}
+          </span>
+        </a>
+      )}
+    </nav>
+  )}
+  <p class="border-rule mt-8 border-t pt-6 text-center">
+    <a
+      href={back.href}
+      class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp text-[17px] underline underline-offset-4 transition-colors duration-200"
+    >
+      {back.label}
+    </a>
+  </p>
+</footer>

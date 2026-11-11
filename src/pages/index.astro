@@ -9,7 +9,8 @@ import { getContentNavigate } from '@/lib/api/get-content-navigate';
 import { getCurrentLocation } from '@/lib/api/get-current-location';
 import { getTrip } from '@/lib/api/get-trip';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
-import { adaptLetters, adaptTripBundles, placePhoto } from '@/lib/adapters/home-adapter';
+import { adaptLetters, placePhoto } from '@/lib/adapters/home-adapter';
+import { adaptTripBundles, getTripWeeks } from '@/lib/adapters/trip-adapter';
 import { processDiario } from '@/lib/markdown/process';
 import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
@@ -21,11 +22,11 @@ export const prerender = true;
 // Más de esto y la carta de la home muestra el comienzo y sigue en la página del texto
 const FOLD_AT_CHARS = 1600;
 
-const [tales, poems, further, articles, location, trip] = await Promise.all([
+const [tales, poems, further, tripWeeks, location, trip] = await Promise.all([
   getContentNavigate<ContentNavigate[]>('tales'),
   getContentNavigate<ContentNavigate[]>('poems'),
   getContentNavigate<ContentNavigate[]>('further'),
-  getContentNavigate<ContentNavigate[]>('articles'),
+  getTripWeeks(),
   getCurrentLocation<Location>(),
   getTrip<Trip>(),
 ]);
@@ -67,8 +68,8 @@ const latestLength = latestHtml.replace(/<[^>]+>/g, '').length;
       />
     )}
     {previous.length > 0 && <PreviousLetters letters={previous} />}
-    {(articles?.data?.length ?? 0) > 0 && (
-      <TripBundles bundles={adaptTripBundles(articles?.data ?? [], stops)} />
+    {tripWeeks.length > 0 && (
+      <TripBundles bundles={adaptTripBundles(tripWeeks.map(({ week }) => week))} />
     )}
   </main>
 </Layout>

@@ -1,0 +1,60 @@
+---
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<!-- Sin JS no hay dónde guardarlo: el botón aparece cuando corre el script -->
+<div data-read-mark data-slug={slug} hidden class="border-rule mt-14 border-t pt-8 text-center">
+  <p class="text-muted text-[17px]" data-read-hint>
+    ¿Terminaste la semana?
+  </p>
+  <button
+    type="button"
+    aria-pressed="false"
+    class="border-ink hover:bg-ink hover:text-paper aria-pressed:border-lamp aria-pressed:text-lamp aria-pressed:hover:bg-transparent mt-3 inline-flex min-h-12 cursor-pointer items-center gap-2 border px-5.5 text-[17px] transition-colors duration-200 active:scale-95"
+  >
+    <svg
+      data-read-check
+      hidden
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      class="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5"></path>
+    </svg>
+    <span data-read-label>Marcarla como leída</span>
+  </button>
+</div>
+
+<script>
+  import { readWeeks, toggleRead } from '@/lib/store/viaje-store';
+
+  for (const mark of document.querySelectorAll<HTMLElement>('[data-read-mark]')) {
+    const slug = mark.dataset.slug ?? '';
+    const button = mark.querySelector('button');
+    const hint = mark.querySelector<HTMLElement>('[data-read-hint]');
+    const check = mark.querySelector<SVGElement>('[data-read-check]');
+    const label = mark.querySelector<HTMLElement>('[data-read-label]');
+    if (!slug || !button || !hint || !check || !label) continue;
+
+    button.addEventListener('click', () => toggleRead(slug));
+    readWeeks.subscribe((read) => {
+      const isRead = read.includes(slug);
+      button.setAttribute('aria-pressed', String(isRead));
+      check.toggleAttribute('hidden', !isRead);
+      label.textContent = isRead ? 'Semana leída' : 'Marcarla como leída';
+      hint.textContent = isRead
+        ? 'Queda marcada en el índice del viaje. Tocá de nuevo para desmarcarla.'
+        : '¿Terminaste la semana?';
+    });
+    mark.hidden = false;
+  }
+</script>
