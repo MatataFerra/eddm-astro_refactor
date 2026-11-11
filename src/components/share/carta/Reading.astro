@@ -44,17 +44,11 @@ const blocks = await Promise.all(
 <Masthead />
 
 <main class="pb-24">
-  <header class="mx-auto max-w-[700px] px-[22px]">
-    <a
-      href={`${APP_ROUTER.HOME}#cartas`}
-      class="text-muted hover:text-lamp inline-block text-base no-underline transition-colors duration-200"
-    >
-      Todas las cartas
-    </a>
-    <h1 class="font-bodoni mt-10 text-[clamp(36px,5.6vw,58px)] leading-[1.05] font-semibold text-balance">
+  <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+    <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
       {title}
     </h1>
-    <p class="text-muted mt-2.5 text-base">{kind}</p>
+    <p class="text-muted mt-3 text-[17px]">{kind}</p>
     {createdAt && (
       <Dateline
         place={place ?? undefined}
@@ -119,8 +113,8 @@ const blocks = await Promise.all(
     <Signature />
   </article>
 
-  {(prev || next) && (
-    <div class="mx-auto mt-18 max-w-[700px] px-[22px]">
+  <footer class="mx-auto mt-18 max-w-[700px] px-[22px]">
+    {(prev || next) && (
       <nav aria-label="Otras cartas" class="border-rule grid grid-cols-2 gap-6 border-t pt-6">
         {prev ? (
           <a href={prev.href} class="group no-underline">
@@ -141,6 +135,14 @@ const blocks = await Promise.all(
           </a>
         )}
       </nav>
-    </div>
-  )}
+    )}
+    <p class="border-rule mt-8 border-t pt-6 text-center">
+      <a
+        href={`${APP_ROUTER.HOME}#cartas`}
+        class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp text-[17px] underline underline-offset-4 transition-colors duration-200"
+      >
+        Volver a todas las cartas
+      </a>
+    </p>
+  </footer>
 </main>
