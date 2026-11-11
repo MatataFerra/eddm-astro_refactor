@@ -57,8 +57,8 @@ const rays = RAYS.map(([deg, length]) => {
 <style>
   .horizon {
     --x: 50%;
-    --sun-y: 40px;
-    --moon-y: 40px;
+    --sun-y: 44px;
+    --moon-y: 44px;
     /* Cuánto ilumina: crece con la altura del sol */
     --light: 0;
     --light-color: var(--color-sun-core);
@@ -87,8 +87,14 @@ const rays = RAYS.map(([deg, length]) => {
   /* Todo lo que está sobre la línea; lo que baja de ella se esconde */
   .sky-frame {
     position: relative;
-    height: 56px;
+    height: 66px;
     overflow: hidden;
+  }
+
+  /* Las luces se apagan antes de llegar a las puntas del horizonte */
+  .light,
+  .aurora {
+    mask-image: linear-gradient(to right, transparent, black 30%, black 70%, transparent);
   }
 
   .line {
@@ -102,8 +108,8 @@ const rays = RAYS.map(([deg, length]) => {
     position: absolute;
     bottom: 0;
     left: var(--x);
-    width: min(78%, 520px);
-    height: 64px;
+    width: min(44%, 300px);
+    height: 56px;
     translate: -50% 50%;
     border-radius: 50%;
     background: radial-gradient(
@@ -129,8 +135,8 @@ const rays = RAYS.map(([deg, length]) => {
   }
 
   .aurora-1 {
-    left: 4%;
-    width: 46%;
+    left: 16%;
+    width: 32%;
     background: linear-gradient(
       90deg,
       transparent,
@@ -141,8 +147,8 @@ const rays = RAYS.map(([deg, length]) => {
   }
 
   .aurora-2 {
-    left: 30%;
-    width: 42%;
+    left: 34%;
+    width: 32%;
     background: linear-gradient(
       90deg,
       transparent,
@@ -154,7 +160,7 @@ const rays = RAYS.map(([deg, length]) => {
 
   .aurora-3 {
     left: 52%;
-    width: 44%;
+    width: 32%;
     background: linear-gradient(
       90deg,
       transparent,
@@ -239,9 +245,9 @@ const rays = RAYS.map(([deg, length]) => {
 
   const horizon = document.querySelector<HTMLElement>('[data-horizon]');
   const timeZone = document.documentElement.dataset.tz;
-  const SUN_ARC = 28;
-  const MOON_ARC = 16;
-  const HIDDEN = 40;
+  const SUN_ARC = 38;
+  const MOON_ARC = 22;
+  const HIDDEN = 44;
   const DAY_LENGTH = NIGHT_START - DAWN_START;
   const NIGHT_LENGTH = 24 - DAY_LENGTH;
 
