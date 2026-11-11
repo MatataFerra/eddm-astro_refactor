@@ -1,49 +1,60 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import PoemaDetail from '@/components/poemas/PoemaDetail.astro';
+import Reading from '@/components/share/carta/Reading.astro';
 import { getContentNavigate } from '@/lib/api/get-content-navigate';
-import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import { withNeighbors, type Neighbor } from '@/lib/adapters/reading-adapter';
+import { APP_ROUTER } from '@/lib/constants';
+import { processDiario } from '@/lib/markdown/process';
+import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
+import type { Location } from '@/lib/interfaces/location';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const response = await getContentNavigate<ContentNavigate[]>('poems');
-  const poems = response?.data || [];
 
-  const sortedPoems = [...poems].sort((a, b) => (a.order || 0) - (b.order || 0));
+  return withNeighbors(response?.data ?? [], APP_ROUTER.POEM).map(({ slug, prev, next }) => ({
+    params: { slug },
+    props: { prev, next },
+  }));
+}
 
-  return sortedPoems.map((tale, index) => {
-    const nextPoem = sortedPoems[index + 1]
-      ? { title: sortedPoems[index + 1].title, slug: sortedPoems[index + 1].slug }
-      : null;
-
-    const prevPoem = sortedPoems[index - 1]
-      ? { title: sortedPoems[index - 1].title, slug: sortedPoems[index - 1].slug }
-      : null;
-
-    return {
-      params: { slug: tale.slug },
-      props: {
-        nav: { nextPoem, prevPoem },
-      },
-    };
-  });
+interface Props {
+  prev: Neighbor;
+  next: Neighbor;
 }
 
 const { slug } = Astro.params;
-const { nav } = Astro.props;
+const { prev, next } = Astro.props;
 
-const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
-  query: slug,
-});
+const [response, location] = await Promise.all([
+  getArticleContentFromNotion<ContentBySlug<Article>>({ query: slug }),
+  getCurrentLocation<Location>(),
+]);
 
 if (!response || !response.data) return Astro.redirect('/404');
 
-const poema = response.data;
+const entry = response.data;
+const sections = await processDiario(entry.md_content, 'poem');
+// En los poemas, `description` es el lugar desde donde lo escribí
+const extra = { place: entry.description?.trim() || null, cover: entry.header?.url, verse: true };
 ---
 
-<Layout title={`${poema.title} — Poemas`}>
-  <PoemaDetail poema={poema} nav={nav} />
+<Layout
+  title={`${entry.title} | El diario de Mati`}
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Reading
+    kind="Poema"
+    title={entry.title}
+    createdAt={entry.createdAt}
+    {sections}
+    {prev}
+    {next}
+    {...extra}
+  />
 </Layout>
