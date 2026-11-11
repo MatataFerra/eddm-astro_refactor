@@ -28,6 +28,18 @@ function preparePoem(text: string): string {
     .join('\n');
 }
 
+/** Cada verso en su propio renglón (`.verso`), para que el que no entra siga con sangría */
+function wrapVerses(html: string): string {
+  return html.replace(
+    /<p>([\s\S]*?)<\/p>/g,
+    (_, inner: string) =>
+      `<p>${inner
+        .split(/<br\s*\/?>\n?/)
+        .map((line) => `<span class="verso">${line}</span>`)
+        .join('')}</p>`
+  );
+}
+
 export async function processDiario(
   content: string | undefined,
   type: RelatoType = 'prose'
@@ -88,9 +100,9 @@ export async function processDiario(
 
       return {
         title,
-        htmlContent: marked.parse(isPoem ? preparePoem(rawText) : rawText, {
-          breaks: isPoem,
-        }),
+        htmlContent: isPoem
+          ? Promise.resolve(marked.parse(preparePoem(rawText), { breaks: true })).then(wrapVerses)
+          : marked.parse(rawText),
         media,
       };
     })

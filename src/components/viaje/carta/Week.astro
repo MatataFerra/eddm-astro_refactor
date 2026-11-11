@@ -4,6 +4,7 @@ import Dateline from '@/components/share/carta/Dateline.astro';
 import Prose from '@/components/share/carta/Prose.astro';
 import Signature from '@/components/share/carta/Signature.astro';
 import LetterNav from '@/components/share/carta/LetterNav.astro';
+import TextSize from '@/components/share/carta/TextSize.astro';
 import Photo from '@/components/share/Photo.astro';
 import MediaGrid from '@/components/share/carta/MediaGrid.astro';
 import ReadMark from '@/components/viaje/carta/ReadMark.astro';
@@ -45,7 +46,10 @@ const dayLabel = (day: TripDay) =>
     <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
       {week.title}
     </h1>
-    {when() && <p class="text-muted mt-3 text-[17px] text-pretty">{when()}</p>}
+    <div class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+      {when() && <p class="text-muted text-[17px] text-pretty">{when()}</p>}
+      <TextSize class="ml-auto" />
+    </div>
   </header>
 
   {week.cover && (

@@ -235,6 +235,8 @@
 /* Cuerpo de una carta: el HTML que sale de marked (párrafos, énfasis, citas, links) */
 @layer components {
   .carta-prose {
+    /* El lector puede agrandar o achicar la letra (TextSize.astro) */
+    font-size: calc(1em * var(--text-scale, 1));
     @apply text-pretty;
   }
 
@@ -271,7 +273,15 @@
     @apply list-decimal;
   }
 
+  /* Poemas: en redonda, con aire entre palabras; un verso que no entra sigue con sangría */
   .carta-prose.is-verse p {
-    @apply text-[21px] leading-[1.7] whitespace-pre-line italic;
+    @apply text-[1.1em] leading-[1.7];
+    word-spacing: 0.06em;
+  }
+
+  .carta-prose.is-verse .verso {
+    display: block;
+    padding-left: 1.5em;
+    text-indent: -1.5em;
   }
 }
