@@ -1,26 +1,19 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import PoemasHero from '@/components/poemas/PoemasHero.astro';
-import PoemaFeatured from '@/components/poemas/PoemaFeatured.astro';
-import PoemaList from '@/components/poemas/PoemaList.astro';
-import { splitFeatured, toPoema } from '@/lib/poems';
-import { getContentNavigate } from '@/lib/api/get-content-navigate';
-import type { ContentNavigate } from '@/lib/interfaces/share';
+import LettersIndex from '@/components/cartas/LettersIndex.astro';
+import { loadLettersIndex } from '@/lib/adapters/letters-adapter';
 
-const data = await getContentNavigate<ContentNavigate[]>('poems');
+export const prerender = true;
 
-const poemas = (data?.data ?? []).map((item) => toPoema(item));
-const { featured, rest } = splitFeatured(poemas);
+const { letters, tripWeeks, timeZone } = await loadLettersIndex('poema');
 ---
 
-<Layout title="Poemas — El diario de Mati">
-  <PoemasHero />
-
-  {featured && (
-    <section class="mx-auto max-w-250 px-6 pb-14 md:px-12">
-      <PoemaFeatured poema={featured} />
-    </section>
-  )}
-
-  {rest.length > 0 && <PoemaList poemas={rest} />}
+<Layout title="Poemas | El diario de Mati" variant="carta" {timeZone}>
+  <LettersIndex
+    title="Poemas"
+    intro="Versos sueltos escritos en el camino."
+    {letters}
+    kind="poema"
+    {tripWeeks}
+  />
 </Layout>

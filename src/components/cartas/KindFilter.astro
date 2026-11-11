@@ -1,0 +1,39 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import type { LetterKind } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  current: LetterKind | null;
+}
+
+const { current } = Astro.props;
+
+// Cada tipo es su propia ruta: el filtro son links, no hace falta JavaScript
+const options: { kind: LetterKind | null; label: string; href: string }[] = [
+  { kind: null, label: 'Todo', href: APP_ROUTER.LETTERS },
+  { kind: 'relato', label: 'Relatos', href: APP_ROUTER.TALES },
+  { kind: 'poema', label: 'Poemas', href: APP_ROUTER.POEMS },
+  { kind: 'historia', label: 'Más acá en el tiempo', href: APP_ROUTER.FURTHER_TIME },
+];
+---
+
+<nav aria-label="Tipo de escrito" class="flex flex-wrap gap-x-5 gap-y-2 text-[17px]">
+  {options.map((option) =>
+    option.kind === current ? (
+      <a
+        href={option.href}
+        aria-current="page"
+        class="decoration-lamp text-ink underline decoration-2 underline-offset-[6px]"
+      >
+        {option.label}
+      </a>
+    ) : (
+      <a
+        href={option.href}
+        class="text-muted hover:text-lamp no-underline transition-colors duration-200"
+      >
+        {option.label}
+      </a>
+    )
+  )}
+</nav>

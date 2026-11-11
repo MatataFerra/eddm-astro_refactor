@@ -1,0 +1,273 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+import type { ConcordanceEntry } from '@/lib/concordance';
+
+type Starter = Pick<ConcordanceEntry, 'word' | 'key'>;
+
+interface Props {
+  frequent: Starter[];
+  places: Starter[];
+  totalWords: number;
+  textCount: number;
+}
+
+const { frequent, places, totalWords, textCount } = Astro.props;
+const number = new Intl.NumberFormat('es-AR');
+---
+
+<section
+  id="buscar"
+  class="mx-auto mt-[clamp(72px,12vh,120px)] max-w-[700px] scroll-mt-6 px-[22px]"
+  aria-labelledby="buscar-titulo"
+  data-word-search
+  data-src={APP_ROUTER.LETTERS_WORDS}
+>
+  <h2
+    id="buscar-titulo"
+    class="font-bodoni mb-2 text-[clamp(30px,4.6vw,44px)] leading-tight font-normal italic"
+  >
+    Buscar una palabra
+  </h2>
+  <p class="text-muted text-[17px]">
+    Las palabras que más uso y los lugares del viaje, con cada frase donde aparecen. Son{' '}
+    {number.format(totalWords)} palabras en {textCount} textos, el viaje incluido.
+  </p>
+
+  <form role="search" class="mt-7" data-search-form>
+    <label for="palabra" class="sr-only">
+      Palabra
+    </label>
+    <input
+      id="palabra"
+      type="search"
+      name="palabra"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder="silencio, mate, Mildura…"
+      class="border-ink font-bodoni placeholder:text-muted/70 focus-visible:border-lamp w-full appearance-none rounded-none border-b bg-transparent py-2 text-[clamp(24px,4vw,32px)] italic transition-colors duration-200 focus-visible:border-b-2 focus-visible:outline-none [&::-webkit-search-cancel-button]:appearance-none"
+    />
+  </form>
+
+  <p class="text-muted mt-3 min-h-[1.5em] text-[15px]" aria-live="polite" data-search-status></p>
+  <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1.5" data-search-suggestions></ul>
+  <ol class="mt-6" data-search-lines></ol>
+
+  <div class="mt-8 space-y-6" data-search-starters>
+    <div>
+      <p class="text-muted mb-2 text-[15px]">Las que más uso</p>
+      <ul class="flex flex-wrap gap-x-4 gap-y-1.5">
+        {frequent.map((entry) => (
+          <li>
+            <button
+              type="button"
+              data-word={entry.key}
+              class="hover:text-lamp decoration-rule hover:decoration-lamp cursor-pointer text-[17px] underline underline-offset-4 transition-colors duration-200"
+            >
+              {entry.word}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+    {places.length > 0 && (
+      <div>
+        <p class="text-muted mb-2 text-[15px]">Lugares</p>
+        <ul class="flex flex-wrap gap-x-4 gap-y-1.5">
+          {places.map((entry) => (
+            <li>
+              <button
+                type="button"
+                data-word={entry.key}
+                class="hover:text-lamp decoration-rule hover:decoration-lamp font-bodoni cursor-pointer text-[18px] italic underline underline-offset-4 transition-colors duration-200"
+              >
+                {entry.word}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* El contexto izquierdo se corta por la izquierda y el derecho por la derecha, para que la
+     palabra quede siempre en la misma columna, como en una concordancia impresa */
+  @media (min-width: 768px) {
+    :global([data-kwic-left]) {
+      display: flex;
+      justify-content: flex-end;
+      overflow: hidden;
+      white-space: nowrap;
+      mask-image: linear-gradient(to right, transparent, black 2.5em);
+    }
+
+    :global([data-kwic-right]) {
+      overflow: hidden;
+      white-space: nowrap;
+      mask-image: linear-gradient(to left, transparent, black 2.5em);
+    }
+  }
+</style>
+
+<script>
+  import { normalizeWord, type Concordance, type ConcordanceEntry } from '@/lib/concordance';
+
+  const root = document.querySelector<HTMLElement>('[data-word-search]');
+  const form = root?.querySelector<HTMLFormElement>('[data-search-form]');
+  const input = root?.querySelector<HTMLInputElement>('#palabra');
+  const status = root?.querySelector<HTMLElement>('[data-search-status]');
+  const suggestions = root?.querySelector<HTMLElement>('[data-search-suggestions]');
+  const lines = root?.querySelector<HTMLElement>('[data-search-lines]');
+  const starters = root?.querySelector<HTMLElement>('[data-search-starters]');
+  const MAX_SUGGESTIONS = 12;
+
+  let data: Promise<Concordance | null> | null = null;
+
+  // El índice de palabras pesa: se baja recién cuando alguien va a buscar
+  function load() {
+    data ??= fetch(root?.dataset.src ?? '')
+      .then((response) => (response.ok ? (response.json() as Promise<Concordance>) : null))
+      .catch(() => null);
+    return data;
+  }
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function times(count: number) {
+    return count === 1 ? 'una vez' : `${count} veces`;
+  }
+
+  function showEntry(entry: ConcordanceEntry, concordance: Concordance) {
+    if (!lines || !status) return;
+    status.textContent = `«${entry.word}» aparece ${times(entry.count)}${
+      entry.count > entry.lines.length ? `; estas son ${entry.lines.length} de las frases` : ''
+    }.`;
+    lines.replaceChildren(
+      ...entry.lines.map(([docIndex, left, word, right]) => {
+        const doc = concordance.docs[docIndex];
+        const item = el('li', 'border-rule border-t first:border-t-0');
+        const link = el('a', 'group block py-3.5 no-underline');
+        link.href = doc.href;
+
+        const phrase = el(
+          'span',
+          'block text-[17px] leading-relaxed md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]'
+        );
+        const leftCell = el('span', 'text-muted');
+        leftCell.dataset.kwicLeft = '';
+        leftCell.append(el('span', '', left));
+        // En la grilla los espacios de los bordes se pierden: los repone un margen
+        const wordCell = el(
+          'mark',
+          [
+            'text-lamp bg-transparent italic',
+            /\s$/.test(left) && 'md:pl-[0.25em]',
+            /^\s/.test(right) && 'md:pr-[0.25em]',
+          ]
+            .filter(Boolean)
+            .join(' '),
+          word
+        );
+        const rightCell = el('span', 'text-muted', right);
+        rightCell.dataset.kwicRight = '';
+        phrase.append(leftCell, wordCell, rightCell);
+
+        const source = el(
+          'span',
+          'group-hover:text-lamp mt-1 block text-[15px] transition-colors duration-200',
+          `${doc.title}, ${doc.kind.toLowerCase()}`
+        );
+        link.append(phrase, source);
+        item.append(link);
+        return item;
+      })
+    );
+  }
+
+  function showSuggestions(matches: ConcordanceEntry[], selected: ConcordanceEntry) {
+    if (!suggestions) return;
+    suggestions.replaceChildren(
+      ...matches
+        .filter((entry) => entry !== selected)
+        .map((entry) => {
+          const item = el('li');
+          const button = el(
+            'button',
+            'text-muted hover:text-lamp cursor-pointer text-[15px] transition-colors duration-200',
+            `${entry.word} (${entry.count})`
+          );
+          button.type = 'button';
+          button.dataset.word = entry.key;
+          item.append(button);
+          return item;
+        })
+    );
+  }
+
+  async function search(raw: string) {
+    const query = normalizeWord(raw.trim());
+    if (starters) starters.hidden = query.length > 0;
+    if (query.length < 2) {
+      status?.replaceChildren();
+      suggestions?.replaceChildren();
+      lines?.replaceChildren();
+      return;
+    }
+
+    const concordance = await load();
+    if (!concordance || !status) {
+      if (status)
+        status.textContent = 'No se pudo cargar el índice de palabras. Probá recargar la página.';
+      return;
+    }
+    // Lo escrito puede haber cambiado mientras se bajaba el índice
+    if (normalizeWord(input?.value.trim() ?? '') !== query) return;
+
+    const matches = concordance.entries
+      .filter((entry) => entry.key.startsWith(query))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, MAX_SUGGESTIONS);
+    const selected = matches.find((entry) => entry.key === query) ?? matches[0];
+
+    if (!selected) {
+      status.textContent = `Ninguna palabra del índice empieza con «${raw.trim()}». Están las que usé al menos tres veces y en más de un texto.`;
+      suggestions?.replaceChildren();
+      lines?.replaceChildren();
+      return;
+    }
+
+    showEntry(selected, concordance);
+    showSuggestions(matches, selected);
+  }
+
+  function choose(key: string) {
+    if (!input) return;
+    input.value = key;
+    void search(key);
+    input.focus();
+  }
+
+  if (root && input) {
+    input.addEventListener('focus', () => void load(), { once: true });
+    input.addEventListener('input', () => void search(input.value));
+    form?.addEventListener('submit', (event) => event.preventDefault());
+    root.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('button[data-word]');
+      if (button?.dataset.word) choose(button.dataset.word);
+    });
+
+    // /cartas?palabra=silencio abre la búsqueda hecha
+    const initial = new URLSearchParams(location.search).get('palabra');
+    if (initial) {
+      input.value = initial;
+      void search(initial);
+    }
+  }
+</script>

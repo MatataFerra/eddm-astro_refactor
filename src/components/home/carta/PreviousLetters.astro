@@ -1,6 +1,7 @@
 ---
-import { formatLongDate } from '@/lib/dates';
-import { LETTER_KIND_LABEL, type Letter } from '@/lib/adapters/home-adapter';
+import LetterList from '@/components/share/carta/LetterList.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Letter } from '@/lib/adapters/home-adapter';
 
 interface Props {
   letters: Letter[];
@@ -20,27 +21,15 @@ const { letters } = Astro.props;
   >
     Cartas anteriores
   </h2>
-  <p class="text-muted mb-6.5 text-[17px]">Todo lo que escribí, de lo más nuevo a lo más viejo.</p>
-
-  <ol class="border-rule border-t">
-    {letters.map((letter) => (
-      <li class="border-rule border-b">
-        <a
-          href={letter.href}
-          class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4.5 gap-y-1 py-4 no-underline"
-        >
-          <span class="group-hover:text-lamp text-[21px] leading-[1.3] transition-colors duration-200">
-            {letter.title}
-          </span>
-          <span class="text-muted col-start-2 row-start-1 text-right text-[15px] tabular-nums">
-            {formatLongDate(letter.createdAt, 'America/Argentina/Buenos_Aires')}
-          </span>
-          <span class="text-muted col-start-1 text-[15px]">
-            {LETTER_KIND_LABEL[letter.kind]}
-            {letter.place && ` · ${letter.place}`}
-          </span>
-        </a>
-      </li>
-    ))}
-  </ol>
+  <p class="text-muted mb-6.5 text-[17px]">
+    Todo lo que escribí, de lo más nuevo a lo más viejo. También podés
+    <a
+      href={`${APP_ROUTER.LETTERS}#buscar`}
+      class="text-lamp decoration-lamp/40 hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+    >
+      buscar por palabra
+    </a>
+    .
+  </p>
+  <LetterList {letters} />
 </section>

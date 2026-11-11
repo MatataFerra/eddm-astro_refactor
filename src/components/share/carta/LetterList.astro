@@ -1,0 +1,35 @@
+---
+import { formatLongDate } from '@/lib/dates';
+import { LETTER_KIND_LABEL, type Letter } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  letters: Letter[];
+  /** En un índice de un solo tipo, repetir "Poema" en cada fila sobra */
+  showKind?: boolean;
+}
+
+const { letters, showKind = true } = Astro.props;
+---
+
+<ol class="border-rule border-t">
+  {letters.map((letter) => (
+    <li class="border-rule border-b">
+      <a
+        href={letter.href}
+        class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4.5 gap-y-1 py-4 no-underline"
+      >
+        <span class="group-hover:text-lamp text-[21px] leading-[1.3] transition-colors duration-200">
+          {letter.title}
+        </span>
+        <span class="text-muted col-start-2 row-start-1 text-right text-[15px] tabular-nums">
+          {formatLongDate(letter.createdAt, 'America/Argentina/Buenos_Aires')}
+        </span>
+        {(showKind || letter.place) && (
+          <span class="text-muted col-start-1 text-[15px]">
+            {[showKind && LETTER_KIND_LABEL[letter.kind], letter.place].filter(Boolean).join(', ')}
+          </span>
+        )}
+      </a>
+    </li>
+  ))}
+</ol>
