@@ -1,10 +1,74 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import App from '@/components/App.astro';
+import Masthead from '@/components/share/carta/Masthead.astro';
+import Hero from '@/components/home/carta/Hero.astro';
+import LatestLetter from '@/components/home/carta/LatestLetter.astro';
+import PreviousLetters from '@/components/home/carta/PreviousLetters.astro';
+import TripBundles from '@/components/home/carta/TripBundles.astro';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { getTrip } from '@/lib/api/get-trip';
+import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import { adaptLetters, adaptTripBundles, placePhoto } from '@/lib/adapters/home-adapter';
+import { processDiario } from '@/lib/markdown/process';
+import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
+import type { Article } from '@/lib/interfaces/articles';
+import type { Location } from '@/lib/interfaces/location';
+import type { Trip } from '@/lib/interfaces/recorrido';
 
 export const prerender = true;
+
+// Más de esto y la carta de la home muestra el comienzo y sigue en la página del texto
+const FOLD_AT_CHARS = 1600;
+
+const [tales, poems, further, articles, location, trip] = await Promise.all([
+  getContentNavigate<ContentNavigate[]>('tales'),
+  getContentNavigate<ContentNavigate[]>('poems'),
+  getContentNavigate<ContentNavigate[]>('further'),
+  getContentNavigate<ContentNavigate[]>('articles'),
+  getCurrentLocation<Location>(),
+  getTrip<Trip>(),
+]);
+
+const letters = adaptLetters({
+  tales: tales?.data ?? [],
+  poems: poems?.data ?? [],
+  further: further?.data ?? [],
+});
+const [latest, ...previous] = letters;
+const stops = trip?.data?.stops ?? [];
+const place = location?.data ?? null;
+
+const latestContent = latest
+  ? await getArticleContentFromNotion<ContentBySlug<Article>>({ query: latest.slug })
+  : null;
+const sections = await processDiario(
+  latestContent?.data?.md_content,
+  latest?.kind === 'poema' ? 'poem' : 'prose'
+);
+const latestHtml = (await Promise.all(sections.map((section) => section.htmlContent))).join('');
+const latestLength = latestHtml.replace(/<[^>]+>/g, '').length;
 ---
 
-<Layout title="El diario de Mati - Home">
-  <App />
+<Layout title="El diario de Mati" variant="carta" timeZone={place?.metadata?.timeZone}>
+  <Masthead />
+  <main>
+    <Hero
+      place={place?.name ?? null}
+      timeZone={place?.metadata?.timeZone}
+      photo={placePhoto(place, stops)}
+    />
+    {latest && latestHtml && (
+      <LatestLetter
+        letter={latest}
+        html={latestHtml}
+        folded={latestLength > FOLD_AT_CHARS}
+        postscript={place?.metadata?.description?.trim() || undefined}
+      />
+    )}
+    {previous.length > 0 && <PreviousLetters letters={previous} />}
+    {(articles?.data?.length ?? 0) > 0 && (
+      <TripBundles bundles={adaptTripBundles(articles?.data ?? [], stops)} />
+    )}
+  </main>
 </Layout>

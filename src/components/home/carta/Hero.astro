@@ -1,0 +1,80 @@
+---
+import Dateline from '@/components/share/carta/Dateline.astro';
+import Photo from '@/components/share/Photo.astro';
+
+interface Props {
+  place: string | null;
+  timeZone?: string;
+  photo: string | null;
+}
+
+const { place, timeZone, photo } = Astro.props;
+---
+
+<section aria-label="Desde dónde escribo">
+  <div class="mx-auto max-w-[700px] px-[22px] pt-[clamp(40px,9vh,96px)]">
+    <Dateline as="h1" size="lg" place={place ?? undefined} date={new Date()} {timeZone} />
+    {timeZone && (
+      <p class="text-muted mt-3.5 text-right text-base" data-clock hidden>
+        Acá son las <span class="text-lamp tabular-nums" data-clock-time />
+        <span data-clock-phase />.
+      </p>
+    )}
+  </div>
+
+  {photo && (
+    <div class="mx-auto mt-10 max-w-[1100px] md:mt-14 md:px-[22px]">
+      <Photo
+        src={photo}
+        alt={place ? `${place}, hoy` : 'El lugar desde donde escribo'}
+        width={1920}
+        height={1280}
+        sizes="(min-width: 1144px) 1100px, 100vw"
+        priority
+        class="aspect-[4/3] w-full object-cover md:aspect-[16/9]"
+      />
+    </div>
+  )}
+</section>
+
+<script>
+  // La página es estática: la fecha y la hora de allá se actualizan acá.
+  const root = document.documentElement;
+  const timeZone = root.dataset.tz;
+  const PHASE_WORDS: Record<string, string> = {
+    night: 'es de noche',
+    dawn: 'está amaneciendo',
+    day: 'es de día',
+    dusk: 'está atardeciendo',
+  };
+
+  function tick() {
+    if (!timeZone) return;
+    const now = new Date();
+    const date = new Intl.DateTimeFormat('es-AR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone,
+    }).format(now);
+    const time = new Intl.DateTimeFormat('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+      timeZone,
+    }).format(now);
+
+    document.querySelectorAll('[data-dateline-date]').forEach((el) => {
+      if (el.closest('h1')) el.textContent = date;
+    });
+    const clock = document.querySelector<HTMLElement>('[data-clock]');
+    if (!clock) return;
+    clock.querySelector('[data-clock-time]')!.textContent = time;
+    clock.querySelector('[data-clock-phase]')!.textContent =
+      ` y ${PHASE_WORDS[root.dataset.hourPhase ?? 'day'] ?? ''}`;
+    clock.hidden = false;
+  }
+
+  tick();
+  setInterval(tick, 30_000);
+</script>
