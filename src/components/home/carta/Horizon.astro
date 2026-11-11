@@ -1,75 +1,188 @@
 ---
-// Un horizonte con el sol o la luna de la hora de allá. Lo mueve sólo el CSS según
-// data-hour-phase, que el script del <head> actualiza cada cinco minutos.
+// El día entero en una línea: de 00:00 a la izquierda a 24:00 a la derecha, con el color del
+// cielo de cada hora. Lo vivido va a color pleno y lo que falta, apagado. El sol (o la luna)
+// recorre su arco sobre la línea según la hora del lugar desde donde escribo.
+import { DAWN_START, DAY_START, DUSK_START, NIGHT_START } from '@/lib/day-phases';
+
+const at = (hour: number) => `${(hour / 24) * 100}%`;
+// Las paradas del color salen de los mismos cortes que las luces de la página
+const sky = [
+  `var(--color-sky-night) 0%`,
+  `var(--color-sky-night) ${at(DAWN_START - 0.5)}`,
+  `var(--color-sky-dawn) ${at(DAWN_START + 1)}`,
+  `var(--color-sky-gold) ${at(DAY_START - 0.75)}`,
+  `var(--color-sky-day) ${at(DAY_START + 1)}`,
+  `var(--color-sky-day) ${at(DUSK_START - 1)}`,
+  `var(--color-sky-gold) ${at(DUSK_START)}`,
+  `var(--color-sky-dusk) ${at(DUSK_START + 1.5)}`,
+  `var(--color-sky-blue-hour) ${at(NIGHT_START)}`,
+  `var(--color-sky-night) ${at(NIGHT_START + 1.5)}`,
+  `var(--color-sky-night) 100%`,
+].join(', ');
 ---
 
-<div class="horizon relative mx-auto mt-8 h-8 max-w-[700px] px-[22px]" aria-hidden="true">
-  <span class="bg-rule absolute inset-x-[22px] bottom-0 h-px"></span>
-  <div class="absolute bottom-px left-1/2 h-8 w-14 -translate-x-1/2 overflow-hidden">
-    <svg class="sky sun" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.25">
-      <circle cx="14" cy="14" r="5.5"></circle>
+<div
+  class="horizon mx-auto mt-8 max-w-[700px] px-[22px]"
+  aria-hidden="true"
+  data-horizon
+  style={`--sky: linear-gradient(to right, ${sky}); --dawn-x: ${at((DAWN_START + DAY_START) / 2)}; --dusk-x: ${at((DUSK_START + NIGHT_START) / 2)};`}
+>
+  <div class="sky-frame">
+    <span class="glow glow-dawn"></span>
+    <span class="glow glow-dusk"></span>
+
+    <svg class="body sun" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.25">
+      <circle cx="14" cy="14" r="5.5" fill="var(--color-paper)"></circle>
       <path
         d="M14 2.5v3M14 22.5v3M2.5 14h3M22.5 14h3M5.9 5.9l2.1 2.1M20 20l2.1 2.1M5.9 22.1L8 20M20 8l2.1-2.1"
         stroke-linecap="round"
       ></path>
     </svg>
-    <svg class="sky moon" viewBox="0 0 28 28" fill="currentColor">
+    <svg class="body moon" viewBox="0 0 28 28" fill="currentColor">
       <path d="M17.5 5.5a8.5 8.5 0 1 0 5 15.4A9.5 9.5 0 0 1 17.5 5.5Z"></path>
     </svg>
+  </div>
+
+  <div class="line">
+    <span class="line-future"></span>
+    <span class="line-lived"></span>
   </div>
 </div>
 
 <style>
-  .sky {
+  .horizon {
+    --x: 0%;
+    --sun-y: -40px;
+    --moon-y: -40px;
+  }
+
+  /* Todo lo que está sobre la línea; lo que baja de ella se esconde */
+  .sky-frame {
+    position: relative;
+    height: 44px;
+    overflow: hidden;
+  }
+
+  .line {
+    position: relative;
+    height: 2px;
+  }
+
+  .line > span {
     position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 28px;
-    height: 28px;
-    color: var(--color-ink);
+    inset: 0;
+    background: var(--sky);
+  }
+
+  .line-future {
+    opacity: 0.28;
+  }
+
+  .line-lived {
+    clip-path: inset(0 calc(100% - var(--x)) 0 0);
+  }
+
+  /* La luz del amanecer y del atardecer, apoyada sobre la línea */
+  .glow {
+    position: absolute;
+    bottom: -18px;
+    width: 34%;
+    height: 44px;
     translate: -50% 0;
-    transition:
-      transform 1200ms cubic-bezier(0.65, 0, 0.35, 1),
-      opacity 1200ms ease;
+    border-radius: 50%;
+    filter: blur(14px);
+    opacity: 0.14;
+    transition: opacity 2400ms ease;
   }
 
-  /* Día: el sol apoyado sobre la línea. Amanecer y atardecer: a medias. Noche: la luna. */
+  .glow-dawn {
+    left: var(--dawn-x);
+    background: radial-gradient(
+      closest-side,
+      var(--color-sky-dawn),
+      color-mix(in oklab, var(--color-sky-gold) 55%, transparent),
+      transparent
+    );
+  }
+
+  .glow-dusk {
+    left: var(--dusk-x);
+    background: radial-gradient(
+      closest-side,
+      var(--color-sky-dusk),
+      color-mix(in oklab, var(--color-sky-gold) 55%, transparent),
+      transparent
+    );
+  }
+
+  :global(:root[data-hour-phase='dawn']) .glow-dawn,
+  :global(:root[data-hour-phase='dusk']) .glow-dusk {
+    opacity: 0.6;
+  }
+
+  .body {
+    position: absolute;
+    bottom: 0;
+    left: var(--x);
+    width: 24px;
+    height: 24px;
+    color: var(--color-ink);
+    translate: -50% 50%;
+    transition: opacity 600ms ease;
+  }
+
   .sun {
-    transform: translateY(0);
+    transform: translateY(var(--sun-y));
   }
+
   .moon {
-    transform: translateY(110%);
-    opacity: 0;
-  }
-
-  :global(:root[data-hour-phase='dawn']) .sun,
-  :global(:root[data-hour-phase='dusk']) .sun {
-    transform: translateY(50%);
-  }
-
-  :global(:root[data-hour-phase='night']) .sun {
-    transform: translateY(110%);
-    opacity: 0;
-  }
-
-  :global(:root[data-hour-phase='night']) .moon {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  /* Primero se pone uno y después sale el otro: el que entra espera al que se va */
-  .sun,
-  :global(:root[data-hour-phase='night']) .moon {
-    transition-delay: 700ms;
-  }
-
-  :global(:root[data-hour-phase='night']) .sun {
-    transition-delay: 0ms;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .sky {
-      transition: none;
-    }
+    transform: translateY(var(--moon-y));
   }
 </style>
+
+<script>
+  import { DAWN_START, NIGHT_START, hourIn } from '@/lib/day-phases';
+
+  const horizon = document.querySelector<HTMLElement>('[data-horizon]');
+  const timeZone = document.documentElement.dataset.tz;
+  const SUN_ARC = 26;
+  const MOON_ARC = 14;
+  const DAY_LENGTH = NIGHT_START - DAWN_START;
+  const NIGHT_LENGTH = 24 - DAY_LENGTH;
+
+  // Cuánto subió el sol o la luna: 0 sobre la línea al salir y al ponerse, máximo a mitad de camino
+  function place(hour: number) {
+    if (!horizon) return;
+    const sunT = (hour - DAWN_START) / DAY_LENGTH;
+    const moonT = ((((hour - NIGHT_START) % 24) + 24) % 24) / NIGHT_LENGTH;
+    const isDay = sunT >= 0 && sunT <= 1;
+    const sunY = isDay ? Math.sin(Math.PI * sunT) * SUN_ARC : -12;
+    const moonY = !isDay ? Math.sin(Math.PI * Math.min(moonT, 1)) * MOON_ARC : -12;
+
+    horizon.style.setProperty('--x', `${(hour / 24) * 100}%`);
+    horizon.style.setProperty('--sun-y', `${-sunY}px`);
+    horizon.style.setProperty('--moon-y', `${-moonY}px`);
+  }
+
+  if (horizon && timeZone) {
+    const now = hourIn(timeZone);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduce) {
+      place(now);
+    } else {
+      // El único momento animado: el día se pinta desde la medianoche hasta ahora
+      const start = performance.now();
+      const duration = 1400;
+      const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+      const step = (time: number) => {
+        const t = Math.min(1, (time - start) / duration);
+        place(now * ease(t));
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    setInterval(() => place(hourIn(timeZone)), 30_000);
+  }
+</script>

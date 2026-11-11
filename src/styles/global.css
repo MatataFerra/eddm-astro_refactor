@@ -58,6 +58,14 @@
   --color-rule: #d9d9d4;
   --color-lamp: #1f5d86;
 
+  /* El cielo de cada hora, para el horizonte de la home. Decorativo: nunca para texto. */
+  --color-sky-night: #26355a;
+  --color-sky-dawn: #e9a48c;
+  --color-sky-gold: #edc36a;
+  --color-sky-day: #9fbfd6;
+  --color-sky-dusk: #e37f45;
+  --color-sky-blue-hour: #3e5c94;
+
   --font-bodoni: 'Bodoni Moda', Didot, Georgia, serif;
   --font-newsreader: 'Newsreader', Georgia, 'Times New Roman', serif;
 
