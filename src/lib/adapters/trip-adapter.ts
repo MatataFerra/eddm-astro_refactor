@@ -98,7 +98,7 @@ export function parseWeekRange(summary: string | null | undefined) {
 }
 
 /** Para comparar nombres de lugares: "KatiKati" y "Katikati" son el mismo */
-const placeKey = (name: string) =>
+export const placeKey = (name: string) =>
   name
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
