@@ -8,12 +8,11 @@ frontend; el contenido viene del backend `eddm-back-nextjs`.
 - **Framework:** Astro v7 con `output: 'server'` y adapter de Vercel. Cada página decide si se
   prerenderiza (`export const prerender = true`); las entradas de `/viaje/[slug]` se renderizan
   bajo demanda.
-- **UI interactiva:** Svelte v5 con runas (`$props`, `$state`, `$derived`), sólo como islas
-  (`client:load`, `client:visible`, `client:idle`). Si algo se resuelve con HTML + CSS o un
-  `<script>` chico en un `.astro`, no se hace isla.
-- **Estado global:** nanostores (`atom`, `map`, `computed`) y `@nanostores/persistent` para lo que
-  vive en `localStorage` (p. ej. semanas leídas en `src/lib/store/viaje-store.ts`). En Svelte se
-  leen con `$store` y lo derivado va con `$derived`.
+- **UI interactiva:** HTML + CSS y un `<script>` chico dentro del `.astro`. No hay framework de
+  islas; si alguna vez hace falta uno, se suma para esa pieza y no antes.
+- **Estado global:** nanostores con `@nanostores/persistent` para lo que vive en `localStorage`
+  (p. ej. semanas leídas en `src/lib/store/viaje-store.ts`); los `<script>` se suscriben con
+  `.subscribe()`.
 - **Lenguaje:** TypeScript estricto (`astro/tsconfigs/strict`), prohibido `any`.
 - **Estilos:** Tailwind CSS v4. Los tokens viven en `@theme` dentro de `src/styles/global.css`.
   Diseño "Carta": los colores son los tokens `paper`, `ink`, `muted`, `rule` y `lamp` (cambian con
@@ -31,7 +30,7 @@ src/
 ├── pages/          # rutas; una carpeta por sección (viaje, relatos, poemas, mas-aca-en-el-tiempo, …)
 ├── layouts/        # Layout.astro: head, meta, Nav, Footer
 ├── components/
-│   ├── <sección>/  # componentes propios de cada sección; las islas en <sección>/svelte/
+│   ├── <sección>/  # componentes propios de cada sección
 │   ├── home/       # piezas de la home
 │   └── share/      # Nav, Footer, Article y lo compartido
 ├── lib/
@@ -63,7 +62,7 @@ src/
 - **Validación antes de cerrar una tarea:**
   - `pnpm exec tsc --noEmit`: sólo revisa archivos `.ts`.
   - `pnpm exec eslint src`.
-  - `pnpm build`: es lo que realmente compila `.astro` y `.svelte`; tiene que pasar.
+  - `pnpm build`: es lo que realmente compila los `.astro`; tiene que pasar.
   - Prettier sobre los archivos tocados (`pnpm exec prettier --write <archivos>`).
   - Cambios visuales: revisar en 390, 768, 1024 y 1440 px de ancho.
   - Hoy no hay tests automatizados; si se agregan, también tienen que pasar.
@@ -79,8 +78,7 @@ src/
 
 ## 5. Patrones de Código
 
-- Componentes modulares, legibles y fuertemente tipados: cada `.astro` declara `interface Props`;
-  cada `.svelte` tipa sus `$props()`.
+- Componentes modulares, legibles y fuertemente tipados: cada `.astro` declara `interface Props`.
 - Separar datos de presentación: las páginas y adapters obtienen y transforman; los componentes
   reciben props ya listas.
 - Pedir datos en paralelo con `Promise.all` cuando una página necesita varios endpoints.

@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig, logHandlers } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import svelte from '@astrojs/svelte';
 import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
@@ -11,7 +10,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   logger: logHandlers.console({ level: 'debug' }),
-  integrations: [svelte()],
   // Las fotos de R2 pasan por Vercel Image; Cloudinary e ImageKit se achican con sus propios
   // parámetros (src/lib/media/resize.ts) para no gastar cuota de Vercel en lo que ya hacen gratis.
   image: {
