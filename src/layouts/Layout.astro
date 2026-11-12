@@ -13,10 +13,10 @@ interface Props {
 
 const { title, timeZone } = Astro.props;
 const fonts = [newsreaderFont, bodoniItalicFont];
+
 // El panel del cielo es sólo para desarrollo: en el build esta rama desaparece y el import también
-const SkyControls = import.meta.env.DEV
-  ? (await import('@/components/dev/SkyControls.astro')).default
-  : null;
+const isDev = import.meta.env.NODE_ENV === 'development';
+const SkyControls = isDev ? (await import('@/components/dev/SkyControls.astro')).default : null;
 ---
 
 <!doctype html>
