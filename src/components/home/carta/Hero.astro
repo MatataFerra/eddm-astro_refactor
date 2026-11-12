@@ -1,6 +1,7 @@
 ---
 import Dateline from '@/components/share/carta/Dateline.astro';
 import Photo from '@/components/share/Photo.astro';
+import Horizon from '@/components/home/carta/Horizon.astro';
 
 interface Props {
   place: string | null;
@@ -22,8 +23,10 @@ const { place, timeZone, photo } = Astro.props;
     )}
   </div>
 
+  {timeZone && <Horizon />}
+
   {photo && (
-    <div class="mx-auto mt-10 max-w-[1100px] md:mt-14 md:px-[22px]">
+    <div class="mx-auto mt-8 max-w-[1100px] md:mt-10 md:px-[22px]">
       <Photo
         src={photo}
         alt={place ? `${place}, hoy` : 'El lugar desde donde escribo'}
