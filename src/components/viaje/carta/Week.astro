@@ -46,10 +46,7 @@ const dayLabel = (day: TripDay) =>
     <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
       {week.title}
     </h1>
-    <div class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-      {when() && <p class="text-muted text-[17px] text-pretty">{when()}</p>}
-      <TextSize class="ml-auto" />
-    </div>
+    {when() && <p class="text-muted mt-3 text-[17px] text-pretty">{when()}</p>}
   </header>
 
   {week.cover && (
@@ -66,8 +63,12 @@ const dayLabel = (day: TripDay) =>
     </div>
   )}
 
+  <div class="mx-auto mt-6 flex max-w-[700px] justify-end px-[22px]">
+    <TextSize />
+  </div>
+
   {days.map((day, index) => (
-    <section class={index === 0 ? 'mt-14' : 'mt-[clamp(64px,11vh,104px)]'}>
+    <section class={index === 0 ? 'mt-8' : 'mt-[clamp(64px,11vh,104px)]'}>
       <div class="mx-auto max-w-[700px] px-[22px]">
         <div class:list={[index > 0 && 'border-rule border-t pt-12']}>
           {day.date ? (
