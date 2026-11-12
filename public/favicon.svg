@@ -1,16 +1,1 @@
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Fondo circular sutil (opcional) -->
-  <circle cx="16" cy="16" r="14" fill="#e8924a" fill-opacity="0.1"/>
-  
-  <!-- Símbolo de Ruta -->
-  <path 
-    d="M8 22V10L16 18L24 10V22" 
-    stroke="#e8924a" 
-    stroke-width="3" 
-    stroke-linecap="round" 
-    stroke-linejoin="round"
-  />
-  
-  <!-- Punto de origen (el "punto cero") -->
-  <circle cx="8" cy="22" r="2.5" fill="#e8924a"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>.p{fill:#f4f4f1}.i{fill:#16181b}.l{fill:#1f5d86}@media (prefers-color-scheme:dark){.p{fill:#0f1216}.i{fill:#e5e4df}.l{fill:#e2ac5f}}</style><rect width="32" height="32" rx="6" class="p"/><path class="i" transform="translate(2.95 8.95) scale(0.00980)" d="M726 1520 490.5 0H857.4L1018.6 990.6L1560 0H1642.7L808.7 1520ZM0 1500V1427H333.6V1500ZM130.7 1500 441.7 73H300.7V0H527.7L207 1500ZM1156.7 1500V1427H1822.4V1500ZM1296.7 1500 1617.5 0H2102.7V73H1975.1L1662.7 1500Z"/><circle class="l" cx="26.95" cy="21.35" r="2.50"/></svg>
