@@ -1,0 +1,54 @@
+---
+import Masthead from '@/components/share/carta/Masthead.astro';
+import LetterList from '@/components/share/carta/LetterList.astro';
+import KindFilter from '@/components/cartas/KindFilter.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Letter, LetterKind } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  title: string;
+  intro: string;
+  letters: Letter[];
+  kind: LetterKind | null;
+  tripWeeks: number;
+}
+
+const { title, intro, letters, kind, tripWeeks } = Astro.props;
+---
+
+<Masthead />
+
+<main class="pb-24">
+  <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+    <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance">
+      {title}
+    </h1>
+    <p class="text-muted mt-4 max-w-[46ch] text-[19px]">{intro}</p>
+    <div class="mt-10">
+      <KindFilter current={kind} />
+    </div>
+  </header>
+
+  <section class="mx-auto mt-6 max-w-[700px] px-[22px]" aria-label={title}>
+    {letters.length > 0 ? (
+      <LetterList {letters} showKind={kind === null} />
+    ) : (
+      <p class="border-rule text-muted border-t py-6">Todavía no hay nada de este tipo.</p>
+    )}
+
+    {tripWeeks > 0 && (
+      <p class="text-muted mt-6 text-[17px]">
+        Y el viaje, que se lee aparte:{' '}
+        <a
+          href={APP_ROUTER.JOURNEY}
+          class="text-lamp decoration-lamp/40 hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          {tripWeeks} cartas de un año de viaje
+        </a>
+        .
+      </p>
+    )}
+  </section>
+
+  <slot />
+</main>

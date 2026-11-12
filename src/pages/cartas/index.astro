@@ -1,0 +1,37 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import LettersIndex from '@/components/cartas/LettersIndex.astro';
+import WordSearch from '@/components/cartas/WordSearch.astro';
+import { loadLettersIndex } from '@/lib/adapters/letters-adapter';
+import { getConcordance } from '@/lib/adapters/concordance-adapter';
+
+export const prerender = true;
+
+const STARTERS = 24;
+
+const [{ letters, tripWeeks, timeZone }, concordance] = await Promise.all([
+  loadLettersIndex(null),
+  getConcordance(),
+]);
+
+const byCount = [...concordance.entries].sort((a, b) => b.count - a.count);
+const frequent = byCount.filter((entry) => !entry.place).slice(0, STARTERS);
+const places = byCount.filter((entry) => entry.place);
+---
+
+<Layout title="Cartas | El diario de Mati" variant="carta" {timeZone}>
+  <LettersIndex
+    title="Cartas"
+    intro="Relatos, poemas e historias de más acá en el tiempo, de lo más nuevo a lo más viejo."
+    {letters}
+    kind={null}
+    {tripWeeks}
+  >
+    <WordSearch
+      {frequent}
+      {places}
+      totalWords={concordance.totalWords}
+      textCount={concordance.docs.length}
+    />
+  </LettersIndex>
+</Layout>

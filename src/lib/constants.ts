@@ -6,6 +6,7 @@ export const APP_ROUTES = {
   furtherTime: '/mas-aca-en-el-tiempo',
   poems: '/poemas',
   gallery: '/galeria',
+  letters: '/cartas',
 } as const;
 
 export type RoutePaths = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];
@@ -23,6 +24,9 @@ export const APP_ROUTER = {
   POEMS: `${APP_ROUTES.poems}`,
   POEM: (slug: string) => `${APP_ROUTES.poems}/${slug}`,
   GALLERY: `${APP_ROUTES.gallery}`,
+  LETTERS: `${APP_ROUTES.letters}`,
+  /** La concordancia: se descarga recién cuando alguien busca una palabra */
+  LETTERS_WORDS: `${APP_ROUTES.letters}/palabras.json`,
 } as const;
 
 export type NavigateSection = 'articles' | 'further' | 'tales' | 'poems';

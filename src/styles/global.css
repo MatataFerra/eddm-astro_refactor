@@ -168,6 +168,11 @@
       color 900ms ease;
   }
 
+  body.carta :focus-visible {
+    outline: 2px solid var(--color-lamp);
+    outline-offset: 3px;
+  }
+
   body.carta ::selection {
     @apply bg-lamp text-paper;
   }
