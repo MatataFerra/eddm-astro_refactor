@@ -59,7 +59,7 @@ const links: Link[] = [
 ].filter((link): link is Link => Boolean(link));
 ---
 
-<Layout title="Enlaces | El diario de Mati" variant="carta" {timeZone}>
+<Layout title="Enlaces | El diario de Mati" {timeZone}>
   <main class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)] pb-24">
     <Dateline place={place?.name} date={new Date()} {timeZone} />
 

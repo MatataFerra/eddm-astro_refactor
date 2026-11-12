@@ -46,11 +46,7 @@ const extra = {
 };
 ---
 
-<Layout
-  title={`${entry.title} | El diario de Mati`}
-  variant="carta"
-  timeZone={location?.data?.metadata?.timeZone}
->
+<Layout title={`${entry.title} | El diario de Mati`} timeZone={location?.data?.metadata?.timeZone}>
   <Reading
     kind="Relato"
     title={entry.title}

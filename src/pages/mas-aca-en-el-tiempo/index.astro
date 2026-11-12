@@ -8,7 +8,7 @@ export const prerender = true;
 const { letters, tripWeeks, timeZone } = await loadLettersIndex('historia');
 ---
 
-<Layout title="Más acá en el tiempo | El diario de Mati" variant="carta" {timeZone}>
+<Layout title="Más acá en el tiempo | El diario de Mati" {timeZone}>
   <LettersIndex
     title="Más acá en el tiempo"
     intro="Historias que pasaron recientemente y que quizás no sean correlativas."

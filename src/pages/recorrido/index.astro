@@ -43,11 +43,7 @@ const legLinks = legs.map((leg, index) => {
 });
 ---
 
-<Layout
-  title="El recorrido | El diario de Mati"
-  variant="carta"
-  timeZone={location?.data?.metadata?.timeZone}
->
+<Layout title="El recorrido | El diario de Mati" timeZone={location?.data?.metadata?.timeZone}>
   <Masthead />
   <main class="pb-24">
     <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">

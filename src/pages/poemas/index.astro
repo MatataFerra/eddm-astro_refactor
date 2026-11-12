@@ -8,7 +8,7 @@ export const prerender = true;
 const { letters, tripWeeks, timeZone } = await loadLettersIndex('poema');
 ---
 
-<Layout title="Poemas | El diario de Mati" variant="carta" {timeZone}>
+<Layout title="Poemas | El diario de Mati" {timeZone}>
   <LettersIndex
     title="Poemas"
     intro="Versos sueltos escritos en el camino."

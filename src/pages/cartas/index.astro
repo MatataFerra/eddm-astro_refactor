@@ -19,7 +19,7 @@ const frequent = byCount.filter((entry) => !entry.place).slice(0, STARTERS);
 const places = byCount.filter((entry) => entry.place);
 ---
 
-<Layout title="Cartas | El diario de Mati" variant="carta" {timeZone}>
+<Layout title="Cartas | El diario de Mati" {timeZone}>
   <LettersIndex
     title="Cartas"
     intro="Relatos, poemas e historias de más acá en el tiempo, de lo más nuevo a lo más viejo."

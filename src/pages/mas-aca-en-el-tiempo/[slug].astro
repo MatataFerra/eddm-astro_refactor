@@ -44,11 +44,7 @@ const sections = await processDiario(entry.md_content);
 const extra = { epigraph: entry.summary, cover: entry.header?.url };
 ---
 
-<Layout
-  title={`${entry.title} | El diario de Mati`}
-  variant="carta"
-  timeZone={location?.data?.metadata?.timeZone}
->
+<Layout title={`${entry.title} | El diario de Mati`} timeZone={location?.data?.metadata?.timeZone}>
   <Reading
     kind="Más acá en el tiempo"
     title={entry.title}
