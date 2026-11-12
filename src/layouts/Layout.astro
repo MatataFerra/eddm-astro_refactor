@@ -72,7 +72,10 @@ const fonts = [newsreaderFont, bodoniItalicFont];
       <link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
     ))}
 
+    <!-- La M de la firma. El SVG pasa a la luz de noche con el modo oscuro del sistema -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <Analytics />
     <SpeedInsights />
