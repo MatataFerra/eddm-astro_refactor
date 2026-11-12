@@ -41,6 +41,8 @@ const { place, timeZone, photo } = Astro.props;
 </section>
 
 <script>
+  import { SKY_EVENT, formatHour, hourNow } from '@/lib/day-phases';
+
   // La página es estática: la fecha y la hora de allá se actualizan acá.
   const root = document.documentElement;
   const timeZone = root.dataset.tz;
@@ -60,12 +62,7 @@ const { place, timeZone, photo } = Astro.props;
       year: 'numeric',
       timeZone,
     }).format(now);
-    const time = new Intl.DateTimeFormat('es-AR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hourCycle: 'h23',
-      timeZone,
-    }).format(now);
+    const time = formatHour(hourNow(timeZone));
 
     document.querySelectorAll('[data-dateline-date]').forEach((el) => {
       if (el.closest('h1')) el.textContent = date;
@@ -80,4 +77,5 @@ const { place, timeZone, photo } = Astro.props;
 
   tick();
   setInterval(tick, 30_000);
+  document.addEventListener(SKY_EVENT, tick);
 </script>

@@ -280,7 +280,7 @@ const rays = RAYS.map(([deg, length]) => {
 </style>
 
 <script>
-  import { DAWN_START, NIGHT_START, hourIn } from '@/lib/day-phases';
+  import { DAWN_START, NIGHT_START, SKY_EVENT, hourNow } from '@/lib/day-phases';
 
   const horizon = document.querySelector<HTMLElement>('[data-horizon]');
   const timeZone = document.documentElement.dataset.tz;
@@ -309,7 +309,7 @@ const rays = RAYS.map(([deg, length]) => {
   }
 
   if (horizon && timeZone) {
-    const now = hourIn(timeZone);
+    const now = hourNow(timeZone);
     horizon.style.setProperty('--x', `${(now / 24) * 100}%`);
 
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -317,10 +317,16 @@ const rays = RAYS.map(([deg, length]) => {
     } else {
       // La llegada, una sola vez: la aurora vibra, el sol sube despacio y todo se calma
       horizon.classList.add('is-arriving');
-      setTimeout(() => place(now), 600);
+      setTimeout(() => place(hourNow(timeZone)), 600);
       setTimeout(() => horizon.classList.remove('is-arriving'), 4700);
     }
 
-    setInterval(() => place(hourIn(timeZone)), 30_000);
+    setInterval(() => place(hourNow(timeZone)), 30_000);
+
+    // El panel del cielo de desarrollo: el sol sigue al slider sin la subida lenta
+    document.addEventListener(SKY_EVENT, () => {
+      horizon.style.setProperty('--rise', '250ms');
+      place(hourNow(timeZone));
+    });
   }
 </script>
