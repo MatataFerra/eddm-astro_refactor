@@ -4,6 +4,7 @@ import Dateline from '@/components/share/carta/Dateline.astro';
 import Prose from '@/components/share/carta/Prose.astro';
 import Signature from '@/components/share/carta/Signature.astro';
 import LetterNav from '@/components/share/carta/LetterNav.astro';
+import TextSize from '@/components/share/carta/TextSize.astro';
 import Photo from '@/components/share/Photo.astro';
 import MediaGrid from '@/components/share/carta/MediaGrid.astro';
 import ReadMark from '@/components/viaje/carta/ReadMark.astro';
@@ -62,8 +63,12 @@ const dayLabel = (day: TripDay) =>
     </div>
   )}
 
+  <div class="mx-auto mt-6 flex max-w-[700px] justify-end px-[22px]">
+    <TextSize />
+  </div>
+
   {days.map((day, index) => (
-    <section class={index === 0 ? 'mt-14' : 'mt-[clamp(64px,11vh,104px)]'}>
+    <section class={index === 0 ? 'mt-8' : 'mt-[clamp(64px,11vh,104px)]'}>
       <div class="mx-auto max-w-[700px] px-[22px]">
         <div class:list={[index > 0 && 'border-rule border-t pt-12']}>
           {day.date ? (

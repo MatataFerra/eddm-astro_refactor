@@ -32,6 +32,12 @@ const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSa
       (() => {
         const root = document.documentElement;
         const dark = matchMedia('(prefers-color-scheme: dark)');
+
+        // El tamaño de letra que eligió el lector (src/lib/text-scale.ts)
+        try {
+          const scale = Number(localStorage.getItem('eddm_text_scale'));
+          if (scale >= 0.9 && scale <= 1.4) root.style.setProperty('--text-scale', String(scale));
+        } catch {}
         const phaseAt = (hour) =>
           hour < 6 ? 'night' : hour < 9 ? 'dawn' : hour < 18 ? 'day' : hour < 21 ? 'dusk' : 'night';
 

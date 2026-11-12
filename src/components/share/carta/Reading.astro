@@ -4,6 +4,7 @@ import Dateline from '@/components/share/carta/Dateline.astro';
 import Prose from '@/components/share/carta/Prose.astro';
 import Signature from '@/components/share/carta/Signature.astro';
 import LetterNav from '@/components/share/carta/LetterNav.astro';
+import TextSize from '@/components/share/carta/TextSize.astro';
 import Photo from '@/components/share/Photo.astro';
 import { APP_ROUTER } from '@/lib/constants';
 import type { ProcessedSection } from '@/lib/markdown/process';
@@ -75,7 +76,11 @@ const blocks = await Promise.all(
     </div>
   )}
 
-  <article class="mx-auto mt-12 max-w-[700px] px-[22px]">
+  <div class="mx-auto mt-6 flex max-w-[700px] justify-end px-[22px]">
+    <TextSize />
+  </div>
+
+  <article class="mx-auto mt-8 max-w-[700px] px-[22px]">
     {blocks.map((block) => (
       <>
         {block.title && (

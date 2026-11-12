@@ -1,6 +1,6 @@
 ---
 // Un horizonte con el sol (o la luna) de la hora del lugar desde donde escribo, y la luz que
-// echa a los dos lados. Al abrir la página pasa una sola cosa: una aurora vibra sobre la línea,
+// echa a los dos lados. Al abrir la página pasa una sola cosa: una aurora corre sobre la línea,
 // el sol sube despacio hasta su lugar en el arco y la aurora se calma.
 
 // Rayos irregulares: largos y ángulos fijos (no aleatorios) para que el sol sea siempre el mismo
@@ -30,9 +30,8 @@ const rays = RAYS.map(([deg, length]) => {
 
 <div class="horizon mx-auto mt-8 max-w-[700px] px-[22px]" aria-hidden="true" data-horizon>
   <div class="sky-frame">
-    <span class="aurora aurora-1"></span>
-    <span class="aurora aurora-2"></span>
-    <span class="aurora aurora-3"></span>
+    <span class="aurora"></span>
+    <span class="aurora aurora-veil"></span>
 
     <span class="light"></span>
 
@@ -91,12 +90,6 @@ const rays = RAYS.map(([deg, length]) => {
     overflow: hidden;
   }
 
-  /* Las luces se apagan antes de llegar a las puntas del horizonte */
-  .light,
-  .aurora {
-    mask-image: linear-gradient(to right, transparent, black 30%, black 70%, transparent);
-  }
-
   .line {
     display: block;
     height: 1px;
@@ -119,79 +112,112 @@ const rays = RAYS.map(([deg, length]) => {
       transparent
     );
     filter: blur(6px);
+    /* Se apaga antes de llegar a las puntas del horizonte */
+    mask-image: linear-gradient(to right, transparent, black 30%, black 70%, transparent);
     opacity: var(--light);
     transition: opacity var(--rise) cubic-bezier(0.37, 0, 0.2, 1);
   }
 
-  /* La aurora: bandas de luz que vibran mientras sale el sol y después se apagan */
+  /*
+   * La aurora: una sola banda de luz a lo ancho de todo el horizonte. Los colores son un degradé
+   * continuo (verde, celeste, rosa, oro y vuelta) que corre de izquierda a derecha mientras sale el
+   * sol, y después se apaga. El velo es la misma banda, más baja y corrida: se funde con la primera.
+   */
   .aurora {
     position: absolute;
-    bottom: -14px;
-    height: 50px;
-    border-radius: 50%;
-    filter: blur(12px);
+    inset-inline: 0;
+    bottom: -10px;
+    height: 64px;
+    background-image: linear-gradient(
+      90deg,
+      var(--color-sky-aurora),
+      var(--color-sky-day),
+      var(--color-sky-dawn),
+      var(--color-sky-gold),
+      var(--color-sky-dawn),
+      var(--color-sky-day),
+      var(--color-sky-aurora),
+      var(--color-sky-day),
+      var(--color-sky-dawn),
+      var(--color-sky-gold),
+      var(--color-sky-dawn),
+      var(--color-sky-day),
+      var(--color-sky-aurora)
+    );
+    background-image: linear-gradient(
+      in oklch 90deg,
+      var(--color-sky-aurora),
+      var(--color-sky-day),
+      var(--color-sky-dawn),
+      var(--color-sky-gold),
+      var(--color-sky-dawn),
+      var(--color-sky-day),
+      var(--color-sky-aurora),
+      var(--color-sky-day),
+      var(--color-sky-dawn),
+      var(--color-sky-gold),
+      var(--color-sky-dawn),
+      var(--color-sky-day),
+      var(--color-sky-aurora)
+    );
+    /* Dos vueltas del degradé en el doble de ancho: al correr una vuelta entera no se nota el corte */
+    background-size: 200% 100%;
+    /* Se apaga hacia las puntas y hacia arriba: es luz que sale de la línea */
+    mask-image:
+      linear-gradient(to right, transparent, black 20%, black 80%, transparent),
+      linear-gradient(to top, black, transparent 72%);
+    mask-composite: intersect;
+    filter: blur(10px);
     opacity: 0;
+    transform-origin: bottom;
     pointer-events: none;
   }
 
-  .aurora-1 {
-    left: 16%;
-    width: 32%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-sky-aurora),
-      var(--color-sky-blue-hour),
-      transparent
-    );
-  }
-
-  .aurora-2 {
-    left: 34%;
-    width: 32%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-sky-dawn),
-      var(--color-sky-gold),
-      transparent
-    );
-  }
-
-  .aurora-3 {
-    left: 52%;
-    width: 32%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-sky-blue-hour),
-      var(--color-sky-aurora),
-      transparent
-    );
+  .aurora-veil {
+    height: 44px;
+    background-position: 50% 0;
   }
 
   .is-arriving .aurora {
     animation:
-      aurora-shimmer 900ms ease-in-out infinite alternate,
+      aurora-flow 4600ms linear forwards,
+      aurora-sway 1300ms ease-in-out infinite alternate,
       aurora-life 4600ms ease forwards;
   }
 
-  .is-arriving .aurora-2 {
-    animation-duration: 700ms, 4600ms;
-    animation-delay: -250ms, 0ms;
+  .is-arriving .aurora-veil {
+    animation-name: aurora-flow-back, aurora-sway, aurora-veil-life;
+    animation-duration: 4600ms, 900ms, 4600ms;
+    animation-delay:
+      0ms,
+      -400ms,
+      0ms;
   }
 
-  .is-arriving .aurora-3 {
-    animation-duration: 1100ms, 4600ms;
-    animation-delay: -500ms, 0ms;
-  }
-
-  @keyframes aurora-shimmer {
+  @keyframes aurora-flow {
     from {
-      transform: translateX(-6%) scaleY(0.7) skewX(-8deg);
+      background-position: 0% 0;
     }
     to {
-      transform: translateX(6%) scaleY(1.15) skewX(8deg);
+      background-position: 100% 0;
+    }
+  }
+
+  @keyframes aurora-flow-back {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0% 0;
+    }
+  }
+
+  @keyframes aurora-sway {
+    from {
+      transform: scaleY(0.75);
+    }
+    to {
+      transform: scaleY(1.12);
     }
   }
 
@@ -202,6 +228,19 @@ const rays = RAYS.map(([deg, length]) => {
     15%,
     45% {
       opacity: var(--aurora-peak);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes aurora-veil-life {
+    0% {
+      opacity: 0;
+    }
+    15%,
+    45% {
+      opacity: calc(var(--aurora-peak) * 0.6);
     }
     100% {
       opacity: 0;
