@@ -1,0 +1,27 @@
+---
+import { APP_ROUTER } from '@/lib/constants';
+
+const links = [
+  { label: 'Cartas', href: `${APP_ROUTER.HOME}#cartas` },
+  { label: 'El viaje', href: APP_ROUTER.JOURNEY },
+];
+---
+
+<header class="mx-auto flex max-w-[700px] items-baseline justify-between gap-4 px-[22px] py-6">
+  <a
+    href={APP_ROUTER.HOME}
+    class="font-bodoni hover:text-lamp text-lg font-medium italic no-underline transition-colors duration-200"
+  >
+    El diario de Mati
+  </a>
+  <nav aria-label="Secciones" class="flex gap-5 text-base">
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class="text-muted hover:text-lamp no-underline transition-colors duration-200"
+      >
+        {link.label}
+      </a>
+    ))}
+  </nav>
+</header>

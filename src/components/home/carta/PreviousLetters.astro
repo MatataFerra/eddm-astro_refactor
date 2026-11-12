@@ -1,0 +1,46 @@
+---
+import { formatLongDate } from '@/lib/dates';
+import { LETTER_KIND_LABEL, type Letter } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  letters: Letter[];
+}
+
+const { letters } = Astro.props;
+---
+
+<section
+  id="cartas"
+  class="mx-auto mt-[clamp(80px,14vh,140px)] max-w-[700px] scroll-mt-6 px-[22px]"
+  aria-labelledby="cartas-titulo"
+>
+  <h2
+    id="cartas-titulo"
+    class="font-bodoni mb-2 text-[clamp(30px,4.6vw,44px)] leading-tight font-normal italic"
+  >
+    Cartas anteriores
+  </h2>
+  <p class="text-muted mb-6.5 text-[17px]">Todo lo que escribí, de lo más nuevo a lo más viejo.</p>
+
+  <ol class="border-rule border-t">
+    {letters.map((letter) => (
+      <li class="border-rule border-b">
+        <a
+          href={letter.href}
+          class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4.5 gap-y-1 py-4 no-underline"
+        >
+          <span class="group-hover:text-lamp text-[21px] leading-[1.3] transition-colors duration-200">
+            {letter.title}
+          </span>
+          <span class="text-muted col-start-2 row-start-1 text-right text-[15px] tabular-nums">
+            {formatLongDate(letter.createdAt, 'America/Argentina/Buenos_Aires')}
+          </span>
+          <span class="text-muted col-start-1 text-[15px]">
+            {LETTER_KIND_LABEL[letter.kind]}
+            {letter.place && ` · ${letter.place}`}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</section>

@@ -52,7 +52,10 @@ const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSa
         }
 
         function paint() {
-          let phase = phaseAt(hourThere());
+          const hour = hourThere();
+          let phase = phaseAt(hour);
+          // La hora real de allá, aunque el modo oscuro cambie la luz
+          root.dataset.hourPhase = phaseAt(hour);
           // Quien navega en modo oscuro nunca recibe la luz de día
           if (dark.matches && (phase === 'day' || phase === 'dawn')) phase = 'night';
           root.dataset.phase = phase;
