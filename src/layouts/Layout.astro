@@ -13,6 +13,10 @@ interface Props {
 
 const { title, timeZone } = Astro.props;
 const fonts = [newsreaderFont, bodoniItalicFont];
+// El panel del cielo es sólo para desarrollo: en el build esta rama desaparece y el import también
+const SkyControls = import.meta.env.DEV
+  ? (await import('@/components/dev/SkyControls.astro')).default
+  : null;
 ---
 
 <!doctype html>
@@ -36,6 +40,8 @@ const fonts = [newsreaderFont, bodoniItalicFont];
           hour < 6 ? 'night' : hour < 9 ? 'dawn' : hour < 18 ? 'day' : hour < 21 ? 'dusk' : 'night';
 
         function hourThere() {
+          // El panel del cielo (sólo en desarrollo) puede fijar otra hora
+          if (root.dataset.devHour) return Number(root.dataset.devHour);
           try {
             const parts = new Intl.DateTimeFormat('en-GB', {
               timeZone: root.dataset.tz || undefined,
@@ -57,7 +63,8 @@ const fonts = [newsreaderFont, bodoniItalicFont];
           // La hora real de allá, aunque el modo oscuro cambie la luz
           root.dataset.hourPhase = phaseAt(hour);
           // Quien navega en modo oscuro nunca recibe la luz de día
-          if (dark.matches && (phase === 'day' || phase === 'dawn')) phase = 'night';
+          const isDark = root.dataset.devDark ? root.dataset.devDark === 'true' : dark.matches;
+          if (isDark && (phase === 'day' || phase === 'dawn')) phase = 'night';
           root.dataset.phase = phase;
           const paper = getComputedStyle(root).getPropertyValue('--color-paper').trim();
           document.querySelector('meta[name="theme-color"]')?.setAttribute('content', paper);
@@ -65,6 +72,7 @@ const fonts = [newsreaderFont, bodoniItalicFont];
 
         paint();
         dark.addEventListener('change', paint);
+        document.addEventListener('eddm:sky', paint);
         setInterval(paint, 5 * 60 * 1000);
       })();
     </script>
@@ -83,6 +91,7 @@ const fonts = [newsreaderFont, bodoniItalicFont];
   <body>
     <div id="page-loader"></div>
     <slot />
+    {SkyControls && <SkyControls />}
   </body>
 </html>
 

@@ -1,0 +1,153 @@
+---
+// Sólo en desarrollo (Layout.astro lo renderiza con import.meta.env.DEV): fija otra hora y otro
+// modo oscuro para ver el sol, la luna y las cuatro luces sin esperar a que pase el día. Lo que
+// elegís queda en sessionStorage, así sigue igual al cambiar de página. Va arriba de la barra de
+// desarrollo de Astro, que ocupa el borde de abajo.
+const control =
+  'border-rule hover:border-lamp hover:text-lamp border px-2.5 py-1 transition-colors duration-200 active:scale-95';
+---
+
+<details
+  class="border-rule bg-paper text-ink fixed bottom-18 left-4 z-50 w-[min(300px,calc(100vw-32px))] border text-[15px] leading-snug shadow-lg"
+  data-sky-controls
+>
+  <summary class="cursor-pointer px-3 py-2 select-none">
+    Cielo <span class="text-muted">· dev</span>
+    <span class="text-lamp float-right tabular-nums" data-sky-readout></span>
+  </summary>
+
+  <div class="border-rule space-y-3 border-t px-3 pt-3 pb-3.5">
+    <label class="block">
+      <span class="text-muted">Hora de allá</span>
+      <input
+        type="range"
+        min="0"
+        max="24"
+        step="0.25"
+        class="accent-lamp mt-1 block w-full"
+        data-sky-hour
+      />
+    </label>
+
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="accent-lamp size-4" data-sky-dark />
+      Modo oscuro del visitante
+    </label>
+
+    <div class="flex flex-wrap gap-2">
+      <button type="button" class={control} data-sky-play>
+        Recorrer el día
+      </button>
+      <button type="button" class={control} data-sky-reset>
+        Hora real
+      </button>
+    </div>
+  </div>
+</details>
+
+<script>
+  import { SKY_EVENT, formatHour, hourIn } from '@/lib/day-phases';
+
+  const STORAGE_KEY = 'eddm_dev_sky';
+  // Un día entero en 24 segundos
+  const HOURS_PER_SECOND = 1;
+
+  type Sky = { hour: number | null; dark: boolean | null; open: boolean };
+
+  const root = document.documentElement;
+  const panel = document.querySelector<HTMLDetailsElement>('[data-sky-controls]')!;
+  const hourInput = panel.querySelector<HTMLInputElement>('[data-sky-hour]')!;
+  const darkInput = panel.querySelector<HTMLInputElement>('[data-sky-dark]')!;
+  const playButton = panel.querySelector<HTMLButtonElement>('[data-sky-play]')!;
+  const resetButton = panel.querySelector<HTMLButtonElement>('[data-sky-reset]')!;
+  const readout = panel.querySelector<HTMLElement>('[data-sky-readout]')!;
+  const systemDark = matchMedia('(prefers-color-scheme: dark)');
+
+  const realHour = () =>
+    root.dataset.tz
+      ? hourIn(root.dataset.tz)
+      : new Date().getHours() + new Date().getMinutes() / 60;
+
+  function load(): Sky {
+    try {
+      return {
+        hour: null,
+        dark: null,
+        open: false,
+        ...JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}'),
+      };
+    } catch {
+      return { hour: null, dark: null, open: false };
+    }
+  }
+
+  let sky = load();
+  let playing: number | null = null;
+
+  function apply() {
+    if (sky.hour === null) delete root.dataset.devHour;
+    else root.dataset.devHour = String(sky.hour);
+    if (sky.dark === null) delete root.dataset.devDark;
+    else root.dataset.devDark = String(sky.dark);
+
+    document.dispatchEvent(new CustomEvent(SKY_EVENT));
+
+    const hour = sky.hour ?? realHour();
+    hourInput.value = String(hour);
+    darkInput.checked = sky.dark ?? systemDark.matches;
+    readout.textContent = `${formatHour(hour)} · ${root.dataset.phase ?? ''}`;
+    resetButton.disabled = sky.hour === null && sky.dark === null;
+
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sky));
+    } catch {
+      // Sin almacenamiento vale sólo para esta página
+    }
+  }
+
+  function stop() {
+    if (playing !== null) cancelAnimationFrame(playing);
+    playing = null;
+    playButton.textContent = 'Recorrer el día';
+  }
+
+  function play() {
+    let last = performance.now();
+    const step = (now: number) => {
+      const hour = (sky.hour ?? realHour()) + ((now - last) / 1000) * HOURS_PER_SECOND;
+      last = now;
+      sky.hour = hour % 24;
+      apply();
+      playing = requestAnimationFrame(step);
+    };
+    playing = requestAnimationFrame(step);
+    playButton.textContent = 'Pausa';
+  }
+
+  hourInput.addEventListener('input', () => {
+    stop();
+    sky.hour = Number(hourInput.value);
+    apply();
+  });
+
+  darkInput.addEventListener('change', () => {
+    sky.dark = darkInput.checked;
+    apply();
+  });
+
+  playButton.addEventListener('click', () => (playing === null ? play() : stop()));
+
+  resetButton.addEventListener('click', () => {
+    stop();
+    sky = { ...sky, hour: null, dark: null };
+    apply();
+  });
+
+  panel.open = sky.open;
+  panel.addEventListener('toggle', () => {
+    sky.open = panel.open;
+    apply();
+  });
+
+  apply();
+</script>
