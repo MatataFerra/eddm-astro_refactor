@@ -16,9 +16,8 @@ frontend; el contenido viene del backend `eddm-back-nextjs`.
   leen con `$store` y lo derivado va con `$derived`.
 - **Lenguaje:** TypeScript estricto (`astro/tsconfigs/strict`), prohibido `any`.
 - **Estilos:** Tailwind CSS v4. Los tokens viven en `@theme` dentro de `src/styles/global.css`.
-  Rediseño v2 en curso ("Carta"): las páginas nuevas usan `<Layout variant="carta">` y los tokens
-  `paper`, `ink`, `muted`, `rule`, `lamp`; los tokens `ash-*` y de color por sección son legado y se
-  borran cuando la última página deje de usarlos.
+  Diseño "Carta": los colores son los tokens `paper`, `ink`, `muted`, `rule` y `lamp` (cambian con
+  la luz), más `sky-*` y `sun*`, que sólo decoran el horizonte de la home.
 - **Contenido:** Markdown procesado con `marked` (`src/lib/markdown/process.ts`); galería con
   PhotoSwipe.
 - **Imágenes:** Cloudinary, ImageKit y R2. Para pedir un ancho concreto usar

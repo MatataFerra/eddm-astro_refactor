@@ -1,23 +1,6 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/typography';
 
-@font-face {
-  font-family: 'DM Sans';
-  src: url('@/assets/fonts/dm-sans.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: optional;
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  src: url('@/assets/fonts/fraunces.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: block;
-}
-
-/* Carta: Bodoni Moda para encabezados, Newsreader para el texto y la interfaz */
+/* Bodoni Moda para encabezados, Newsreader para el texto y la interfaz */
 @font-face {
   font-family: 'Bodoni Moda';
   src: url('@/assets/fonts/bodoni-moda.woff2') format('woff2');
@@ -70,50 +53,9 @@
 
   --font-bodoni: 'Bodoni Moda', Didot, Georgia, serif;
   --font-newsreader: 'Newsreader', Georgia, 'Times New Roman', serif;
-
-  /* Legado: tokens del diseño anterior, hasta que cada etapa reemplace su página */
-  --color-accent-main: #d4a843;
-  --color-accent-soft: rgba(212, 168, 67, 0.15);
-  --color-accent-glow: rgba(212, 168, 67, 0.25);
-  --color-accent-text: #e8ca7a;
-
-  --color-green-main: #5d9e6b;
-  --color-green-soft: #8ac49a;
-
-  --color-lilac-main: #b3a6ff;
-  --color-lilac-soft: rgba(179, 166, 255, 0.12);
-  --color-lilac-glow: rgba(179, 166, 255, 0.18);
-  --color-lilac-text: #cfc6ff;
-
-  --color-blue-main: #4ca8c8;
-  --color-blue-soft: #7ecde0;
-  --color-blue-text: #e0dcff;
-  --color-blue-glow: rgba(76, 168, 200, 0.25);
-
-  --color-orange-main: #e8924a;
-  --color-orange-soft: rgba(232, 146, 74, 0.12);
-  --color-orange-glow: rgba(232, 146, 74, 0.2);
-  --color-orange-text: #f0c080;
-  --color-orange-dim: #c4783a;
-
-  --color-ash-main: #0a0a0f;
-  --color-ash-hard: #666666;
-  --color-ash-soft: #555555;
-  --color-ash-softest: #444444;
-  --color-ash-muted: #8b8996;
-  --color-ash-text: #f0eeff;
-
-  --font-dm: 'DM Sans', system-ui, sans-serif;
-  --font-fraunces: 'Fraunces', Georgia, 'Times New Roman', serif;
-
-  --animate-pulse-dot: pulse-dot 3s infinite;
-
-  --color-coral: var(--color-orange-main);
-  --color-coral-soft: var(--color-orange-soft);
-  --color-coral-text: var(--color-orange-text);
 }
 
-/* Las otras tres luces de Carta. data-phase lo pone el script del <head> según la hora del lugar
+/* Las otras tres luces. data-phase lo pone el script del <head> según la hora del lugar
    desde donde escribo; sin JS, el modo oscuro del visitante elige la noche. */
 :root[data-phase='dawn'] {
   --color-paper: #e6e8e5;
@@ -158,22 +100,18 @@
   }
 
   body {
-    @apply font-dm bg-ash-main text-ash-text overflow-x-hidden;
-  }
-
-  body.carta {
     @apply font-newsreader bg-paper text-ink text-[19px] leading-[1.65] antialiased;
     transition:
       background-color 900ms ease,
       color 900ms ease;
   }
 
-  body.carta :focus-visible {
+  body :focus-visible {
     outline: 2px solid var(--color-lamp);
     outline-offset: 3px;
   }
 
-  body.carta ::selection {
+  ::selection {
     @apply bg-lamp text-paper;
   }
 
@@ -182,53 +120,13 @@
       scroll-behavior: auto;
     }
 
-    body.carta {
+    body {
       transition: none;
     }
   }
 
   img {
     display: block;
-  }
-  /* Grain overlay (sólo el diseño anterior) */
-  body:not(.carta)::before {
-    content: '';
-    @apply pointer-events-none fixed inset-0 z-9999 opacity-[0.035];
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 120px 120px;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #0a0a0f;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-accent-glow);
-    border-radius: 2px;
-  }
-}
-
-.heading-1 {
-  @apply font-fraunces text-ash-text text-[clamp(44px,7vw,128px)] leading-[0.95] font-extrabold tracking-[-0.04em];
-}
-
-@utility verse {
-  white-space: pre-line;
-  text-wrap: pretty;
-  @apply font-fraunces font-light italic;
-}
-
-@keyframes pulse-dot {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(232, 146, 74, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(232, 146, 74, 0);
   }
 }
 

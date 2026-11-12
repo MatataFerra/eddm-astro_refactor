@@ -51,7 +51,7 @@ const latestHtml = (await Promise.all(sections.map((section) => section.htmlCont
 const latestLength = latestHtml.replace(/<[^>]+>/g, '').length;
 ---
 
-<Layout title="El diario de Mati" variant="carta" timeZone={place?.metadata?.timeZone}>
+<Layout title="El diario de Mati" timeZone={place?.metadata?.timeZone}>
   <Masthead />
   <main>
     <Hero

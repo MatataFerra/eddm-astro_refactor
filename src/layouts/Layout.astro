@@ -1,8 +1,5 @@
 ---
 import '../styles/global.css';
-import Nav from '@/components/share/Nav.astro';
-import frauncesFont from '@/assets/fonts/fraunces.woff2';
-import dmSansFont from '@/assets/fonts/dm-sans.woff2';
 import newsreaderFont from '@/assets/fonts/newsreader.woff2';
 import bodoniItalicFont from '@/assets/fonts/bodoni-moda-italic.woff2';
 import Analytics from '@vercel/analytics/astro';
@@ -10,24 +7,21 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
-  /** `carta` es el diseño nuevo; `legacy` queda hasta que cada etapa reemplace su página. */
-  variant?: 'carta' | 'legacy';
   /** Zona horaria del lugar desde donde escribo (IANA). Sin ella, la luz sigue la hora del visitante. */
   timeZone?: string;
 }
 
-const { title, variant = 'legacy', timeZone } = Astro.props;
-const isCarta = variant === 'carta';
-const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSansFont];
+const { title, timeZone } = Astro.props;
+const fonts = [newsreaderFont, bodoniItalicFont];
 ---
 
 <!doctype html>
-<html lang="es" data-tz={isCarta ? timeZone : undefined}>
+<html lang="es" data-tz={timeZone}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content={isCarta ? '#f4f4f1' : '#000000'} />
-    {isCarta && <script is:inline>
+    <meta name="theme-color" content="#f4f4f1" />
+    <script is:inline>
       // La luz de la página es la de la hora donde estoy. Corre antes de pintar para no parpadear.
       (() => {
         const root = document.documentElement;
@@ -73,7 +67,7 @@ const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSa
         dark.addEventListener('change', paint);
         setInterval(paint, 5 * 60 * 1000);
       })();
-    </script>}
+    </script>
     {fonts.map((font) => (
       <link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
     ))}
@@ -83,77 +77,30 @@ const fonts = isCarta ? [newsreaderFont, bodoniItalicFont] : [frauncesFont, dmSa
     <Analytics />
     <SpeedInsights />
   </head>
-  <body id="body-root" class:list={{ carta: isCarta }}>
+  <body>
     <div id="page-loader"></div>
-    {!isCarta && <Nav variant="main" data-navbar />}
     <slot />
   </body>
 </html>
 
 <style is:global>
-  html {
-    visibility: visible;
-  }
-  .reveal {
-    opacity: 0;
-    transform: translateY(12px);
-    transition:
-      opacity 0.7s ease,
-      transform 0.7s ease;
-    transition-delay: var(--delay, 0s);
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
   #page-loader {
     position: fixed;
     top: 0;
     left: 0;
     width: 0%;
     height: 3px;
-    background-color: var(--color-orange-main);
+    background-color: var(--color-lamp);
     z-index: 9999;
     transition:
       width 0.3s ease,
       opacity 0.3s ease;
     opacity: 0;
     pointer-events: none;
-    box-shadow: 0 0 10px var(--color-orange-glow);
-  }
-
-  body.carta #page-loader {
-    background-color: var(--color-lamp);
-    box-shadow: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
   }
 </style>
 
 <script>
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      }
-    },
-    { threshold: 0, rootMargin: '0px' }
-  );
-
-  document.querySelectorAll('.reveal').forEach((el) => {
-    revealObserver.observe(el);
-  });
-
   // --- PAGE LOADER (solo /viaje/[slug]) ---
   function showLoader() {
     const loader = document.getElementById('page-loader');

@@ -43,11 +43,7 @@ const sections = await processDiario(entry.md_content, 'poem');
 const extra = { place: entry.description?.trim() || null, cover: entry.header?.url, verse: true };
 ---
 
-<Layout
-  title={`${entry.title} | El diario de Mati`}
-  variant="carta"
-  timeZone={location?.data?.metadata?.timeZone}
->
+<Layout title={`${entry.title} | El diario de Mati`} timeZone={location?.data?.metadata?.timeZone}>
   <Reading
     kind="Poema"
     title={entry.title}
