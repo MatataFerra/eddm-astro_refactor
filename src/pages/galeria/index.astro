@@ -1,36 +1,96 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import CityIndex from '@/components/galeria/svelte/CityIndex.svelte';
-import Lightbox from '@/components/galeria/svelte/Lightbox.svelte';
-import { getGalleryWithPhotos } from '@/lib/api/get-gallery';
+import Masthead from '@/components/share/carta/Masthead.astro';
+import Photo from '@/components/share/Photo.astro';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { getGallery, type GalleryPlace } from '@/lib/adapters/gallery-adapter';
+import { APP_ROUTER } from '@/lib/constants';
+import { formatMonthRange } from '@/lib/dates';
+import type { Location } from '@/lib/interfaces/location';
 
 export const prerender = true;
 
-const lugares = await getGalleryWithPhotos();
+const [places, location] = await Promise.all([getGallery(), getCurrentLocation<Location>()]);
+
+const total = places.reduce((sum, place) => sum + place.photos.length, 0);
+const count = (n: number) => (n === 1 ? '1 foto' : `${n} fotos`);
+const detail = (place: GalleryPlace) =>
+  [count(place.photos.length), place.date && formatMonthRange(place.date, null)]
+    .filter(Boolean)
+    .join(', ');
 ---
 
-<Layout title="Galería — El diario de Mati | Fotos de viaje, por ciudad">
-  <header class="px-5 pt-30 pb-12 text-center md:px-12">
-    <div class="reveal">
-      <div class="bg-coral-soft border-coral/30 text-coral-text mb-5.5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] tracking-[0.12em] uppercase">
-        <i class="bg-coral size-1.5 rounded-full"></i>Fotos
-      </div>
-    </div>
-
-    <div class="reveal" style="--delay: 0.08s">
-      <h1 class="font-fraunces text-ash-text text-[clamp(48px,7vw,80px)] leading-[.95] font-extrabold tracking-[-0.04em]">
+<Layout
+  title="Galería | El diario de Mati"
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Masthead />
+  <main class="pb-24">
+    <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+      <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em]">
         Galería
       </h1>
-    </div>
-  </header>
+      {places.length > 0 && (
+        <p class="mt-6 text-[21px] leading-normal text-pretty">
+          {count(total)} de {places.length} lugares. Elegí uno para verlas.
+        </p>
+      )}
+    </header>
 
-  <main class="mx-auto max-w-300 px-5 pb-36 md:px-12">
-    {lugares.length > 0 ? (
-      <CityIndex client:load lugares={lugares} />
+    {places.length > 0 ? (
+      <ul class="border-rule mx-auto mt-14 max-w-[1100px] border-t px-[22px]">
+        {places.map((place, index) => (
+          <li class="border-rule border-b">
+            <a
+              href={place.href}
+              class="group grid items-center gap-5 py-8 no-underline sm:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] sm:gap-10"
+            >
+              {place.photos[0] && (
+                <div class="overflow-hidden">
+                  <Photo
+                    src={place.photos[0].src}
+                    alt=""
+                    width={place.photos[0].width ?? 1200}
+                    height={place.photos[0].height ?? 900}
+                    widths={[480, 720, 1080]}
+                    sizes="(min-width: 1144px) 440px, (min-width: 640px) 40vw, 100vw"
+                    priority={index === 0}
+                    class="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                </div>
+              )}
+              <div>
+                <h2 class="font-bodoni group-hover:text-lamp text-[clamp(40px,6.5vw,72px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance transition-colors duration-200">
+                  {place.name}
+                </h2>
+                <p class="text-muted mt-3 text-[17px]">{detail(place)}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
     ) : (
-      <p class="font-dm text-ash-muted text-center">Todavía no hay fotos.</p>
+      <p class="text-muted mx-auto mt-12 max-w-[700px] px-[22px]">
+        Las fotos no cargaron. Probá de nuevo en un rato.
+      </p>
     )}
-  </main>
 
-  <Lightbox client:idle />
+    <footer class="mx-auto mt-18 max-w-[700px] px-[22px]">
+      <p class="border-rule flex flex-wrap justify-center gap-x-8 gap-y-2 border-t pt-6 text-[17px]">
+        <a
+          href={APP_ROUTER.TRIP}
+          class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          El mapa del recorrido
+        </a>
+        <a
+          href={APP_ROUTER.JOURNEY}
+          class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          Volver al viaje
+        </a>
+      </p>
+    </footer>
+  </main>
 </Layout>

@@ -24,6 +24,7 @@ export const APP_ROUTER = {
   POEMS: `${APP_ROUTES.poems}`,
   POEM: (slug: string) => `${APP_ROUTES.poems}/${slug}`,
   GALLERY: `${APP_ROUTES.gallery}`,
+  GALLERY_PLACE: (slug: string) => `${APP_ROUTES.gallery}/${slug}`,
   LETTERS: `${APP_ROUTES.letters}`,
   /** La concordancia: se descarga recién cuando alguien busca una palabra */
   LETTERS_WORDS: `${APP_ROUTES.letters}/palabras.json`,

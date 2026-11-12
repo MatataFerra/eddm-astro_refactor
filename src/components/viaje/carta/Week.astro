@@ -5,7 +5,7 @@ import Prose from '@/components/share/carta/Prose.astro';
 import Signature from '@/components/share/carta/Signature.astro';
 import LetterNav from '@/components/share/carta/LetterNav.astro';
 import Photo from '@/components/share/Photo.astro';
-import DayMedia from '@/components/viaje/carta/DayMedia.astro';
+import MediaGrid from '@/components/share/carta/MediaGrid.astro';
 import ReadMark from '@/components/viaje/carta/ReadMark.astro';
 import { APP_ROUTER } from '@/lib/constants';
 import { formatDayRange, formatLongDate } from '@/lib/dates';
@@ -82,7 +82,9 @@ const dayLabel = (day: TripDay) =>
           )}
         </div>
       </div>
-      {!!day.media?.length && <DayMedia items={day.media} label={dayLabel(day)} />}
+      {!!day.media?.length && (
+        <MediaGrid items={day.media} of={`del ${dayLabel(day)}`} class="mt-10" />
+      )}
     </section>
   ))}
 

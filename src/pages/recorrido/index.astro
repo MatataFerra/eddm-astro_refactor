@@ -1,18 +1,113 @@
 ---
-import MainLayout from '@/layouts/Layout.astro';
-import type { Trip } from '@/lib/interfaces/recorrido';
+import Layout from '@/layouts/Layout.astro';
+import Masthead from '@/components/share/carta/Masthead.astro';
+import RouteMap from '@/components/recorrido/carta/RouteMap.astro';
+import RouteLegs from '@/components/recorrido/carta/RouteLegs.astro';
 import { getTrip } from '@/lib/api/get-trip';
-import RecorridoView from '@/components/recorrido/View.astro';
-import { adaptTripToParadas } from '@/lib/adapters/recorrido-adapter';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { adaptRoute } from '@/lib/adapters/route-adapter';
+import { getTripWeeks } from '@/lib/adapters/trip-adapter';
+import { APP_ROUTER } from '@/lib/constants';
+import { formatMonthRange } from '@/lib/dates';
+import type { Location } from '@/lib/interfaces/location';
+import type { Trip } from '@/lib/interfaces/recorrido';
 
 export const prerender = true;
 
-const trip = await getTrip<Trip>();
-const paradasUI = adaptTripToParadas(trip?.data);
+const [trip, tripWeeks, location] = await Promise.all([
+  getTrip<Trip>(),
+  getTripWeeks(),
+  getCurrentLocation<Location>(),
+]);
+
+const route = adaptRoute(
+  trip?.data,
+  tripWeeks.map(({ week }) => week)
+);
+const { legs, stops } = route;
+
+const number = new Intl.NumberFormat('es-AR');
+const listFormat = new Intl.ListFormat('es', { type: 'conjunction' });
+const countries = [...new Set(legs.map((leg) => leg.country))];
+const since = route.since ? formatMonthRange(route.since, null) : null;
+const mapLabel = stops.length
+  ? `Mapa del recorrido: de ${stops[0].city} a ${stops.at(-1)!.city}, pasando por ${listFormat.format(countries)}.`
+  : '';
+// Un país al que volví lleva "de nuevo" en el índice, y "otra vez" si fue una tercera
+const visits = new Map<string, number>();
+const legLinks = legs.map((leg, index) => {
+  const visit = (visits.get(leg.country) ?? 0) + 1;
+  visits.set(leg.country, visit);
+  const again = visit === 1 ? '' : visit === 2 ? ' de nuevo' : ' otra vez';
+  return { href: `#tramo-${index + 1}`, label: `${leg.country}${again}` };
+});
 ---
 
-<MainLayout title="El Recorrido | El Diario de Mati">
-  <main>
-    <RecorridoView stops={paradasUI} />
+<Layout
+  title="El recorrido | El diario de Mati"
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Masthead />
+  <main class="pb-24">
+    <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+      <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em]">
+        El recorrido
+      </h1>
+      {stops.length > 0 && (
+        <p class="mt-6 text-[21px] leading-normal text-pretty">
+          {stops.length} paradas en {route.countries} países
+          {route.distance > 0 && <>, unos {number.format(route.distance)} km</>}
+          {since && <> desde {since}</>}.
+        </p>
+      )}
+    </header>
+
+    {stops.length > 0 ? (
+      <>
+        <div class="mt-12">
+          <RouteMap {stops} label={mapLabel} current={location?.data?.name} />
+        </div>
+
+        <nav aria-label="Países" class="mx-auto mt-10 max-w-[700px] px-[22px]">
+          <ol class="flex flex-wrap gap-x-1 text-[17px] leading-relaxed">
+            {legLinks.map((link, index) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+                >
+                  {link.label}
+                </a>
+                {index < legLinks.length - 1 && <span class="text-muted">,</span>}
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <RouteLegs {legs} />
+      </>
+    ) : (
+      <p class="text-muted mx-auto mt-12 max-w-[700px] px-[22px]">
+        El recorrido no cargó. Probá de nuevo en un rato.
+      </p>
+    )}
+
+    <footer class="mx-auto mt-18 max-w-[700px] px-[22px]">
+      <p class="border-rule flex flex-wrap justify-center gap-x-8 gap-y-2 border-t pt-6 text-[17px]">
+        <a
+          href={APP_ROUTER.GALLERY}
+          class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          Las fotos, por lugar
+        </a>
+        <a
+          href={APP_ROUTER.JOURNEY}
+          class="text-muted hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          Volver al viaje
+        </a>
+      </p>
+    </footer>
   </main>
-</MainLayout>
+</Layout>

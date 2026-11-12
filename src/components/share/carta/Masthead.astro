@@ -1,24 +1,35 @@
 ---
 import { APP_ROUTER } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 const links = [
   { label: 'Cartas', href: APP_ROUTER.LETTERS },
   { label: 'El viaje', href: APP_ROUTER.JOURNEY },
+  { label: 'Recorrido', href: APP_ROUTER.TRIP },
+  { label: 'Galería', href: APP_ROUTER.GALLERY },
 ];
+
+// La sección donde estoy: /viaje/semana-3 marca "El viaje"
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
 
-<header class="mx-auto flex max-w-[700px] items-baseline justify-between gap-4 px-[22px] py-6">
+<header class="mx-auto flex max-w-[700px] flex-wrap items-baseline justify-between gap-x-6 gap-y-2 px-[22px] py-6">
   <a
     href={APP_ROUTER.HOME}
     class="font-bodoni hover:text-lamp text-lg font-medium italic no-underline transition-colors duration-200"
   >
     El diario de Mati
   </a>
-  <nav aria-label="Secciones" class="flex gap-5 text-base">
+  <nav aria-label="Secciones" class="flex flex-wrap gap-x-5 gap-y-1 text-base">
     {links.map((link) => (
       <a
         href={link.href}
-        class="text-muted hover:text-lamp no-underline transition-colors duration-200"
+        aria-current={isCurrent(link.href) ? 'page' : undefined}
+        class={cn(
+          'hover:text-lamp no-underline transition-colors duration-200',
+          isCurrent(link.href) ? 'text-ink' : 'text-muted'
+        )}
       >
         {link.label}
       </a>

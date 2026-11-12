@@ -9,11 +9,14 @@ import 'photoswipe/style.css';
 
 interface Props {
   items: NonNullable<ProcessedSection['media']>;
-  /** "16 de febrero": arma el texto alternativo cuando la foto sólo trae su nombre de archivo */
-  label: string;
+  /** "del 16 de febrero", "de Mallorca": arma el texto alternativo cuando la foto no trae uno */
+  of: string;
+  /** La grilla abre la página: su primera foto carga ya */
+  priority?: boolean;
+  class?: string;
 }
 
-const { items, label } = Astro.props;
+const { items, of, priority = false, class: className } = Astro.props;
 
 // Lo que se ve al ampliar: hasta 1920 px de ancho, nunca más grande que el original
 const LIGHTBOX_WIDTH = 1920;
@@ -23,13 +26,13 @@ const isFileName = (alt: string) =>
 
 const media = await Promise.all(
   items.map(async (item, index) => {
-    const alt = isFileName(item.alt) ? `Foto ${index + 1} del ${label}` : item.alt;
+    const alt = isFileName(item.alt) ? `Foto ${index + 1} ${of}` : item.alt;
     if (item.type === 'video') {
       // R2 no tiene póster: el navegador muestra un cuadro del medio segundo
       const isR2 = detectProvider(item.src) === 'cloudflare';
       return {
         ...item,
-        alt: isFileName(item.alt) ? `Video ${index + 1} del ${label}` : item.alt,
+        alt: isFileName(item.alt) ? `Video ${index + 1} ${of}` : item.alt,
         src: isR2 ? `${item.src}#t=0.5` : item.src,
         poster: isR2 ? undefined : item.poster,
       };
@@ -59,9 +62,14 @@ const sizes = single
 
 <div
   data-gallery
-  class={cn('mx-auto mt-10 gap-3 px-[22px]', single ? 'max-w-[700px]' : 'max-w-[1100px]', columns)}
+  class={cn(
+    'mx-auto gap-3 px-[22px]',
+    single ? 'max-w-[700px]' : 'max-w-[1100px]',
+    columns,
+    className
+  )}
 >
-  {media.map((item) =>
+  {media.map((item, index) =>
     item.type === 'video' ? (
       <video
         src={item.src}
@@ -87,6 +95,7 @@ const sizes = single
           width={item.width}
           height={item.height}
           sizes={sizes}
+          priority={priority && index === 0}
           class="h-auto w-full transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100"
         />
       </a>
@@ -97,7 +106,7 @@ const sizes = single
 <script>
   import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
-  // Una galería por día: al ampliar, las flechas recorren sólo las fotos de ese día
+  // Cada grilla es su galería: al ampliar, las flechas recorren sólo esas fotos
   const lightbox = new PhotoSwipeLightbox({
     gallery: '[data-gallery]',
     children: 'a[data-pswp-width]',

@@ -5,6 +5,7 @@ import TripNext from '@/components/viaje/carta/TripNext.astro';
 import TripPlaces from '@/components/viaje/carta/TripPlaces.astro';
 import { getCurrentLocation } from '@/lib/api/get-current-location';
 import { adaptTripBundles, getTripWeeks } from '@/lib/adapters/trip-adapter';
+import { APP_ROUTER } from '@/lib/constants';
 import { formatMonthRange } from '@/lib/dates';
 import type { Location } from '@/lib/interfaces/location';
 
@@ -44,6 +45,23 @@ const span = dated.length ? formatMonthRange(dated[0].from!, dated.at(-1)!.to) :
           ></p>
         </div>
       )}
+      <p class="text-muted mt-8 text-[17px] leading-relaxed text-pretty">
+        El viaje empezó antes y siguió después de estas semanas:{' '}
+        <a
+          href={APP_ROUTER.TRIP}
+          class="hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          el recorrido completo
+        </a>
+        , con cada lugar en el mapa, y{' '}
+        <a
+          href={APP_ROUTER.GALLERY}
+          class="hover:text-lamp decoration-rule hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+        >
+          las fotos, por lugar
+        </a>
+        .
+      </p>
     </header>
 
     {bundles.length > 0 ? (
