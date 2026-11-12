@@ -1,0 +1,11 @@
+---
+import { cn } from '@/lib/utils';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<p class={cn('font-bodoni mt-10 text-right text-3xl italic', className)}>Mati</p>
