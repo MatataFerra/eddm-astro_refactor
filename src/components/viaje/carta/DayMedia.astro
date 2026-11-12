@@ -1,0 +1,108 @@
+---
+import { getImage } from 'astro:assets';
+import Photo from '@/components/share/Photo.astro';
+import { detectProvider } from '@/lib/media/detect';
+import { resizeImage } from '@/lib/media/resize';
+import { cn } from '@/lib/utils';
+import type { ProcessedSection } from '@/lib/markdown/process';
+import 'photoswipe/style.css';
+
+interface Props {
+  items: NonNullable<ProcessedSection['media']>;
+  /** "16 de febrero": arma el texto alternativo cuando la foto sólo trae su nombre de archivo */
+  label: string;
+}
+
+const { items, label } = Astro.props;
+
+// Lo que se ve al ampliar: hasta 1920 px de ancho, nunca más grande que el original
+const LIGHTBOX_WIDTH = 1920;
+
+const isFileName = (alt: string) =>
+  !alt.trim() || /\.[a-z0-9]{2,4}$/i.test(alt) || /^IMG[_-]/i.test(alt);
+
+const media = await Promise.all(
+  items.map(async (item, index) => {
+    const alt = isFileName(item.alt) ? `Foto ${index + 1} del ${label}` : item.alt;
+    if (item.type === 'video') {
+      // R2 no tiene póster: el navegador muestra un cuadro del medio segundo
+      const isR2 = detectProvider(item.src) === 'cloudflare';
+      return {
+        ...item,
+        alt: isFileName(item.alt) ? `Video ${index + 1} del ${label}` : item.alt,
+        src: isR2 ? `${item.src}#t=0.5` : item.src,
+        poster: isR2 ? undefined : item.poster,
+      };
+    }
+
+    const width = item.width ?? 1200;
+    const height = item.height ?? 900;
+    const zoomWidth = Math.min(width, LIGHTBOX_WIDTH);
+    const zoomHeight = Math.round((height * zoomWidth) / width);
+    const zoomSrc =
+      detectProvider(item.src) === 'cloudflare'
+        ? (await getImage({ src: item.src, width: zoomWidth, height: zoomHeight, quality: 80 })).src
+        : resizeImage(item.src, zoomWidth);
+
+    return { ...item, alt, width, height, zoomSrc, zoomWidth, zoomHeight };
+  })
+);
+
+const single = media.length === 1;
+const columns = single ? '' : media.length === 2 ? 'sm:columns-2' : 'sm:columns-2 lg:columns-3';
+const sizes = single
+  ? '(min-width: 744px) 700px, 100vw'
+  : media.length === 2
+    ? '(min-width: 1144px) 540px, (min-width: 640px) 50vw, 100vw'
+    : '(min-width: 1144px) 360px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
+---
+
+<div
+  data-gallery
+  class={cn('mx-auto mt-10 gap-3 px-[22px]', single ? 'max-w-[700px]' : 'max-w-[1100px]', columns)}
+>
+  {media.map((item) =>
+    item.type === 'video' ? (
+      <video
+        src={item.src}
+        poster={item.poster}
+        aria-label={item.alt}
+        controls
+        playsinline
+        preload={item.poster ? 'none' : 'metadata'}
+        class="mb-3 max-h-[85vh] w-full break-inside-avoid"
+      />
+    ) : (
+      <a
+        href={item.zoomSrc}
+        data-pswp-width={item.zoomWidth}
+        data-pswp-height={item.zoomHeight}
+        target="_blank"
+        aria-label={`Ampliar: ${item.alt}`}
+        class="mb-3 block cursor-zoom-in overflow-hidden break-inside-avoid"
+      >
+        <Photo
+          src={item.src}
+          alt={item.alt}
+          width={item.width}
+          height={item.height}
+          sizes={sizes}
+          class="h-auto w-full transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100"
+        />
+      </a>
+    )
+  )}
+</div>
+
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+
+  // Una galería por día: al ampliar, las flechas recorren sólo las fotos de ese día
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '[data-gallery]',
+    children: 'a[data-pswp-width]',
+    pswpModule: () => import('photoswipe'),
+    bgOpacity: 0.94,
+  });
+  lightbox.init();
+</script>

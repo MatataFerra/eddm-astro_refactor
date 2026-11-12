@@ -1,18 +1,71 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import Tracker from '@/components/viaje/Tracker.astro';
-import { getContentNavigate } from '@/lib/api/get-content-navigate';
-import type { ContentNavigate } from '@/lib/interfaces/share';
-import { adaptArticlesToMeses } from '@/lib/adapters/viaje-adapter';
+import Masthead from '@/components/share/carta/Masthead.astro';
+import TripNext from '@/components/viaje/carta/TripNext.astro';
+import TripPlaces from '@/components/viaje/carta/TripPlaces.astro';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { adaptTripBundles, getTripWeeks } from '@/lib/adapters/trip-adapter';
+import { formatMonthRange } from '@/lib/dates';
+import type { Location } from '@/lib/interfaces/location';
 
 export const prerender = true;
 
-const articles = await getContentNavigate<ContentNavigate[]>('articles');
-const mesesData = adaptArticlesToMeses(articles?.data || []);
+const [tripWeeks, location] = await Promise.all([getTripWeeks(), getCurrentLocation<Location>()]);
+
+const weeks = tripWeeks.map(({ week }) => week);
+const bundles = adaptTripBundles(weeks);
+const dated = weeks.filter((week) => week.from);
+const span = dated.length ? formatMonthRange(dated[0].from!, dated.at(-1)!.to) : null;
 ---
 
-<Layout title="Un año viajando | El diario de Mati">
-  <main class="bg-ash-main min-h-screen">
-    <Tracker months={mesesData} />
+<Layout
+  title="El viaje | El diario de Mati"
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Masthead />
+  <main class="pb-24">
+    <header class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)]">
+      <h1 class="font-bodoni text-[clamp(44px,8vw,88px)] leading-[1.02] font-semibold tracking-[-0.01em]">
+        El viaje
+      </h1>
+      <p class="mt-6 text-[21px] leading-normal text-pretty">
+        Lo escribí semana a semana{span && <>, de {span}</>}: {weeks.length} cartas, agrupadas por
+        el lugar donde estaba viviendo.
+      </p>
+      {weeks.length > 0 && (
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <TripNext {weeks} />
+          <p
+            data-trip-progress
+            data-slugs={JSON.stringify(weeks.map((week) => week.slug))}
+            hidden
+            class="text-muted text-[17px]"
+          ></p>
+        </div>
+      )}
+    </header>
+
+    {bundles.length > 0 ? (
+      <TripPlaces {bundles} />
+    ) : (
+      <p class="text-muted mx-auto mt-12 max-w-[700px] px-[22px]">
+        Las cartas del viaje no cargaron. Probá de nuevo en un rato.
+      </p>
+    )}
   </main>
 </Layout>
+
+<script>
+  import { readWeeks } from '@/lib/store/viaje-store';
+
+  const progress = document.querySelector<HTMLElement>('[data-trip-progress]');
+  if (progress) {
+    const slugs: string[] = JSON.parse(progress.dataset.slugs ?? '[]');
+    readWeeks.subscribe((read) => {
+      const done = slugs.filter((slug) => read.includes(slug)).length;
+      progress.hidden = done === 0;
+      progress.textContent = `Llevás ${done} de ${slugs.length} leídas.`;
+    });
+  }
+</script>

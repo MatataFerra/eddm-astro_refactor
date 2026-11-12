@@ -1,6 +1,7 @@
 ---
 import Photo from '@/components/share/Photo.astro';
-import type { TripBundle } from '@/lib/adapters/home-adapter';
+import TripNext from '@/components/viaje/carta/TripNext.astro';
+import type { TripBundle } from '@/lib/adapters/trip-adapter';
 
 interface Props {
   bundles: TripBundle[];
@@ -9,7 +10,6 @@ interface Props {
 const { bundles } = Astro.props;
 const weeks = bundles.flatMap((bundle) => bundle.weeks);
 const total = weeks.length;
-const first = weeks[0];
 
 const monthYear = (date: string) =>
   new Intl.DateTimeFormat('es-AR', { month: 'short', year: 'numeric', timeZone: 'UTC' })
@@ -47,9 +47,9 @@ function range(bundle: TripBundle) {
           href={bundle.weeks[0].href}
           class="group grid grid-cols-[76px_minmax(0,1fr)_auto] items-center gap-4 py-2.5 no-underline"
         >
-          {bundle.cover ? (
+          {bundle.photo ? (
             <Photo
-              src={bundle.cover}
+              src={bundle.photo}
               alt=""
               width={480}
               height={480}
@@ -74,32 +74,5 @@ function range(bundle: TripBundle) {
     ))}
   </ul>
 
-  {first && (
-    <a
-      href={first.href}
-      data-trip-next
-      data-weeks={JSON.stringify(weeks)}
-      class="border-ink hover:bg-ink hover:text-paper mt-6.5 inline-flex min-h-12 items-center border px-5.5 text-[17px] no-underline transition-colors duration-200 active:scale-95"
-    >
-      Empezá por el prólogo
-    </a>
-  )}
+  <TripNext {weeks} class="mt-6.5" />
 </section>
-
-<script>
-  import { readWeeks } from '@/lib/store/viaje-store';
-  import type { TripWeek } from '@/lib/adapters/home-adapter';
-
-  // Si ya leíste alguna semana, el botón te lleva a la primera que te falta
-  const button = document.querySelector<HTMLAnchorElement>('[data-trip-next]');
-  if (button) {
-    const weeks: TripWeek[] = JSON.parse(button.dataset.weeks ?? '[]');
-    readWeeks.subscribe((read) => {
-      if (!read.length) return;
-      const next = weeks.find((week) => !read.includes(week.slug));
-      if (!next) return;
-      button.href = next.href;
-      button.textContent = `Seguí con ${next.title.toLowerCase()}`;
-    });
-  }
-</script>
