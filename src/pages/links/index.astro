@@ -1,99 +1,103 @@
 ---
-import MainLayout from '@/layouts/Layout.astro';
-import { getLastArticle } from '@/lib/api/get-last-article';
-import { getLastEntry } from '@/lib/api/get-last-entry';
+import Layout from '@/layouts/Layout.astro';
+import Dateline from '@/components/share/carta/Dateline.astro';
+import Signature from '@/components/share/carta/Signature.astro';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
+import { adaptLetters, LETTER_KIND_PHRASE } from '@/lib/adapters/home-adapter';
+import { adaptTripWeek, sortTripEntries } from '@/lib/adapters/trip-adapter';
 import { APP_ROUTER } from '@/lib/constants';
-import type { Article } from '@/lib/interfaces/articles';
-import type { Category } from '@/lib/interfaces/share';
+import { formatLongDate } from '@/lib/dates';
+import type { ContentNavigate } from '@/lib/interfaces/share';
+import type { Location } from '@/lib/interfaces/location';
 
-type Response = (Pick<Article, 'slug' | 'title'> | null) & {
-  category: { name: Category['name'] | null } | null;
-  href: string;
-};
-
+// El link de la bio: siempre muestra lo último, así que se arma en cada visita
 export const prerender = false;
 
-const lastArticle = await getLastArticle<Response>();
-const lastEntry = await getLastEntry<Response>();
+type Link = { href: string; title: string; note: string; date?: string };
 
-const links = [
-  {
-    title: lastEntry?.data.title ? `Último relato: ${lastEntry.data.title}` : 'Último relato',
-    subtitle: 'Última nota subida',
-    url: lastEntry?.data.href ?? APP_ROUTER.JOURNEY,
-    highlight: true,
+const [tales, poems, further, articles, location] = await Promise.all([
+  getContentNavigate<ContentNavigate[]>('tales'),
+  getContentNavigate<ContentNavigate[]>('poems'),
+  getContentNavigate<ContentNavigate[]>('further'),
+  getContentNavigate<ContentNavigate[]>('articles'),
+  getCurrentLocation<Location>(),
+]);
+
+const place = location?.data ?? null;
+const timeZone = place?.metadata?.timeZone;
+const [latest] = adaptLetters({
+  tales: tales?.data ?? [],
+  poems: poems?.data ?? [],
+  further: further?.data ?? [],
+});
+const lastWeekEntry = sortTripEntries(articles?.data ?? []).at(-1);
+const lastWeek = lastWeekEntry ? adaptTripWeek(lastWeekEntry, []) : null;
+
+const links: Link[] = [
+  latest && {
+    href: latest.href,
+    title: latest.title,
+    note: `Lo último que escribí, ${LETTER_KIND_PHRASE[latest.kind]}`,
+    date: formatLongDate(latest.createdAt, 'America/Argentina/Buenos_Aires'),
+  },
+  lastWeek && {
+    href: lastWeek.href,
+    title: lastWeek.title,
+    note: 'La última semana del viaje',
   },
   {
-    title: 'Última semana publicada',
-    subtitle: 'Durante mi viaje entre 2024 y 2025 publiqué todos los días.',
-    url: APP_ROUTER.ARTICLE(lastArticle?.data.slug ?? APP_ROUTER.JOURNEY),
-    highlight: false,
-  },
-  {
+    href: APP_ROUTER.TALE('el-origen-del-miedo'),
     title: 'El origen del miedo',
-    subtitle: 'Relato que da una idea cómo se inició el miedo en el hombre',
-    url: APP_ROUTER.TALE('el-origen-del-miedo'),
-    highlight: false,
+    note: 'Un relato sobre cómo empezó el miedo en el hombre',
   },
-];
+  {
+    href: APP_ROUTER.LETTERS,
+    title: 'Todas las cartas',
+    note: 'Relatos, poemas e historias, de lo más nuevo a lo más viejo',
+  },
+].filter((link): link is Link => Boolean(link));
 ---
 
-<MainLayout title="Enlaces | El Diario de Mati">
-  <main class="mx-auto flex max-w-md flex-col justify-between px-6 pt-16 pb-4 text-center">
-    <header class="flex flex-col items-center gap-3">
-      <div
-        class="bg-ash-main relative h-16 w-16 overflow-hidden rounded-full border border-white/10 p-1"
-      >
-        <div
-          class="from-orange-main absolute inset-0 h-full w-full rounded-full bg-linear-to-tr to-transparent opacity-40"
-        >
-        </div>
-        <span
-          class="font-fraunces relative flex h-full w-full items-center justify-center text-xl font-bold text-white"
-          >M</span
-        >
-      </div>
+<Layout title="Enlaces | El diario de Mati" variant="carta" {timeZone}>
+  <main class="mx-auto max-w-[700px] px-[22px] pt-[clamp(32px,7vh,72px)] pb-24">
+    <Dateline place={place?.name} date={new Date()} {timeZone} />
 
-      <div class="space-y-1">
-        <h1 class="font-fraunces text-2xl font-semibold tracking-tight text-white">
-          el diario de mati
-        </h1>
-        <div class="flex items-center justify-center gap-2">
-          <span class="bg-green-soft h-1.5 w-1.5 animate-pulse rounded-full"></span>
-          <p class="font-dm text-ash-soft text-[10px] tracking-widest uppercase">
-            bitácora digital // en vivo
-          </p>
-        </div>
-      </div>
+    <header class="mt-12">
+      <h1 class="font-bodoni text-[clamp(44px,8vw,72px)] leading-[1.02] font-semibold tracking-[-0.01em] italic">
+        <a
+          href={APP_ROUTER.HOME}
+          class="hover:text-lamp no-underline transition-colors duration-200"
+        >
+          El diario de Mati
+        </a>
+      </h1>
+      <p class="text-muted mt-3 text-[19px] text-pretty">
+        Relatos, poemas y un año de viaje escrito semana a semana.
+      </p>
     </header>
 
-    <section class="my-auto mt-12 flex flex-col gap-4 py-8">
-      {
-        links.map((link) => (
+    <ul class="border-rule mt-10 border-t">
+      {links.map((link) => (
+        <li class="border-rule border-b">
           <a
-            href={link.url}
-            class={`group relative flex flex-col items-start rounded-xl border p-4 text-left backdrop-blur-md transition-all duration-300 hover:scale-[1.01] ${
-              link.highlight
-                ? 'border-orange-main/30 bg-orange-main/3 hover:border-orange-main/60 hover:bg-orange-main/6'
-                : 'border-white/5 bg-white/2 hover:border-white/20 hover:bg-white/4'
-            }`}
+            href={link.href}
+            class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4.5 gap-y-1 py-4 no-underline"
           >
-            {link.highlight && (
-              <span class="font-dm text-orange-main absolute top-3 right-4 text-[8px] font-medium tracking-widest uppercase">
-                Reciente
-              </span>
-            )}
-
-            <span
-              class={`font-fraunces text-base font-medium transition-colors ${link.highlight ? 'text-orange-main' : 'group-hover:text-green-soft text-white'}`}
-            >
+            <span class="group-hover:text-lamp text-[21px] leading-[1.3] transition-colors duration-200">
               {link.title}
             </span>
-
-            <span class="font-dm text-ash-soft mt-0.5 text-xs">{link.subtitle}</span>
+            {link.date && (
+              <span class="text-muted col-start-2 row-start-1 text-right text-[15px] tabular-nums">
+                {link.date}
+              </span>
+            )}
+            <span class="text-muted col-start-1 text-[15px]">{link.note}</span>
           </a>
-        ))
-      }
-    </section>
+        </li>
+      ))}
+    </ul>
+
+    <Signature />
   </main>
-</MainLayout>
+</Layout>

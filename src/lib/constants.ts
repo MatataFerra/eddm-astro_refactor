@@ -53,8 +53,6 @@ export const EXTERNAL_API_ENDPOINTS = {
   // Misc
   STATS: '/stats',
   TRIP: '/trip',
-  LAST_ARTICLE: '/articles/last',
-  LAST_ENTRY: '/entries/last',
   LOCATION: '/location',
   GALLERY: '/gallery',
   GALLERY_PLACE: (slug: string) => `/gallery/${slug}`,
