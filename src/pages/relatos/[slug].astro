@@ -1,60 +1,63 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import Reading from '@/components/share/carta/Reading.astro';
+import { getContentNavigate } from '@/lib/api/get-content-navigate';
+import { getCurrentLocation } from '@/lib/api/get-current-location';
 import { getArticleContentFromNotion } from '@/lib/api/get-notion-content';
+import { withNeighbors, type Neighbor } from '@/lib/adapters/reading-adapter';
+import { APP_ROUTER } from '@/lib/constants';
+import { processDiario } from '@/lib/markdown/process';
 import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
-
-import { getContentNavigate } from '@/lib/api/get-content-navigate';
-import Hero from '@/components/relatos/entry/Hero.astro';
-import Content from '@/components/relatos/entry/Content.astro';
+import type { Location } from '@/lib/interfaces/location';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const response = await getContentNavigate<ContentNavigate[]>('tales');
-  const tales = response?.data || [];
 
-  const sortedTales = [...tales].sort((a, b) => (a.order || 0) - (b.order || 0));
+  return withNeighbors(response?.data ?? [], APP_ROUTER.TALE).map(({ slug, prev, next }) => ({
+    params: { slug },
+    props: { prev, next },
+  }));
+}
 
-  return sortedTales.map((tale, index) => {
-    const nextRelato = sortedTales[index + 1]
-      ? { title: sortedTales[index + 1].title, slug: sortedTales[index + 1].slug }
-      : null;
-
-    const prevRelato = sortedTales[index - 1]
-      ? { title: sortedTales[index - 1].title, slug: sortedTales[index - 1].slug }
-      : null;
-
-    return {
-      params: { slug: tale.slug },
-      props: {
-        nav: { nextRelato, prevRelato },
-      },
-    };
-  });
+interface Props {
+  prev: Neighbor;
+  next: Neighbor;
 }
 
 const { slug } = Astro.params;
-const { nav } = Astro.props;
+const { prev, next } = Astro.props;
 
-const response = await getArticleContentFromNotion<ContentBySlug<Article>>({
-  query: slug,
-});
+const [response, location] = await Promise.all([
+  getArticleContentFromNotion<ContentBySlug<Article>>({ query: slug }),
+  getCurrentLocation<Location>(),
+]);
 
 if (!response || !response.data) return Astro.redirect('/404');
 
-const tale = response.data;
+const entry = response.data;
+const sections = await processDiario(entry.md_content, entry.type);
+const extra = {
+  epigraph: entry.summary,
+  cover: entry.header?.url,
+  verse: entry.type === 'poem',
+};
 ---
 
-<Layout title={tale.title}>
-  <Hero {tale} />
-  <Content
-    relato={{
-      content: tale.md_content,
-      description: tale.description,
-      summary: tale.summary ?? '',
-      type: tale.type,
-    }}
-    nextRelato={nav?.nextRelato}
+<Layout
+  title={`${entry.title} | El diario de Mati`}
+  variant="carta"
+  timeZone={location?.data?.metadata?.timeZone}
+>
+  <Reading
+    kind="Relato"
+    title={entry.title}
+    createdAt={entry.createdAt}
+    {sections}
+    {prev}
+    {next}
+    {...extra}
   />
 </Layout>
