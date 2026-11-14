@@ -12,7 +12,6 @@ type FetchOptions = {
   method?: Methods;
   params?: Record<string, ParamValue>;
   fields?: Fields<Article>;
-  isExternalUrl?: boolean;
   headers?: Record<string, string>;
 };
 
@@ -57,7 +56,7 @@ const formatParams = (params: Record<string, ParamValue>): Record<string, string
 };
 
 async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResponse<T>> {
-  const { params = {}, method = 'GET', isExternalUrl = false, fields, headers } = opts;
+  const { params = {}, method = 'GET', fields, headers } = opts;
 
   const formattedFields = formatFields(fields);
   const mergedParams: Record<string, ParamValue> = {
@@ -66,17 +65,19 @@ async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResp
   };
 
   const qs = new URLSearchParams(formatParams(mergedParams)).toString();
-  const base = isExternalUrl ? String(url) : `${import.meta.env.API_URL}/api${url}`;
+  // Siempre contra nuestro backend: el token nunca sale hacia otro host
+  const base = `${import.meta.env.API_URL}/api${url}`;
   const fullUrl = qs ? `${base}${base.includes('?') ? '&' : '?'}${qs}` : base;
 
   const res = await fetch(fullUrl, {
     method,
     headers: {
-      Authorization: getAuthToken(),
       'Content-Type': 'application/json',
       'Cache-Control': 's-maxage=3600, stale-while-revalidate=600',
       'x-debug-req-id': `ID-From_Astro-${Math.random().toString(36).substring(2, 15)}`,
       ...headers,
+      // Al final, para que ninguna cabecera de quien llama lo pise
+      Authorization: getAuthToken(),
     },
   });
 
