@@ -1,4 +1,5 @@
 ---
+import { createHash } from 'node:crypto';
 import { buildRouteMap } from '@/lib/route-map';
 import { placeKey } from '@/lib/adapters/trip-adapter';
 import type { RouteStop } from '@/lib/adapters/route-adapter';
@@ -50,6 +51,16 @@ const labels: Label[] = !first
             ]
           : []),
       ];
+
+// La CSP no deja pasar atributos `style` sueltos: se autoriza cada posición por su hash
+const positionOf = (point: Label['point']) => `left: ${point.x}%; top: ${point.y}%`;
+if (labels.length) {
+  Astro.csp?.insertStyleResource({ resource: "'unsafe-hashes'", kind: 'attribute' });
+  for (const { point } of labels) {
+    const hash = createHash('sha256').update(positionOf(point)).digest('base64');
+    Astro.csp?.insertStyleHash({ hash: `sha256-${hash}`, kind: 'attribute' });
+  }
+}
 ---
 
 <figure class="relative mx-auto max-w-[1100px] md:px-[22px]">
@@ -79,7 +90,7 @@ const labels: Label[] = !first
           'font-bodoni bg-paper/80 absolute px-1 text-[13px] whitespace-nowrap italic sm:text-[15px]',
           position,
         ]}
-        style={`left: ${point.x}%; top: ${point.y}%`}
+        style={positionOf(point)}
       >
         {text}
       </span>
