@@ -1,0 +1,58 @@
+---
+import Prose from '@/components/share/carta/Prose.astro';
+import Signature from '@/components/share/carta/Signature.astro';
+import { LETTER_KIND_PHRASE, type Letter } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  letter: Letter;
+  /** HTML del texto completo (marked) */
+  html: string;
+  /** Si el texto es largo, se muestra el comienzo y se sigue en su página */
+  folded: boolean;
+  postscript?: string;
+}
+
+const { letter, html, folded, postscript } = Astro.props;
+---
+
+<article class="mx-auto max-w-[700px] px-[22px]" aria-labelledby="ultima-carta">
+  <p class="mt-[clamp(48px,9vh,88px)] mb-4.5 italic">
+    Hola. Te mando lo último que escribí, {LETTER_KIND_PHRASE[letter.kind]}:
+  </p>
+  <h2
+    id="ultima-carta"
+    class="font-bodoni mb-5.5 text-[clamp(30px,4.2vw,40px)] leading-[1.1] font-semibold"
+  >
+    <a href={letter.href} class="hover:text-lamp no-underline transition-colors duration-200">
+      {letter.title}
+    </a>
+  </h2>
+
+  <div class:list={['relative', folded && 'max-h-[30em] overflow-hidden']}>
+    <Prose verse={letter.kind === 'poema'}>
+      <Fragment set:html={html} />
+    </Prose>
+    {folded && (
+      <div
+        aria-hidden="true"
+        class="to-paper pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent"
+      />
+    )}
+  </div>
+  {folded && (
+    <a
+      href={letter.href}
+      class="text-lamp decoration-lamp/40 hover:decoration-lamp mt-2 inline-block text-[17px] underline underline-offset-[5px] transition-colors duration-200"
+    >
+      Seguir leyendo «{letter.title}»
+    </a>
+  )}
+
+  <Signature />
+
+  {postscript && (
+    <p class="border-rule text-muted mt-10 border-t pt-5 text-[17px]">
+      <b class="text-ink font-medium">P. D.:</b> {postscript}
+    </p>
+  )}
+</article>

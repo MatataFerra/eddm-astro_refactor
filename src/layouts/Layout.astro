@@ -1,98 +1,73 @@
 ---
+import { createHash } from 'node:crypto';
 import '../styles/global.css';
-import Nav from '@/components/share/Nav.astro';
-import frauncesFont from '@/assets/fonts/fraunces.woff2';
-import dmSansFont from '@/assets/fonts/dm-sans.woff2';
+import newsreaderFont from '@/assets/fonts/newsreader.woff2';
+import bodoniItalicFont from '@/assets/fonts/bodoni-moda-italic.woff2';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+import lightScript from '@/scripts/light.js?raw';
 
 interface Props {
   title: string;
+  /** Zona horaria del lugar desde donde escribo (IANA). Sin ella, la luz sigue la hora del visitante. */
+  timeZone?: string;
 }
 
-const { title } = Astro.props;
+const { title, timeZone } = Astro.props;
+const fonts = [newsreaderFont, bodoniItalicFont];
+
+// Astro no calcula el hash de los scripts `is:inline`: sin esto la CSP no deja correr la luz
+Astro.csp?.insertScriptHash(`sha256-${createHash('sha256').update(lightScript).digest('base64')}`);
+
+// El panel del cielo es sólo para desarrollo: en el build esta rama desaparece y el import también
+const isDev = import.meta.env.NODE_ENV === 'development';
+const SkyControls = isDev ? (await import('@/components/dev/SkyControls.astro')).default : null;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" data-tz={timeZone}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="preload" href={frauncesFont} as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href={dmSansFont} as="font" type="font/woff2" crossorigin="anonymous" />
+    <meta name="theme-color" content="#f4f4f1" />
+    <script is:inline set:html={lightScript} />
+    {fonts.map((font) => (
+      <link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
+    ))}
 
+    <!-- La M de la firma. El SVG pasa a la luz de noche con el modo oscuro del sistema -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <Analytics />
     <SpeedInsights />
   </head>
-  <body id="body-root">
+  <body>
     <div id="page-loader"></div>
-    <Nav variant="main" data-navbar />
     <slot />
+    {SkyControls && <SkyControls />}
   </body>
 </html>
 
 <style is:global>
-  html {
-    visibility: visible;
-  }
-  .reveal {
-    opacity: 0;
-    transform: translateY(12px);
-    transition:
-      opacity 0.7s ease,
-      transform 0.7s ease;
-    transition-delay: var(--delay, 0s);
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
   #page-loader {
     position: fixed;
     top: 0;
     left: 0;
     width: 0%;
     height: 3px;
-    background-color: var(--color-orange-main);
+    background-color: var(--color-lamp);
     z-index: 9999;
     transition:
       width 0.3s ease,
       opacity 0.3s ease;
     opacity: 0;
     pointer-events: none;
-    box-shadow: 0 0 10px var(--color-orange-glow);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
   }
 </style>
 
 <script>
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      }
-    },
-    { threshold: 0, rootMargin: '0px' }
-  );
-
-  document.querySelectorAll('.reveal').forEach((el) => {
-    revealObserver.observe(el);
-  });
-
   // --- PAGE LOADER (solo /viaje/[slug]) ---
   function showLoader() {
     const loader = document.getElementById('page-loader');

@@ -1,0 +1,87 @@
+---
+import Photo from '@/components/share/Photo.astro';
+import { formatDayRange, formatMonthRange } from '@/lib/dates';
+import type { TripBundle } from '@/lib/adapters/trip-adapter';
+
+interface Props {
+  bundles: TripBundle[];
+}
+
+const { bundles } = Astro.props;
+const listFormat = new Intl.ListFormat('es', { type: 'conjunction' });
+
+const count = (n: number) => (n === 1 ? '1 semana' : `${n} semanas`);
+---
+
+{bundles.map((bundle, index) => (
+  <section
+    aria-labelledby={`lugar-${index}`}
+    class="mx-auto mt-[clamp(72px,12vh,128px)] grid max-w-[1100px] gap-8 px-[22px] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
+  >
+    {bundle.photo ? (
+      <div class="lg:sticky lg:top-8 lg:self-start">
+        <Photo
+          src={bundle.photo}
+          alt={bundle.place}
+          width={1440}
+          height={1800}
+          widths={[480, 720, 1080, 1440]}
+          sizes="(min-width: 1144px) 440px, (min-width: 1024px) 40vw, 100vw"
+          class="aspect-[3/2] w-full object-cover lg:aspect-[4/5]"
+        />
+      </div>
+    ) : (
+      <span class="hidden lg:block" />
+    )}
+
+    <div>
+      <h2
+        id={`lugar-${index}`}
+        class="font-bodoni text-[clamp(36px,5.4vw,60px)] leading-[1.02] font-semibold tracking-[-0.01em] text-balance"
+      >
+        {bundle.place}
+      </h2>
+      <p class="text-muted mt-3 text-[17px]">
+        {bundle.from ? formatMonthRange(bundle.from, bundle.to) : 'Lo que conviene saber antes'}
+        {bundle.weeks.length > 1 && <>, {count(bundle.weeks.length)}</>}
+      </p>
+      {bundle.outings.length > 0 && (
+        <p class="text-muted mt-4 text-[17px] text-pretty italic">
+          De paseo por {listFormat.format(bundle.outings)}.
+        </p>
+      )}
+
+      <ol class="border-rule mt-7 border-t">
+        {bundle.weeks.map((week) => (
+          <li class="border-rule border-b">
+            <a
+              href={week.href}
+              class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-3 no-underline"
+            >
+              <span class="font-bodoni group-hover:text-lamp text-[22px] leading-tight transition-colors duration-200">
+                {week.title}
+                <span data-read-week={week.slug} hidden class="text-lamp ml-1.5 text-[17px] italic">
+                  <span aria-hidden="true">✓</span> leída
+                </span>
+              </span>
+              {week.from && (
+                <span class="text-muted text-[15px] whitespace-nowrap tabular-nums">
+                  {formatDayRange(week.from, week.to)}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+))}
+
+<script>
+  import { readWeeks } from '@/lib/store/viaje-store';
+
+  const marks = document.querySelectorAll<HTMLElement>('[data-read-week]');
+  readWeeks.subscribe((read) => {
+    for (const mark of marks) mark.hidden = !read.includes(mark.dataset.readWeek ?? '');
+  });
+</script>

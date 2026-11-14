@@ -1,18 +1,56 @@
 // @ts-check
-import { defineConfig, logHandlers } from 'astro/config';
+import { defineConfig, envField, logHandlers } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import svelte from '@astrojs/svelte';
 import vercel from '@astrojs/vercel';
+
+// El bucket público de R2 (eddm-bucket). Vercel Image sólo acepta este host: con un comodín
+// cualquiera podría pasar fotos de su propio bucket por el optimizador y gastar nuestra cuota.
+const R2_HOST = 'pub-9dc7984a54eb44a383dc44cec5215bce.r2.dev';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  // Se leen al ejecutar, del entorno de Vercel: no quedan escritos en el bundle y rotarlos no pide
+  // un build nuevo. Importarlos desde código del navegador hace fallar el build.
+  env: {
+    schema: {
+      API_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: 'http://localhost:5500',
+      }),
+      FRONTEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      LOG_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },
   logger: logHandlers.console({ level: 'debug' }),
-  integrations: [svelte()],
+  // El markdown pasa por marked, no por el de Astro: Shiki (estilos inline) no hace falta
+  markdown: { syntaxHighlight: false },
+  // Astro calcula el hash de cada script y estilo inline y los declara en un <meta>: el HTML de
+  // Notion se renderiza tal cual, así que un <script> que se colara ahí no corre.
+  security: {
+    csp: {
+      directives: ["base-uri 'self'", "object-src 'none'", "form-action 'self'"],
+    },
+  },
+  // Las fotos de R2 pasan por Vercel Image; Cloudinary e ImageKit se achican con sus propios
+  // parámetros (src/lib/media/resize.ts) para no gastar cuota de Vercel en lo que ya hacen gratis.
+  image: {
+    remotePatterns: [{ protocol: 'https', hostname: R2_HOST }],
+  },
   adapter: vercel({
+    imageService: true,
+    // Pocos anchos y caché larga: cada ancho distinto es una transformación que cuenta en la cuota.
+    // Tienen que coincidir con los de Photo.astro.
+    imagesConfig: {
+      sizes: [480, 720, 1080, 1440, 1920],
+      remotePatterns: [{ protocol: 'https', hostname: R2_HOST }],
+      formats: ['image/avif', 'image/webp'],
+      minimumCacheTTL: 60 * 60 * 24 * 31,
+    },
     webAnalytics: {
       enabled: true,
     },

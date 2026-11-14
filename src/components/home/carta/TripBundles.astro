@@ -1,0 +1,78 @@
+---
+import Photo from '@/components/share/Photo.astro';
+import TripNext from '@/components/viaje/carta/TripNext.astro';
+import type { TripBundle } from '@/lib/adapters/trip-adapter';
+
+interface Props {
+  bundles: TripBundle[];
+}
+
+const { bundles } = Astro.props;
+const weeks = bundles.flatMap((bundle) => bundle.weeks);
+const total = weeks.length;
+
+const monthYear = (date: string) =>
+  new Intl.DateTimeFormat('es-AR', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(`${date}T00:00:00Z`))
+    .replace('.', '');
+
+function range(bundle: TripBundle) {
+  if (!bundle.from) return 'Prólogo';
+  const from = monthYear(bundle.from);
+  const to = bundle.to ? monthYear(bundle.to) : from;
+  return from === to ? from : `${from} – ${to}`;
+}
+---
+
+<section
+  id="viaje"
+  class="mx-auto mt-[clamp(80px,14vh,140px)] max-w-[700px] px-[22px] pb-24"
+  aria-labelledby="viaje-titulo"
+>
+  <h2
+    id="viaje-titulo"
+    class="font-bodoni mb-2 text-[clamp(30px,4.6vw,44px)] leading-tight font-normal italic"
+  >
+    El viaje, en {total} cartas
+  </h2>
+  <p class="text-muted mb-6.5 text-[17px]">
+    Un año de viaje escrito semana a semana. Así quedaron, agrupadas por el lugar desde donde las
+    mandé.
+  </p>
+
+  <ul>
+    {bundles.map((bundle) => (
+      <li class="border-rule border-b">
+        <a
+          href={bundle.weeks[0].href}
+          class="group grid grid-cols-[76px_minmax(0,1fr)_auto] items-center gap-4 py-2.5 no-underline"
+        >
+          {bundle.photo ? (
+            <Photo
+              src={bundle.photo}
+              alt=""
+              width={480}
+              height={480}
+              widths={[160, 480]}
+              sizes="76px"
+              class="size-19 object-cover"
+            />
+          ) : (
+            <span aria-hidden="true" class="border-rule size-19 border" />
+          )}
+          <span>
+            <span class="font-bodoni group-hover:text-lamp block text-2xl leading-[1.15] transition-colors duration-200">
+              {bundle.place}
+            </span>
+            <span class="text-muted block text-[15px]">{range(bundle)}</span>
+          </span>
+          <span class="text-muted text-[15px] whitespace-nowrap tabular-nums">
+            {bundle.weeks.length === 1 ? '1 carta' : `${bundle.weeks.length} cartas`}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <TripNext {weeks} class="mt-6.5" />
+</section>

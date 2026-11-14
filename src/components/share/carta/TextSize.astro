@@ -1,0 +1,69 @@
+---
+// Dos botones para agrandar o achicar la letra del texto. El tamaño elegido queda guardado en el
+// navegador y el script del <head> lo aplica antes de pintar, así la página no salta al abrir.
+import { cn } from '@/lib/utils';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const button =
+  'border-rule hover:border-lamp hover:text-lamp grid size-11 place-items-center border font-newsreader leading-none transition-colors duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-40';
+---
+
+<div role="group" aria-label="Tamaño de la letra" class={cn('flex items-center gap-2', className)}>
+  <button
+    type="button"
+    data-text-size="-1"
+    aria-label="Achicar la letra"
+    class={cn(button, 'text-[15px]')}
+  >
+    A
+  </button>
+  <button
+    type="button"
+    data-text-size="1"
+    aria-label="Agrandar la letra"
+    class={cn(button, 'text-[22px]')}
+  >
+    A
+  </button>
+</div>
+
+<script>
+  import { TEXT_SCALE_KEY, TEXT_SCALES } from '@/lib/text-scale';
+
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-text-size]');
+
+  const saved = Number(getComputedStyle(root).getPropertyValue('--text-scale')) || 1;
+  let index = TEXT_SCALES.reduce(
+    (best, scale, i) => (Math.abs(scale - saved) < Math.abs(TEXT_SCALES[best] - saved) ? i : best),
+    0
+  );
+
+  function render() {
+    for (const button of buttons) {
+      const step = Number(button.dataset.textSize);
+      button.disabled = !TEXT_SCALES[index + step];
+    }
+  }
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const next = index + Number(button.dataset.textSize);
+      if (!TEXT_SCALES[next]) return;
+      index = next;
+      root.style.setProperty('--text-scale', String(TEXT_SCALES[index]));
+      try {
+        localStorage.setItem(TEXT_SCALE_KEY, String(TEXT_SCALES[index]));
+      } catch {
+        // Sin almacenamiento el tamaño vale sólo para esta página
+      }
+      render();
+    });
+  }
+
+  render();
+</script>

@@ -1,4 +1,4 @@
-const API_KEY = import.meta.env.FRONTEND_API_KEY;
+import { FRONTEND_API_KEY as API_KEY } from 'astro:env/server';
 
 export function getAuthToken(): string {
   if (!API_KEY) {

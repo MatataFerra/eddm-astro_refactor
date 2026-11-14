@@ -1,6 +1,9 @@
 import { marked } from 'marked';
 import { getMediaSize } from '@/lib/media/dimensions';
 import { getVideoPoster } from '@/lib/media/poster';
+import { mapLimited } from '@/lib/async';
+
+const MEDIA_CONCURRENCY = 6;
 
 export type RelatoType = 'prose' | 'poem';
 
@@ -28,6 +31,18 @@ function preparePoem(text: string): string {
     .join('\n');
 }
 
+/** Cada verso en su propio renglón (`.verso`), para que el que no entra siga con sangría */
+function wrapVerses(html: string): string {
+  return html.replace(
+    /<p>([\s\S]*?)<\/p>/g,
+    (_, inner: string) =>
+      `<p>${inner
+        .split(/<br\s*\/?>\n?/)
+        .map((line) => `<span class="verso">${line}</span>`)
+        .join('')}</p>`
+  );
+}
+
 export async function processDiario(
   content: string | undefined,
   type: RelatoType = 'prose'
@@ -47,39 +62,38 @@ export async function processDiario(
       const mediaRegex = /(?:!\[(.*?)\]|\[(.*?)\])\((https?:\/\/.*?)\)/g;
       const mediaMatches = [...section.matchAll(mediaRegex)];
 
-      const media = await Promise.all(
-        mediaMatches.map(async (m) => {
-          const altOrName = m[1] || m[2] || '';
-          const url = m[3].trim();
+      // Cada foto se mide con un pedido remoto: pocas a la vez
+      const media = await mapLimited(mediaMatches, MEDIA_CONCURRENCY, async (m) => {
+        const altOrName = m[1] || m[2] || '';
+        const url = m[3].trim();
 
-          const isVideo = /\.(webm|mp4|mov|ogg|m4v)($|\?)/i.test(url);
+        const isVideo = /\.(webm|mp4|mov|ogg|m4v)($|\?)/i.test(url);
 
-          let dimensions = {
-            width: 1200,
-            height: 900,
-          };
+        let dimensions = {
+          width: 1200,
+          height: 900,
+        };
 
-          if (!isVideo) {
-            const response = await getMediaSize(url);
+        if (!isVideo) {
+          const response = await getMediaSize(url);
 
-            if (response) {
-              dimensions = response;
-            }
+          if (response) {
+            dimensions = response;
           }
+        }
 
-          const mediaType: 'image' | 'video' = isVideo ? 'video' : 'image';
+        const mediaType: 'image' | 'video' = isVideo ? 'video' : 'image';
 
-          return {
-            type: mediaType,
-            alt: altOrName,
-            src: url,
+        return {
+          type: mediaType,
+          alt: altOrName,
+          src: url,
 
-            poster: isVideo ? getVideoPoster(url) : undefined,
+          poster: isVideo ? getVideoPoster(url) : undefined,
 
-            ...dimensions,
-          };
-        })
-      );
+          ...dimensions,
+        };
+      });
 
       const rawText = section
         .replace(/^###\s+.*$/m, '')
@@ -88,9 +102,9 @@ export async function processDiario(
 
       return {
         title,
-        htmlContent: marked.parse(isPoem ? preparePoem(rawText) : rawText, {
-          breaks: isPoem,
-        }),
+        htmlContent: isPoem
+          ? Promise.resolve(marked.parse(preparePoem(rawText), { breaks: true })).then(wrapVerses)
+          : marked.parse(rawText),
         media,
       };
     })

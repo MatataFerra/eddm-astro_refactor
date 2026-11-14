@@ -1,0 +1,35 @@
+---
+import LetterList from '@/components/share/carta/LetterList.astro';
+import { APP_ROUTER } from '@/lib/constants';
+import type { Letter } from '@/lib/adapters/home-adapter';
+
+interface Props {
+  letters: Letter[];
+}
+
+const { letters } = Astro.props;
+---
+
+<section
+  id="cartas"
+  class="mx-auto mt-[clamp(80px,14vh,140px)] max-w-[700px] scroll-mt-6 px-[22px]"
+  aria-labelledby="cartas-titulo"
+>
+  <h2
+    id="cartas-titulo"
+    class="font-bodoni mb-2 text-[clamp(30px,4.6vw,44px)] leading-tight font-normal italic"
+  >
+    Cartas anteriores
+  </h2>
+  <p class="text-muted mb-6.5 text-[17px]">
+    Todo lo que escribí, de lo más nuevo a lo más viejo. También podés{' '}
+    <a
+      href={`${APP_ROUTER.LETTERS}#buscar`}
+      class="text-lamp decoration-lamp/40 hover:decoration-lamp underline underline-offset-4 transition-colors duration-200"
+    >
+      buscar por palabra
+    </a>
+    .
+  </p>
+  <LetterList {letters} />
+</section>

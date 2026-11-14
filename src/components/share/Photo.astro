@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import { detectProvider } from '@/lib/media/detect';
+import { resizeImage, resizeSrcset } from '@/lib/media/resize';
+
+interface Props {
+  src: string;
+  alt: string;
+  /** Tamaño real de la foto (o su proporción): reserva el lugar y evita saltos de layout. */
+  width: number;
+  height: number;
+  /** Ancho con el que se ve en pantalla, como en el atributo `sizes`. */
+  sizes?: string;
+  widths?: number[];
+  /** La foto principal de la página: carga ya y con prioridad alta. */
+  priority?: boolean;
+  class?: string;
+}
+
+// Los mismos anchos que `imagesConfig.sizes` en astro.config.mjs
+const DEFAULT_WIDTHS = [480, 720, 1080, 1440, 1920];
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  sizes = '100vw',
+  widths = DEFAULT_WIDTHS,
+  priority = false,
+  class: className,
+} = Astro.props;
+
+const fit = widths.filter((w) => w <= width);
+const candidates = fit.length ? fit : [width];
+const largest = candidates[candidates.length - 1];
+const loading = priority ? 'eager' : 'lazy';
+const fetchpriority = priority ? 'high' : undefined;
+---
+
+{detectProvider(src) === 'cloudflare' ? (
+  <Image
+    {src}
+    {alt}
+    {width}
+    {height}
+    widths={candidates}
+    {sizes}
+    quality={75}
+    {loading}
+    {fetchpriority}
+    class={className}
+  />
+) : (
+  <img
+    src={resizeImage(src, largest)}
+    srcset={resizeSrcset(src, candidates)}
+    sizes={resizeSrcset(src, candidates) ? sizes : undefined}
+    {alt}
+    {width}
+    {height}
+    {loading}
+    {fetchpriority}
+    decoding="async"
+    class={className}
+  />
+)}

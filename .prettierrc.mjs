@@ -6,19 +6,13 @@ export default {
   trailingComma: 'es5',
   printWidth: 100,
 
-  plugins: ['prettier-plugin-astro', 'prettier-plugin-svelte', 'prettier-plugin-tailwindcss'],
+  plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
 
   overrides: [
     {
       files: '*.astro',
       options: {
         parser: 'astro',
-      },
-    },
-    {
-      files: '*.svelte',
-      options: {
-        parser: 'svelte',
       },
     },
   ],

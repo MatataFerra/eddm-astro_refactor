@@ -1,0 +1,45 @@
+---
+import { cn } from '@/lib/utils';
+import type { TripWeek } from '@/lib/adapters/trip-adapter';
+
+interface Props {
+  weeks: TripWeek[];
+  class?: string;
+}
+
+const { weeks, class: className } = Astro.props;
+const first = weeks[0];
+const links = weeks.map(({ slug, title, href }) => ({ slug, title, href }));
+---
+
+{first && (
+  <a
+    href={first.href}
+    data-trip-next
+    data-weeks={JSON.stringify(links)}
+    class={cn(
+      'border-ink hover:bg-ink hover:text-paper inline-flex min-h-12 items-center border px-5.5 text-[17px] no-underline transition-colors duration-200 active:scale-95',
+      className
+    )}
+  >
+    Empezá por el prólogo
+  </a>
+)}
+
+<script>
+  import { readWeeks } from '@/lib/store/viaje-store';
+
+  type WeekLink = { slug: string; title: string; href: string };
+
+  // Si ya leíste alguna semana, el botón te lleva a la primera que te falta
+  for (const button of document.querySelectorAll<HTMLAnchorElement>('[data-trip-next]')) {
+    const weeks: WeekLink[] = JSON.parse(button.dataset.weeks ?? '[]');
+    readWeeks.subscribe((read) => {
+      if (!read.length) return;
+      const next = weeks.find((week) => !read.includes(week.slug));
+      if (!next) return;
+      button.href = next.href;
+      button.textContent = `Seguí con ${next.title.toLowerCase()}`;
+    });
+  }
+</script>
