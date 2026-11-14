@@ -14,6 +14,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   logger: logHandlers.console({ level: 'debug' }),
+  // El markdown pasa por marked, no por el de Astro: Shiki (estilos inline) no hace falta
+  markdown: { syntaxHighlight: false },
+  // Astro calcula el hash de cada script y estilo inline y los declara en un <meta>: el HTML de
+  // Notion se renderiza tal cual, así que un <script> que se colara ahí no corre.
+  security: {
+    csp: {
+      directives: ["base-uri 'self'", "object-src 'none'", "form-action 'self'"],
+    },
+  },
   // Las fotos de R2 pasan por Vercel Image; Cloudinary e ImageKit se achican con sus propios
   // parámetros (src/lib/media/resize.ts) para no gastar cuota de Vercel en lo que ya hacen gratis.
   image: {
