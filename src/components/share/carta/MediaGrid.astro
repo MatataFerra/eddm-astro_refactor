@@ -52,7 +52,16 @@ const media = await Promise.all(
 );
 
 const single = media.length === 1;
-const columns = single ? '' : media.length === 2 ? 'sm:columns-2' : 'sm:columns-2 lg:columns-3';
+// Hasta tres, cada una en su columna: `columns-*` reparte por altura y con una foto alta y un
+// video deja la segunda columna vacía. Con más, la mampostería por columnas.
+const masonry = media.length > 3;
+const columns = single
+  ? ''
+  : media.length === 2
+    ? 'grid items-start sm:grid-cols-2'
+    : masonry
+      ? 'sm:columns-2 lg:columns-3'
+      : 'grid items-start sm:grid-cols-2 lg:grid-cols-3';
 const sizes = single
   ? '(min-width: 744px) 700px, 100vw'
   : media.length === 2
@@ -78,7 +87,7 @@ const sizes = single
         controls
         playsinline
         preload={item.poster ? 'none' : 'metadata'}
-        class="mb-3 max-h-[85vh] w-full break-inside-avoid"
+        class={cn('max-h-[85vh] w-full', masonry && 'mb-3 break-inside-avoid')}
       />
     ) : (
       <a
@@ -87,7 +96,7 @@ const sizes = single
         data-pswp-height={item.zoomHeight}
         target="_blank"
         aria-label={`Ampliar: ${item.alt}`}
-        class="mb-3 block cursor-zoom-in overflow-hidden break-inside-avoid"
+        class={cn('block cursor-zoom-in overflow-hidden', masonry && 'mb-3 break-inside-avoid')}
       >
         <Photo
           src={item.src}
