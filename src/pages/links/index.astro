@@ -24,6 +24,9 @@ const [tales, poems, further, articles, location] = await Promise.all([
   getCurrentLocation<Location>(),
 ]);
 
+// Cinco minutos en el CDN: lo nuevo aparece enseguida y las visitas no pegan siempre al backend
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+
 const place = location?.data ?? null;
 const timeZone = place?.metadata?.timeZone;
 const [latest] = adaptLetters({

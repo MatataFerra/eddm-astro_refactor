@@ -17,15 +17,23 @@ import type { ContentBySlug, ContentNavigate } from '@/lib/interfaces/share';
 import type { Article } from '@/lib/interfaces/articles';
 import type { Location } from '@/lib/interfaces/location';
 
+const SLUG_PATTERN = /^[a-z0-9-]{1,100}$/;
+
 const { slug } = Astro.params;
 
-const [response, articles, location] = await Promise.all([
-  getArticleContentFromNotion<ContentBySlug<Article>>({ query: slug }),
+// Se arma en cada visita: un slug que no puede existir no llega al backend
+if (!slug || !SLUG_PATTERN.test(slug)) return Astro.redirect('/404');
+
+const response = await getArticleContentFromNotion<ContentBySlug<Article>>({ query: slug });
+if (!response?.data) return Astro.redirect('/404');
+
+const [articles, location] = await Promise.all([
   getContentNavigate<ContentNavigate[]>('articles'),
   getCurrentLocation<Location>(),
 ]);
 
-if (!response?.data) return Astro.redirect('/404');
+// El viaje ya terminó: la semana casi no cambia, así que la sirve el CDN de Vercel
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
 
 const article = response.data;
 const entries = sortTripEntries(articles?.data ?? []);
