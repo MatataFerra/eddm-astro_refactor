@@ -1,9 +1,11 @@
 ---
+import { createHash } from 'node:crypto';
 import '../styles/global.css';
 import newsreaderFont from '@/assets/fonts/newsreader.woff2';
 import bodoniItalicFont from '@/assets/fonts/bodoni-moda-italic.woff2';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+import lightScript from '@/scripts/light.js?raw';
 
 interface Props {
   title: string;
@@ -13,6 +15,9 @@ interface Props {
 
 const { title, timeZone } = Astro.props;
 const fonts = [newsreaderFont, bodoniItalicFont];
+
+// Astro no calcula el hash de los scripts `is:inline`: sin esto la CSP no deja correr la luz
+Astro.csp?.insertScriptHash(`sha256-${createHash('sha256').update(lightScript).digest('base64')}`);
 
 // El panel del cielo es sólo para desarrollo: en el build esta rama desaparece y el import también
 const isDev = import.meta.env.NODE_ENV === 'development';
@@ -25,57 +30,7 @@ const SkyControls = isDev ? (await import('@/components/dev/SkyControls.astro'))
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f4f1" />
-    <script is:inline>
-      // La luz de la página es la de la hora donde estoy. Corre antes de pintar para no parpadear.
-      (() => {
-        const root = document.documentElement;
-        const dark = matchMedia('(prefers-color-scheme: dark)');
-
-        // El tamaño de letra que eligió el lector (src/lib/text-scale.ts)
-        try {
-          const scale = Number(localStorage.getItem('eddm_text_scale'));
-          if (scale >= 0.9 && scale <= 1.4) root.style.setProperty('--text-scale', String(scale));
-        } catch {}
-        const phaseAt = (hour) =>
-          hour < 6 ? 'night' : hour < 9 ? 'dawn' : hour < 18 ? 'day' : hour < 21 ? 'dusk' : 'night';
-
-        function hourThere() {
-          // El panel del cielo (sólo en desarrollo) puede fijar otra hora
-          if (root.dataset.devHour) return Number(root.dataset.devHour);
-          try {
-            const parts = new Intl.DateTimeFormat('en-GB', {
-              timeZone: root.dataset.tz || undefined,
-              hour: 'numeric',
-              minute: 'numeric',
-              hourCycle: 'h23',
-            }).formatToParts(new Date());
-            const get = (type) => Number(parts.find((p) => p.type === type)?.value ?? 0);
-            return get('hour') + get('minute') / 60;
-          } catch {
-            const now = new Date();
-            return now.getHours() + now.getMinutes() / 60;
-          }
-        }
-
-        function paint() {
-          const hour = hourThere();
-          let phase = phaseAt(hour);
-          // La hora real de allá, aunque el modo oscuro cambie la luz
-          root.dataset.hourPhase = phaseAt(hour);
-          // Quien navega en modo oscuro nunca recibe la luz de día
-          const isDark = root.dataset.devDark ? root.dataset.devDark === 'true' : dark.matches;
-          if (isDark && (phase === 'day' || phase === 'dawn')) phase = 'night';
-          root.dataset.phase = phase;
-          const paper = getComputedStyle(root).getPropertyValue('--color-paper').trim();
-          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', paper);
-        }
-
-        paint();
-        dark.addEventListener('change', paint);
-        document.addEventListener('eddm:sky', paint);
-        setInterval(paint, 5 * 60 * 1000);
-      })();
-    </script>
+    <script is:inline set:html={lightScript} />
     {fonts.map((font) => (
       <link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
     ))}
