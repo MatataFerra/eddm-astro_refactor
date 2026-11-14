@@ -1,6 +1,9 @@
 import { marked } from 'marked';
 import { getMediaSize } from '@/lib/media/dimensions';
 import { getVideoPoster } from '@/lib/media/poster';
+import { mapLimited } from '@/lib/async';
+
+const MEDIA_CONCURRENCY = 6;
 
 export type RelatoType = 'prose' | 'poem';
 
@@ -59,39 +62,38 @@ export async function processDiario(
       const mediaRegex = /(?:!\[(.*?)\]|\[(.*?)\])\((https?:\/\/.*?)\)/g;
       const mediaMatches = [...section.matchAll(mediaRegex)];
 
-      const media = await Promise.all(
-        mediaMatches.map(async (m) => {
-          const altOrName = m[1] || m[2] || '';
-          const url = m[3].trim();
+      // Cada foto se mide con un pedido remoto: pocas a la vez
+      const media = await mapLimited(mediaMatches, MEDIA_CONCURRENCY, async (m) => {
+        const altOrName = m[1] || m[2] || '';
+        const url = m[3].trim();
 
-          const isVideo = /\.(webm|mp4|mov|ogg|m4v)($|\?)/i.test(url);
+        const isVideo = /\.(webm|mp4|mov|ogg|m4v)($|\?)/i.test(url);
 
-          let dimensions = {
-            width: 1200,
-            height: 900,
-          };
+        let dimensions = {
+          width: 1200,
+          height: 900,
+        };
 
-          if (!isVideo) {
-            const response = await getMediaSize(url);
+        if (!isVideo) {
+          const response = await getMediaSize(url);
 
-            if (response) {
-              dimensions = response;
-            }
+          if (response) {
+            dimensions = response;
           }
+        }
 
-          const mediaType: 'image' | 'video' = isVideo ? 'video' : 'image';
+        const mediaType: 'image' | 'video' = isVideo ? 'video' : 'image';
 
-          return {
-            type: mediaType,
-            alt: altOrName,
-            src: url,
+        return {
+          type: mediaType,
+          alt: altOrName,
+          src: url,
 
-            poster: isVideo ? getVideoPoster(url) : undefined,
+          poster: isVideo ? getVideoPoster(url) : undefined,
 
-            ...dimensions,
-          };
-        })
-      );
+          ...dimensions,
+        };
+      });
 
       const rawText = section
         .replace(/^###\s+.*$/m, '')

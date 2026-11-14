@@ -1,9 +1,11 @@
 import { imageSize } from 'image-size';
+import { fetchMedia, readLimited } from '@/lib/media/remote';
 
 export async function getImageKitSize(url: string) {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+  const response = await fetchMedia(url);
+  if (!response.ok) return null;
+  const buffer = await readLimited(response);
+  if (!buffer) return null;
   const dimensions = imageSize(buffer);
 
   if (!dimensions.width || !dimensions.height) {

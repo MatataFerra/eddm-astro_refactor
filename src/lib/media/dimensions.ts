@@ -1,6 +1,7 @@
 import { detectProvider } from '@/lib/media/detect';
 import { getCloudinarySize } from '@/lib/media/providers/cloudinary';
 import { getImageKitSize } from '@/lib/media/providers/imagekit';
+import { fetchMedia, readLimited } from '@/lib/media/remote';
 import { imageSize } from 'image-size';
 
 export async function getMediaSize(url: string) {
@@ -25,9 +26,11 @@ export async function getMediaSize(url: string) {
 
 async function readSize(url: string, range?: string) {
   try {
-    const response = await fetch(url, range ? { headers: { Range: range } } : undefined);
+    const response = await fetchMedia(url, range ? { headers: { Range: range } } : undefined);
     if (!response.ok) return null;
-    const dimensions = imageSize(Buffer.from(await response.arrayBuffer()));
+    const buffer = await readLimited(response);
+    if (!buffer) return null;
+    const dimensions = imageSize(buffer);
     if (!dimensions.width || !dimensions.height) return null;
 
     // Las fotos del teléfono guardan la rotación aparte: 5 a 8 van giradas 90°
