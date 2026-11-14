@@ -1,4 +1,5 @@
 import type { Article } from '@/lib/interfaces/articles';
+import { API_URL } from 'astro:env/server';
 import { getAuthToken } from '@/lib/jwt';
 
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -66,7 +67,7 @@ async function _fetchData<T>(url: Url, opts: FetchOptions = {}): Promise<ApiResp
 
   const qs = new URLSearchParams(formatParams(mergedParams)).toString();
   // Siempre contra nuestro backend: el token nunca sale hacia otro host
-  const base = `${import.meta.env.API_URL}/api${url}`;
+  const base = `${API_URL}/api${url}`;
   const fullUrl = qs ? `${base}${base.includes('?') ? '&' : '?'}${qs}` : base;
 
   const res = await fetch(fullUrl, {
