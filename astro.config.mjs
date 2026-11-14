@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, logHandlers } from 'astro/config';
+import { defineConfig, envField, logHandlers } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 
@@ -10,6 +10,19 @@ const R2_HOST = 'pub-9dc7984a54eb44a383dc44cec5215bce.r2.dev';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  // Se leen al ejecutar, del entorno de Vercel: no quedan escritos en el bundle y rotarlos no pide
+  // un build nuevo. Importarlos desde código del navegador hace fallar el build.
+  env: {
+    schema: {
+      API_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: 'http://localhost:5500',
+      }),
+      FRONTEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      LOG_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

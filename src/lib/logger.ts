@@ -1,5 +1,7 @@
-const LOG_ENDPOINT = import.meta.env.API_URL ?? '';
-const LOG_TOKEN = import.meta.env.LOG_TOKEN ?? '';
+import { API_URL, LOG_TOKEN as TOKEN } from 'astro:env/server';
+
+const LOG_ENDPOINT = API_URL;
+const LOG_TOKEN = TOKEN ?? '';
 
 const THROTTLE_MS = 5000;
 const MAX_CONTEXT_LENGTH = 100;
