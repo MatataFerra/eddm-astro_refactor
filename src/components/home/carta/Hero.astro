@@ -15,10 +15,18 @@ const { place, timeZone, photo } = Astro.props;
 <section aria-label="Desde dónde escribo">
   <div class="mx-auto max-w-[700px] px-[22px] pt-[clamp(40px,9vh,96px)]">
     <Dateline as="h1" size="lg" place={place ?? undefined} date={new Date()} {timeZone} />
+    <!-- Ocupa su lugar desde el HTML: mientras llega la hora, un bloque de carga en vez de un salto -->
     {timeZone && (
-      <p class="text-muted mt-3.5 text-right text-base" data-clock hidden>
-        Acá son las <span class="text-lamp tabular-nums" data-clock-time />
-        <span data-clock-phase />.
+      <p class="text-muted mt-3.5 text-right text-base" data-clock aria-busy="true">
+        Acá son las{' '}
+        <span class="text-lamp tabular-nums" data-clock-time>
+          <span class="clock-loading w-[5ch]" />
+        </span>
+        <span data-clock-phase>
+          {' '}
+          <span class="clock-loading w-[11ch]" />
+        </span>
+        .
       </p>
     )}
   </div>
@@ -39,6 +47,33 @@ const { place, timeZone, photo } = Astro.props;
     </div>
   )}
 </section>
+
+<style>
+  .clock-loading {
+    display: inline-block;
+    height: 0.9em;
+    vertical-align: -0.1em;
+    border-radius: 2px;
+    background: var(--color-rule);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .clock-loading {
+      animation: clock-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes clock-pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  /* Sin JS no hay hora que esperar */
+  :global(:root:not([data-phase])) [data-clock] {
+    display: none;
+  }
+</style>
 
 <script>
   import { SKY_EVENT, formatHour, hourNow } from '@/lib/day-phases';
@@ -72,7 +107,7 @@ const { place, timeZone, photo } = Astro.props;
     clock.querySelector('[data-clock-time]')!.textContent = time;
     clock.querySelector('[data-clock-phase]')!.textContent =
       ` y ${PHASE_WORDS[root.dataset.hourPhase ?? 'day'] ?? ''}`;
-    clock.hidden = false;
+    clock.removeAttribute('aria-busy');
   }
 
   tick();
