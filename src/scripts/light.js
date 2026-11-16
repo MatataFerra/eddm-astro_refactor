@@ -8,6 +8,14 @@
     const scale = Number(localStorage.getItem('eddm_text_scale'));
     if (scale >= 0.9 && scale <= 1.4) root.style.setProperty('--text-scale', String(scale));
   } catch {}
+
+  // La luz que eligió el lector (LightPicker.astro); sin elección manda la hora de allá
+  const PHASES = ['dawn', 'day', 'dusk', 'night'];
+  try {
+    const light = localStorage.getItem('eddm_light');
+    if (PHASES.includes(light)) root.dataset.light = light;
+  } catch {}
+
   const phaseAt = (hour) =>
     hour < 6 ? 'night' : hour < 9 ? 'dawn' : hour < 18 ? 'day' : hour < 21 ? 'dusk' : 'night';
 
@@ -37,6 +45,8 @@
     // Quien navega en modo oscuro nunca recibe la luz de día
     const isDark = root.dataset.devDark ? root.dataset.devDark === 'true' : dark.matches;
     if (isDark && (phase === 'day' || phase === 'dawn')) phase = 'night';
+    // Lo que eligió el lector va por encima de todo, también del modo oscuro
+    if (PHASES.includes(root.dataset.light)) phase = root.dataset.light;
     root.dataset.phase = phase;
     const paper = getComputedStyle(root).getPropertyValue('--color-paper').trim();
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', paper);

@@ -5,8 +5,18 @@ export const DAY_START = 9;
 export const DUSK_START = 18;
 export const NIGHT_START = 21;
 
-/** Lo dispara el panel del cielo de desarrollo (SkyControls.astro) cuando fija otra hora o luz */
+/** Lo disparan el panel del cielo de desarrollo (SkyControls.astro) y el selector de luz cuando cambian la hora o la luz */
 export const SKY_EVENT = 'eddm:sky';
+
+export const PHASES = ['dawn', 'day', 'dusk', 'night'] as const;
+export type Phase = (typeof PHASES)[number];
+
+/** La luz que eligió el lector (LightPicker.astro). El script del <head> repite la clave. */
+export const LIGHT_KEY = 'eddm_light';
+
+export function isPhase(value: unknown): value is Phase {
+  return PHASES.includes(value as Phase);
+}
 
 /** La hora de allá, salvo que el panel de desarrollo haya fijado otra en `data-dev-hour` */
 export function hourNow(timeZone: string): number {
